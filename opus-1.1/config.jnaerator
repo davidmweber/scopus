@@ -1,0 +1,9 @@
+-library Opus
+///-arch linux_x64
+-jar ../lib/opus.jar
+-package za.co.monadic.scopus
+-mode StandaloneJar
+include/opus/opus.h
+
+lib/libopus.so
+
