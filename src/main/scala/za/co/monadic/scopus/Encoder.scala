@@ -7,7 +7,7 @@ import org.opuscodec.OpusLibrary._
  * Wrapper around the Opus codec's encoder subsystem.
  * The C interface is documented at [[http://www.opus-codec.org]] and should
  * be considered definitive. The encoder accepts buffers of duration of
- * 2,5, 5, 10, 20, 40 or 60ms. To calculate the buffer size, muliply your sample
+ * 2,5, 5, 10, 20, 40 or 60ms. To calculate the buffer size, multiply your sample
  * frequency by the frame duration. At 8kHz a 20ms packet is 160 samples long.
  * @param sampleFreq THe required sampling frequency
  * @param channels The number of channels you intend to encode.
@@ -16,6 +16,7 @@ import org.opuscodec.OpusLibrary._
 class Encoder(sampleFreq:Int, channels:Int, bufferSize: Int = 8192) extends Opus {
 
   val error : Pointer[Integer] = Pointer.allocateInts(1)
+  val decodePtr = Pointer.allocateBytes(bufferSize)
 
   //TODO: Not sure how to handle the cleanup for this pointer. Cannot trust finalize it seems....
   val encoder = opus_encoder_create(sampleFreq,channels,OPUS_APPLICATION_VOIP,error)
@@ -35,10 +36,9 @@ class Encoder(sampleFreq:Int, channels:Int, bufferSize: Int = 8192) extends Opus
   def encode(audio: Array[Short] ): Array[Byte] = {
     val encoded = new Array[Byte](bufferSize)
     val inPtr = Pointer.pointerToArray[java.lang.Short](audio)
-    val outPtr = Pointer.pointerToArray[java.lang.Byte](encoded)
-    val len = opus_encode(encoder,inPtr,audio.length,outPtr,bufferSize)
-    if (len < 0) throw new RuntimeException(s"opus_encode failed: ${errorString(len)}")
-    encoded.slice(0,len-1)
+    val len = opus_encode(encoder,inPtr,audio.length,decodePtr,bufferSize)
+    if (len < 0) throw new RuntimeException(s"opus_encode() failed: ${errorString(len)}")
+    decodePtr.getBytes(len)
   }
 
   /**
@@ -47,16 +47,15 @@ class Encoder(sampleFreq:Int, channels:Int, bufferSize: Int = 8192) extends Opus
    * @return An array containing the compressed audio
    */
   def encode(audio: Array[Float] ): Array[Byte] = {
-    val encoded = new Array[Byte](bufferSize)
     val inPtr = Pointer.pointerToArray[java.lang.Float](audio)
-    val outPtr = Pointer.pointerToArray[java.lang.Byte](encoded)
-    val len = opus_encode_float(encoder,inPtr,audio.length,outPtr,bufferSize)
-    if (len < 0) throw new RuntimeException(s"opus_encode_float failed: ${errorString(len)}")
-    encoded.slice(0,len-1)
+    val len = opus_encode_float(encoder,inPtr,audio.length,decodePtr,bufferSize)
+    if (len < 0) throw new RuntimeException(s"opus_encode_float() failed: ${errorString(len)}")
+    decodePtr.getBytes(len)
   }
 
   override def finalize() {
     opus_encoder_destroy(encoder)
+    decodePtr.release()
   }
 
   def reset = opus_encoder_ctl(encoder, OPUS_RESET_STATE)

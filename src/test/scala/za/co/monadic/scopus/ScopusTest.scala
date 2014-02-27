@@ -23,7 +23,9 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
     it("encode and decode audio segments as Short types") {
       Given("a PCM file coded as an array of short integers")
       val audio = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
-      val chunks = audio.grouped(160).toList // 20ms chunks of audio in 1 statement. Gotta love Scala :)
+      val nChunks = (audio.length / 160) * 160
+      // A list of 20ms chunks of audio rounded up to a whole number of blocks. Gotta love Scala :)
+      val chunks = audio.slice(0,nChunks).grouped(160).toList
       val enc = new Encoder(8000,1)
       val dec = new Decoder(8000,1)
 
@@ -36,7 +38,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
       decoded.length should equal (chunks.length)
 
       And("the decoded packet length should be the same as the coded packet length")
-      coded.head.length should equal (chunks.head.length)
+      decoded.head.length should equal (chunks.head.length)
 
       And("the decoded audio should sound the same as the original audio")
     }

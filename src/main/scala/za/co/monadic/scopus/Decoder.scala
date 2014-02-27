@@ -32,7 +32,7 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
     val inPtr = Pointer.pointerToArray[java.lang.Byte](compressedAudio)
     val outPtr = Pointer.pointerToArray[java.lang.Short](decoded)
     val len = opus_decode(decoder,inPtr,compressedAudio.length,outPtr,bufferLen, fec)
-    if (len < 0) throw new RuntimeException(s"opus_encode failed: ${errorString(len)}")
+    if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${errorString(len)}")
     decoded.slice(0,len-1)
   }
 
@@ -44,7 +44,7 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
     val decoded = new Array[Short](bufferLen)
     val outPtr = Pointer.pointerToArray[java.lang.Short](decoded)
     val len = opus_decode(decoder,nullBytePtr,0,outPtr,bufferLen, fec)
-    if (len < 0) throw new RuntimeException(s"opus_encode failed: ${errorString(len)}")
+    if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${errorString(len)}")
     decoded.slice(0,len-1)
   }
 
@@ -59,7 +59,7 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
     val inPtr = Pointer.pointerToArray[java.lang.Byte](compressedAudio)
     val outPtr = Pointer.pointerToArray[java.lang.Float](decoded)
     val len = opus_decode_float(decoder,inPtr,compressedAudio.length,outPtr, bufferLen, fec)
-    if (len < 0) throw new RuntimeException(s"opus_encode failed: ${errorString(len)}")
+    if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${errorString(len)}")
     decoded.slice(0,len-1)
   }
 
@@ -71,7 +71,7 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
     val decoded = new Array[Float](bufferLen)
     val outPtr = Pointer.pointerToArray[java.lang.Float](decoded)
     val len = opus_decode_float(decoder, nullBytePtr,0,outPtr, bufferLen, fec)
-    if (len < 0) throw new RuntimeException(s"opus_encode failed: ${errorString(len)}")
+    if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${errorString(len)}")
     decoded.slice(0,len-1)
   }
 
