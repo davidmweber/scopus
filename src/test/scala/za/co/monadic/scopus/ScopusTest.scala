@@ -18,6 +18,10 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
     audio
   }
 
+  def energy(audio: Array[Short]) : Double = {
+      audio.map( a => a.toDouble*a.toDouble).sum / audio.length.toDouble
+  }
+
   describe("Opus codec can") {
 
     it("encode and decode audio segments as Short types") {
@@ -41,6 +45,11 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
       decoded.head.length should equal (chunks.head.length)
 
       And("the decoded audio should sound the same as the original audio")
+      // Break the input and output audio streams into 5ms chunks and compute the energy in each chunk
+      val in = chunks.toArray.flatten.grouped(40).toList
+      val out = chunks.toArray.flatten.grouped(40).toList
+      val energyDeltas = for ( (a,b) <- in zip out ) yield energy(a) - energy(b)
+      energyDeltas.sum should be < 0.01
     }
 
     it("encode and decode audio segments as Float types") (pending)

@@ -34,7 +34,6 @@ class Encoder(sampleFreq:Int, channels:Int, bufferSize: Int = 8192) extends Opus
    * @return An array containing the compressed audio
    */
   def encode(audio: Array[Short] ): Array[Byte] = {
-    val encoded = new Array[Byte](bufferSize)
     val inPtr = Pointer.pointerToArray[java.lang.Short](audio)
     val len = opus_encode(encoder,inPtr,audio.length,decodePtr,bufferSize)
     if (len < 0) throw new RuntimeException(s"opus_encode() failed: ${errorString(len)}")
