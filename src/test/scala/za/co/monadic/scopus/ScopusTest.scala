@@ -18,47 +18,25 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
     audio
   }
 
-  // Imperative all the way, but we are working with Arrays. Purists, look away now.
-  def chunk[A: Manifest](buf: Array[A],chunkSize: Int): List[Array[A]] = {
-    var cnt = 0
-    var chunkCnt = 0
-    val chunkList = List[Array[A]]()
-    var chunk = new Array[A](chunkSize)
-    do {
-      chunk(chunkCnt) = buf(cnt)
-      chunkCnt += 1
-      cnt += 1
-      if (chunkCnt == chunkSize) {
-        chunkCnt = 0
-        chunkList ++ chunk
-        chunk = new Array[A](chunkSize)
-      }
-    } while (cnt < buf.length)
-    chunkList
-  }
-
   describe("Opus codec can") {
 
     it("encode and decode audio segments as Short types") {
       Given("a PCM file coded as an array of short integers")
-      val uAudio = readAudioFile("torvalds-says-linux.int.raw")
-      val chunks = chunk(uAudio,160) // 20ms chunks of audio spewed at the encoder
-      val coded = List[Array[Byte]]()
+      val audio = readAudioFile("torvalds-says-linux.int.raw")
+      val chunks = audio.grouped(160).toList // 20ms chunks of audio in 1 statement. Gotta love Scala :)
       val enc = new Encoder(8000,1)
       val dec = new Decoder(8000,1)
-      val decoded = List[Array[Short]]()
 
-      When("the audio is encoded and decoded")
-      for (c <- chunks) {
-        coded ++ enc.encode(c)
-      }
-      for (c <- coded) {
-        decoded ++ dec.decode(c)
-      }
+      When("the audio is encoded and then decoded")
+      val coded = for (c <- chunks) yield enc.encode(c)
+      val decoded  = for (c <- coded)  yield dec.decode(c)
 
-      Then("the number of packets in the original, doded and decoded streams should be the same")
+      Then("the number of packets in the original, coded and decoded streams should be the same")
       coded.length should equal (chunks.length)
       decoded.length should equal (chunks.length)
+
+      And("the decoded packet length should be the same as the coded packet length")
+      coded.head.length should equal (chunks.head.length)
 
       And("the decoded audio should sound the same as the original audio")
     }
