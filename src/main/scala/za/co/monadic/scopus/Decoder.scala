@@ -8,7 +8,7 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
 
   val bufferLen: Int = math.round(0.120f*Fs*channels)
   var fec = 1
-  val nullBytePtr = 0.asInstanceOf[Pointer[java.lang.Byte]]
+  val nullBytePtr = Pointer.NULL.asInstanceOf[Pointer[java.lang.Byte]]
   val error : Pointer[Integer] = Pointer.allocateInts(1)
   val decoder = opus_decoder_create(Fs, channels, error)
 
