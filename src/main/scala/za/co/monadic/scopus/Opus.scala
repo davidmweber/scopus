@@ -1,5 +1,5 @@
 package za.co.monadic.scopus
-import za.co.monadic.scopus.OpusLibrary._
+import org.opuscodec.OpusLibrary._
 /**
  *
  */

@@ -1,21 +1,78 @@
 package za.co.monadic.scopus
 
-import za.co.monadic.scopus.OpusLibrary._
+import org.opuscodec.OpusLibrary._
 import org.bridj.Pointer
 
-/**
- * Decoder implementation
- */
+
 class Decoder(Fs:Int, channels:Int) extends Opus {
 
+  val bufferLen: Int = math.round(0.120f*Fs*channels)
+  var fec = 1
+  val nullBytePtr = 0.asInstanceOf[Pointer[java.lang.Byte]]
   val error : Pointer[Integer] = Pointer.allocateInts(1)
   val decoder = opus_decoder_create(Fs, channels, error)
+
+
   if (error.get() != OPUS_OK) {
     throw new RuntimeException(s"Failed to create the Opus encoder: ${errorString(error.get())}")
   }
+
   val ret = opus_decoder_init(decoder,Fs,channels)
   if (ret != OPUS_OK) {
     throw new RuntimeException(s"Failed to initialise the Opus encoder")
+  }
+
+  /**
+   * Decode an audio packet to an array of Shorts
+   * @param compressedAudio The incoming audio packet
+   * @return Decoded audio packet
+   */
+  def decode(compressedAudio: Array[Byte] ): Array[Short] = {
+    val decoded = new Array[Short](bufferLen)
+    val inPtr = Pointer.pointerToArray[java.lang.Byte](compressedAudio)
+    val outPtr = Pointer.pointerToArray[java.lang.Short](decoded)
+    val len = opus_decode(decoder,inPtr,compressedAudio.length,outPtr,bufferLen, fec)
+    if (len < 0) throw new RuntimeException(s"opus_encode failed: ${errorString(len)}")
+    decoded.slice(0,len-1)
+  }
+
+  /**
+   * Decode an erased (i.e. not received) audio packet
+   * @return The decompressed audio for this packet
+   */
+  def decode(): Array[Short] = {
+    val decoded = new Array[Short](bufferLen)
+    val outPtr = Pointer.pointerToArray[java.lang.Short](decoded)
+    val len = opus_decode(decoder,nullBytePtr,0,outPtr,bufferLen, fec)
+    if (len < 0) throw new RuntimeException(s"opus_encode failed: ${errorString(len)}")
+    decoded.slice(0,len-1)
+  }
+
+
+  /**
+   * Decode an audio packet to an array of Floats
+   * @param compressedAudio The incoming audio packet
+   * @return Decoded audio packet
+   */
+  def decodeFloat(compressedAudio: Array[Byte] ): Array[Float] = {
+    val decoded = new Array[Float](bufferLen)
+    val inPtr = Pointer.pointerToArray[java.lang.Byte](compressedAudio)
+    val outPtr = Pointer.pointerToArray[java.lang.Float](decoded)
+    val len = opus_decode_float(decoder,inPtr,compressedAudio.length,outPtr, bufferLen, fec)
+    if (len < 0) throw new RuntimeException(s"opus_encode failed: ${errorString(len)}")
+    decoded.slice(0,len-1)
+  }
+
+  /**
+   * Decode an erased (i.e. not received) audio packet
+   * @return The decompressed audio for this packet
+   */
+  def decodeFloat(): Array[Float] = {
+    val decoded = new Array[Float](bufferLen)
+    val outPtr = Pointer.pointerToArray[java.lang.Float](decoded)
+    val len = opus_decode_float(decoder, nullBytePtr,0,outPtr, bufferLen, fec)
+    if (len < 0) throw new RuntimeException(s"opus_encode failed: ${errorString(len)}")
+    decoded.slice(0,len-1)
   }
 
   private def getter(command: Int) : Int = {
@@ -32,8 +89,6 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
     if (err != OPUS_OK) throw new RuntimeException(s"opus_encoder_ctl setter failed for command $command: ${errorString(err)}")
   }
 
-  def decode(audio: Array[Byte] ): Array[Byte] = Array[Byte](0,0,0)
-
   def reset = opus_decoder_ctl(decoder, OPUS_RESET_STATE)
 
   def getSampleRate = getter(OPUS_GET_SAMPLE_RATE_REQUEST)
@@ -44,6 +99,22 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
   def getLastPacketDuration = getter(OPUS_GET_LAST_PACKET_DURATION_REQUEST)
 
   def setGain(gain: Int) = setter(OPUS_SET_GAIN_REQUEST,gain)
+
+  /**
+   * Custom setter for the FEC mode in the decoder
+   * @param useFec If true, employ error correction if it is available in the packet
+   */
+  def setFec(useFec: Boolean) = {
+    fec = if (useFec) 1 else 0
+  }
+
+  /**
+   * Returns the current FEC decoding status.
+   * @return  True if FEC is being decoded
+   */
+  def getFec(useFec: Boolean) = {
+    fec == 1
+  }
 
 }
 
