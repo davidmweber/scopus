@@ -22,7 +22,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
 
     it("encode and decode audio segments as Short types") {
       Given("a PCM file coded as an array of short integers")
-      val audio = readAudioFile("torvalds-says-linux.int.raw")
+      val audio = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
       val chunks = audio.grouped(160).toList // 20ms chunks of audio in 1 statement. Gotta love Scala :)
       val enc = new Encoder(8000,1)
       val dec = new Decoder(8000,1)
