@@ -9,7 +9,7 @@ The sources for Opus can be downloaded [here](http://www.opus-codec.org/download
 
 Licensing
 ---------
-Scopus is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/) with the exception that
+Scopus is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/) with the exception of
 files in the `opus-1.1/include` directory which are subject to the [Opus License](http://www.opus-codec.org/license/).
 
 Building
