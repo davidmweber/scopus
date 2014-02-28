@@ -1,6 +1,6 @@
-Scotus
+Scopus
 ------
-Scotus is a Scala interface to the [Opus codec](http://www.opus-codec.org). It is light and thin by design and gives programmers access to the bulk of the functionality in Opus. It uses [JNaerator](https://code.google.com/p/jnaerator/) and [Bridj](https://code.google.com/p/nativelibs4java/) to handle the native code and is presently restricted to Linux code.
+Scopus is a Scala interface to the [Opus codec](http://www.opus-codec.org). It is light and thin by design and gives programmers access to the bulk of the functionality in Opus. It uses [JNaerator](https://code.google.com/p/jnaerator/) and [Bridj](https://code.google.com/p/nativelibs4java/) to handle the native code and is presently restricted to Linux code.
 
 It is capable of encoding and decoding an audio stream but should be considered very alpha
 
