@@ -15,16 +15,19 @@ import org.opuscodec.OpusLibrary._
  */
 class Encoder(sampleFreq:Int, channels:Int, bufferSize: Int = 8192) extends Opus {
 
-  val error : Pointer[Integer] = Pointer.allocateInts(1)
+  val errorPtr : Pointer[Integer] = Pointer.allocateInts(1)
   val decodePtr = Pointer.allocateBytes(bufferSize)
 
   //TODO: Not sure how to handle the cleanup for this pointer. Cannot trust finalize it seems....
-  val encoder = opus_encoder_create(sampleFreq,channels,OPUS_APPLICATION_VOIP,error)
-  if (error.get() != OPUS_OK) {
-    throw new RuntimeException(s"Failed to create the Opus encoder: ${errorString(error.get())}")
+  val encoder = opus_encoder_create(sampleFreq,channels,OPUS_APPLICATION_VOIP,errorPtr)
+  val error = errorPtr.get()
+  errorPtr.release()
+  if (error != OPUS_OK) {
+    throw new RuntimeException(s"Failed to create the Opus encoder: ${errorString(error)}")
   }
   val ret = opus_encoder_init(encoder,sampleFreq,channels,OPUS_APPLICATION_VOIP)
   if (ret != OPUS_OK) {
+    encoder.release()
     throw new RuntimeException(s"Failed to initialise the Opus encoder")
   }
 

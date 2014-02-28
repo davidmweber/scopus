@@ -2,7 +2,7 @@
 import java.io.{BufferedInputStream, FileInputStream, DataInputStream}
 import org.scalatest._
 import za.co.monadic.scopus.Decoder
-
+import Numeric.Implicits._
 class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
 
 
@@ -18,18 +18,26 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
     audio
   }
 
+  def sqr[A : Numeric](a:A):A = a * a
+
   def energy(audio: Array[Short]) : Double = {
-      audio.map( a => a.toDouble*a.toDouble).sum / audio.length.toDouble
+      audio.map( a => sqr(a.toDouble/(1<<15))).sum / audio.length.toDouble
   }
 
   def energy(audio: Array[Float]) : Double = {
-    audio.map( a => a.toDouble*a.toDouble).sum / audio.length.toDouble
+    audio.map( a => sqr(a)).sum / audio.length.toDouble
+  }
+
+  def correlate(a:List[Double], b: List[Double]): Double = {
+    val top = (for ((x,y) <- a zip b ) yield x*y).sum/a.length
+    val bottom = math.sqrt(a.map(sqr(_)).sum/a.length) * math.sqrt(b.map(sqr(_)).sum/a.length)
+    top/bottom
   }
 
   describe("Opus codec can") {
 
     val audio = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
-    val audioFloat = audio.map( _.toFloat)
+    val audioFloat = audio.map( _.toFloat/(1<<15)) // Normalise to +-1.0
     val nChunks = (audio.length / 160) * 160
     // A list of 20ms chunks of audio rounded up to a whole number of blocks. Gotta love Scala :)
     val chunks = audio.slice(0,nChunks).grouped(160).toList
@@ -57,8 +65,9 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
       // Break the input and output audio streams into 5ms chunks and compute the energy in each chunk
       val in = chunks.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
-      val energyDeltas = for ( (a,b) <- in zip out ) yield energy(a) - energy(b)
-      energyDeltas.sum should be < 0.01
+      val eIn = for (a <- in) yield energy(a)
+      val eOut = for (a <- out) yield energy(a)
+      correlate(eIn,eOut) should be > 0.94
     }
 
     it("encode and decode audio segments as Float types") {
@@ -80,8 +89,9 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
       // Break the input and output audio streams into 5ms chunks and compute the energy in each chunk
       val in = chunksFloat.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
-      val energyDeltas = for ( (a,b) <- in zip out ) yield energy(a) - energy(b)
-      energyDeltas.sum should be < 0.01
+      val eIn = for (a <- in) yield energy(a)
+      val eOut = for (a <- out) yield energy(a)
+      correlate(eIn,eOut) should be > 0.94
     }
 
     it("get and set all the encoder parameters") (pending)

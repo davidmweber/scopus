@@ -7,22 +7,23 @@ import org.bridj.Pointer
 class Decoder(Fs:Int, channels:Int) extends Opus {
 
   val bufferLen: Int = math.round(0.120f*Fs*channels)
-  var fec = 1
+  var fec = 0
   val nullBytePtr = Pointer.NULL.asInstanceOf[Pointer[java.lang.Byte]]
-  val error : Pointer[Integer] = Pointer.allocateInts(1)
-  val decoder = opus_decoder_create(Fs, channels, error)
-  val decodedShortPtr = Pointer.allocateShorts(2880*channels) // 60ms of audio at 48kHz
-  val decodedFloatPtr = Pointer.allocateFloats(2880*channels) // 60ms of audio at 48kHz
-
-
-  if (error.get() != OPUS_OK) {
-    throw new RuntimeException(s"Failed to create the Opus encoder: ${errorString(error.get())}")
+  val errorPtr : Pointer[Integer] = Pointer.allocateInts(1)
+  val decoder = opus_decoder_create(Fs, channels, errorPtr)
+  val error = errorPtr.get()
+  errorPtr.release()
+  if (error != OPUS_OK) {
+    throw new RuntimeException(s"Failed to create the Opus encoder: ${errorString(error)}")
   }
 
   val ret = opus_decoder_init(decoder,Fs,channels)
   if (ret != OPUS_OK) {
+    decoder.release()
     throw new RuntimeException(s"Failed to initialise the Opus encoder")
   }
+  val decodedShortPtr = Pointer.allocateShorts(2880*channels) // 60ms of audio at 48kHz
+  val decodedFloatPtr = Pointer.allocateFloats(2880*channels) // 60ms of audio at 48kHz
 
   /**
    * Decode an audio packet to an array of Shorts
@@ -34,7 +35,6 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
     val len = opus_decode(decoder,inPtr,compressedAudio.length,decodedShortPtr,bufferLen, fec)
     inPtr.release()
     if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${errorString(len)}")
-    //for (i <- 0 until 10) println(decodedShortPtr.getShortAtIndex(i))
     decodedShortPtr.getShorts(len)
   }
 
@@ -75,7 +75,7 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
    * Release all pointers allocated for the decoder. Make every attempt to call this
    * when you are done with the encoder as finalise() is what it is in the JVM
    */
-  def cleanup() = {
+  def cleanup() : Unit = {
     decodedFloatPtr.release()
     decodedShortPtr.release()
     opus_decoder_destroy(decoder)
