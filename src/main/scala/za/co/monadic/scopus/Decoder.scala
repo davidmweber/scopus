@@ -4,20 +4,20 @@ import org.opuscodec.OpusLibrary._
 import org.bridj.Pointer
 
 
-class Decoder(Fs:Int, channels:Int) extends Opus {
+class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
 
-  val bufferLen: Int = math.round(0.120f*Fs*channels)
+  val bufferLen: Int = math.round(0.120f*Fs()*channels)
   var fec = 0
   val nullBytePtr = Pointer.NULL.asInstanceOf[Pointer[java.lang.Byte]]
   val errorPtr : Pointer[Integer] = Pointer.allocateInts(1)
-  val decoder = opus_decoder_create(Fs, channels, errorPtr)
+  val decoder = opus_decoder_create(Fs(), channels, errorPtr)
   val error = errorPtr.get()
   errorPtr.release()
   if (error != OPUS_OK) {
     throw new RuntimeException(s"Failed to create the Opus encoder: ${errorString(error)}")
   }
 
-  val ret = opus_decoder_init(decoder,Fs,channels)
+  val ret = opus_decoder_init(decoder,Fs(),channels)
   if (ret != OPUS_OK) {
     decoder.release()
     throw new RuntimeException(s"Failed to initialise the Opus encoder")
@@ -126,6 +126,9 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
 
 }
 
+object Decoder {
+  def apply(Fs:SampleFrequency, channels:Int) = new Decoder(Fs,channels)
+}
 
 /*
 

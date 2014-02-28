@@ -28,6 +28,36 @@ java -jar <path to jnaerator>/jnaerator-0.11-shaded.jar
 You should end up with an new version of `opus.jar` in the `lib` directory.The parameters used for the build are in `opus-1.1/config.jnaerator`.
 
 
+Usage
+-----
+
+Encoding a stream is pretty simple. Java is big endian while most raw audio data are little endian (at least on Intel Architectures). Bridj takes
+care of most endian issues for you so trade in arrays of Short and Float. Endcoding is simple
+
+```scala
+  val enc = Encoder(Sf8000,1)
+  enc.setSetDtx(1)
+
+  //...
+
+  val audio = getAudioFromSomewhere()
+  val encoded = enc.encode(audio)
+
+  // Send compressed audio to wherever
+```
+
+Decoding is just as simple:
+```scala
+  val dec = Decoder(Sf8000,1)
+
+  //...
+  val packet = getCompressedPacket()
+  val audio = enc.encode(codedPacket)
+
+  // Play audio....
+```
+
+
 Caveats
 -------
 Some functions in the Opus native library do not resolve properly and are not accessible. JNaerator emits warnings for these functions. Fortunately, the crucial functions for mono and stereo coding do resolve correctly.

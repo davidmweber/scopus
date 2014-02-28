@@ -1,6 +1,6 @@
 
 import org.bridj.Pointer
-import za.co.monadic.scopus.Opus
+import za.co.monadic.scopus._
 import org.opuscodec.OpusLibrary._
 
 /**
@@ -13,19 +13,19 @@ import org.opuscodec.OpusLibrary._
  * @param channels The number of channels you intend to encode.
  * @param bufferSize The reserved size of the buffer to which compressed data are written
  */
-class Encoder(sampleFreq:Int, channels:Int, bufferSize: Int = 8192) extends Opus {
+class Encoder(sampleFreq:SampleFrequency, channels:Int, bufferSize: Int = 8192) extends Opus {
 
   val errorPtr : Pointer[Integer] = Pointer.allocateInts(1)
   val decodePtr = Pointer.allocateBytes(bufferSize)
 
   //TODO: Not sure how to handle the cleanup for this pointer. Cannot trust finalize it seems....
-  val encoder = opus_encoder_create(sampleFreq,channels,OPUS_APPLICATION_VOIP,errorPtr)
+  val encoder = opus_encoder_create(sampleFreq(),channels,OPUS_APPLICATION_VOIP,errorPtr)
   val error = errorPtr.get()
   errorPtr.release()
   if (error != OPUS_OK) {
     throw new RuntimeException(s"Failed to create the Opus encoder: ${errorString(error)}")
   }
-  val ret = opus_encoder_init(encoder,sampleFreq,channels,OPUS_APPLICATION_VOIP)
+  val ret = opus_encoder_init(encoder,sampleFreq(),channels,OPUS_APPLICATION_VOIP)
   if (ret != OPUS_OK) {
     encoder.release()
     throw new RuntimeException(s"Failed to initialise the Opus encoder")
@@ -120,4 +120,6 @@ class Encoder(sampleFreq:Int, channels:Int, bufferSize: Int = 8192) extends Opus
 
 }
 
-
+object Encoder {
+  def apply(sampleFreq:SampleFrequency, channels:Int, bufferSize: Int = 8192) = new Encoder(sampleFreq,channels,bufferSize)
+}

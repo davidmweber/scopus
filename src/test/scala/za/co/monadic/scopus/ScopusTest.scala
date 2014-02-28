@@ -1,8 +1,9 @@
 
 import java.io.{BufferedInputStream, FileInputStream, DataInputStream}
 import org.scalatest._
-import za.co.monadic.scopus.Decoder
+import za.co.monadic.scopus._
 import Numeric.Implicits._
+
 class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
 
 
@@ -34,17 +35,17 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
     top/bottom
   }
 
+  val audio = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
+  val audioFloat = audio.map( _.toFloat/(1<<15)) // Normalise to +-1.0
+  val nChunks = (audio.length / 160) * 160
+  // A list of 20ms chunks of audio rounded up to a whole number of blocks. Gotta love Scala :)
+  val chunks = audio.slice(0,nChunks).grouped(160).toList
+  val chunksFloat = audioFloat.slice(0,nChunks).grouped(160).toList
+
+  val enc = Encoder(Sf8000,1)
+  val dec = Decoder(Sf8000,1)
+
   describe("Opus codec can") {
-
-    val audio = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
-    val audioFloat = audio.map( _.toFloat/(1<<15)) // Normalise to +-1.0
-    val nChunks = (audio.length / 160) * 160
-    // A list of 20ms chunks of audio rounded up to a whole number of blocks. Gotta love Scala :)
-    val chunks = audio.slice(0,nChunks).grouped(160).toList
-    val chunksFloat = audioFloat.slice(0,nChunks).grouped(160).toList
-
-    val enc = new Encoder(8000,1)
-    val dec = new Decoder(8000,1)
 
     it("encode and decode audio segments as Short types") {
       Given("a PCM file coded as an array of short integers and a codec pair")
@@ -94,11 +95,22 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen {
       correlate(eIn,eOut) should be > 0.94
     }
 
+    it("constructs decoders and encoders for all frequencies") {
+      try {
+        val e = List(Encoder(Sf8000,1),Encoder(Sf16000,1),Encoder(Sf24000,1),Encoder(Sf48000,1))
+        val d = List(Decoder(Sf8000,1),Decoder(Sf16000,1),Decoder(Sf24000,1),Decoder(Sf48000,1))
+        e.map(_.cleanup())
+        d.map(_.cleanup())
+      } catch {
+        case e: Exception => fail(s"Received exception ${e.getMessage}")
+      }
+    }
+
     it("get and set all the encoder parameters") (pending)
     it("get and set all the decoder parameters") (pending)
     it("deal with FEC on decode") (pending)
     it("decode erased packets for Short data")(pending)
     it("decode erased packets for Float data")(pending)
-
   }
+
 }
