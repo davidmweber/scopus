@@ -36,6 +36,7 @@ class Encoder(sampleFreq:Int, channels:Int, bufferSize: Int = 8192) extends Opus
   def encode(audio: Array[Short] ): Array[Byte] = {
     val inPtr = Pointer.pointerToArray[java.lang.Short](audio)
     val len = opus_encode(encoder,inPtr,audio.length,decodePtr,bufferSize)
+    inPtr.release()
     if (len < 0) throw new RuntimeException(s"opus_encode() failed: ${errorString(len)}")
     decodePtr.getBytes(len)
   }
@@ -48,14 +49,21 @@ class Encoder(sampleFreq:Int, channels:Int, bufferSize: Int = 8192) extends Opus
   def encode(audio: Array[Float] ): Array[Byte] = {
     val inPtr = Pointer.pointerToArray[java.lang.Float](audio)
     val len = opus_encode_float(encoder,inPtr,audio.length,decodePtr,bufferSize)
+    inPtr.release()
     if (len < 0) throw new RuntimeException(s"opus_encode_float() failed: ${errorString(len)}")
     decodePtr.getBytes(len)
   }
 
-  override def finalize() {
+  /**
+   * Release all pointers allocated for the encoder. Make every attempt to call this
+   * when you are done with the encoder as finalise() is what it is in the JVM
+   */
+  def cleanup() = {
     opus_encoder_destroy(encoder)
     decodePtr.release()
   }
+
+  override def finalize() = cleanup()
 
   def reset = opus_encoder_ctl(encoder, OPUS_RESET_STATE)
 

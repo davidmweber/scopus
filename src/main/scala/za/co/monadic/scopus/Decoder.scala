@@ -32,7 +32,9 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
   def decode(compressedAudio: Array[Byte] ): Array[Short] = {
     val inPtr = Pointer.pointerToArray[java.lang.Byte](compressedAudio)
     val len = opus_decode(decoder,inPtr,compressedAudio.length,decodedShortPtr,bufferLen, fec)
+    inPtr.release()
     if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${errorString(len)}")
+    //for (i <- 0 until 10) println(decodedShortPtr.getShortAtIndex(i))
     decodedShortPtr.getShorts(len)
   }
 
@@ -54,6 +56,7 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
   def decodeFloat(compressedAudio: Array[Byte] ): Array[Float] = {
     val inPtr = Pointer.pointerToArray[java.lang.Byte](compressedAudio)
     val len = opus_decode_float(decoder,inPtr,compressedAudio.length,decodedFloatPtr, bufferLen, fec)
+    inPtr.release()
     if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${errorString(len)}")
     decodedFloatPtr.getFloats(len)
   }
@@ -68,11 +71,17 @@ class Decoder(Fs:Int, channels:Int) extends Opus {
     decodedFloatPtr.getFloats(len)
   }
 
-  override def finalize() = {
+  /**
+   * Release all pointers allocated for the decoder. Make every attempt to call this
+   * when you are done with the encoder as finalise() is what it is in the JVM
+   */
+  def cleanup() = {
     decodedFloatPtr.release()
     decodedShortPtr.release()
     opus_decoder_destroy(decoder)
   }
+
+  override def finalize() = cleanup()
 
   private def getter(command: Int) : Int = {
     assert(command %2 == 1) // Getter commands are all odd
