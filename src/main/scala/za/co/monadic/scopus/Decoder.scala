@@ -85,22 +85,24 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
 
   private def getter(command: Int) : Int = {
     assert(command %2 == 1) // Getter commands are all odd
-    val result: Integer = 0
-    val err: Int = opus_decoder_ctl(decoder,command,Pointer.pointerToInt(result))
-    if (err != OPUS_OK) throw new RuntimeException(s"opus_encoder_ctl failed for command $command: ${errorString(err)}")
-    result
+    val result : Pointer[Integer] = Pointer.allocateInts(1)
+    val err: Int = opus_decoder_ctl(decoder,command,result)
+    val ret = result.get()
+    result.release()
+    if (err != OPUS_OK) throw new RuntimeException(s"opus_decoder_ctl failed for command $command: ${errorString(err)}")
+    ret
   }
 
   private def setter(command: Integer, parameter: Integer): Unit = {
     assert(command %2 == 0) // Setter commands are even
     val err = opus_decoder_ctl(decoder, command, parameter)
-    if (err != OPUS_OK) throw new RuntimeException(s"opus_encoder_ctl setter failed for command $command: ${errorString(err)}")
+    if (err != OPUS_OK) throw new RuntimeException(s"opus_decoder_ctl setter failed for command $command: ${errorString(err)}")
   }
 
   def reset = opus_decoder_ctl(decoder, OPUS_RESET_STATE)
 
   def getSampleRate = getter(OPUS_GET_SAMPLE_RATE_REQUEST)
-  def getLookahead = getter(OPUS_GET_LOOKAHEAD_REQUEST)
+  def getLookAhead = getter(OPUS_GET_LOOKAHEAD_REQUEST)
   def getBandwidth = getter(OPUS_GET_BANDWIDTH_REQUEST)
   def getPitch = getter(OPUS_GET_PITCH_REQUEST)
   def getGain = getter(OPUS_GET_GAIN_REQUEST)

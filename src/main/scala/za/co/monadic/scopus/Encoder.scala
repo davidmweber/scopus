@@ -77,11 +77,13 @@ class Encoder(sampleFreq:SampleFrequency, channels:Int, bufferSize: Int = 8192) 
   }
 
   private def getter(command: Int) : Int = {
-    assert(command %2 == 1) // Getter commands are even
-    val result: Integer = 0
-    val err: Int = opus_encoder_ctl(encoder,command,Pointer.pointerToInt(result))
+    assert(command %2 == 1) // Getter commands are all odd
+    val result : Pointer[Integer] = Pointer.allocateInts(1)
+    val err: Int = opus_encoder_ctl(encoder,command,result)
+    val ret = result.get()
+    result.release()
     if (err != OPUS_OK) throw new RuntimeException(s"opus_encoder_ctl getter failed for command $command: ${errorString(err)}")
-    result
+    ret
   }
 
   def setComplexity(complexity: Integer) = setter(OPUS_SET_COMPLEXITY_REQUEST, complexity)
