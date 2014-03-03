@@ -6,6 +6,7 @@ import Numeric.Implicits._
 
 class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAndAfterAll {
 
+  // Byteswap. Needed for testing on Intel architectures
   def swap(in: Short): Short = ((in >> 8) + ((in & 0xff) << 8)).asInstanceOf[Short]
 
   def readAudioFile(file: String): Array[Short] = {
@@ -19,12 +20,12 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
   }
 
   /**
-    * Writes a raw audio file that can be played back using sox as
-    * "play -r 8000 -b 16 -e signed <filename.raw> "
-    * @param file Name of the file to write to
-    * @param data Array containing the data formatted as Short
-    */
-  def writeAudioFile(file:String, data: Array[Short]): Unit = {
+   * Writes a raw audio file that can be played back using sox as
+   * "play -r 8000 -b 16 -e signed <filename.raw> "
+   * @param file Name of the file to write to
+   * @param data Array containing the data formatted as Short
+   */
+  def writeAudioFile(file: String, data: Array[Short]): Unit = {
     val stream = new FileOutputStream(file)
     val outfile = new DataOutputStream(new BufferedOutputStream(stream))
     for (i <- 0 until data.length) outfile.writeShort(swap(data(i)))
@@ -41,9 +42,17 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
     audio.map(a => sqr(a)).sum / audio.length.toDouble
   }
 
+  /**
+   * Calculates the correlation coefficient using Pearson's formula.
+   * @param a List for first sequence
+   * @param b List for second sequence
+   * @return Computed correlation coefficient.
+   */
   def correlate(a: List[Double], b: List[Double]): Double = {
-    val top = (for ((x, y) <- a zip b) yield x * y).sum / a.length
-    val bottom = math.sqrt(a.map(sqr(_)).sum / a.length) * math.sqrt(b.map(sqr(_)).sum / a.length)
+    val aAve = a.sum / a.length
+    val bAve = b.sum / b.length
+    val top = (for ((x, y) <- a zip b) yield (x - aAve) * (y - bAve)).sum
+    val bottom = math.sqrt(a.map((t: Double) => sqr(t - aAve)).sum) * math.sqrt(b.map((t: Double) => sqr(t - bAve)).sum)
     top / bottom
   }
 
@@ -88,7 +97,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
       val eOut = for (a <- out) yield energy(a)
-      correlate(eIn, eOut) should be > 0.94 // This is a pretty decent test if all is well
+      correlate(eIn, eOut) should be > 0.93 // This is a pretty decent test if all is well
       // Uncomment for audible verification.
       //writeAudioFile("test-short.raw",decoded.toArray.flatten)
     }
@@ -114,18 +123,22 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
       val eOut = for (a <- out) yield energy(a)
-      correlate(eIn, eOut) should be > 0.94
+      correlate(eIn, eOut) should be > 0.93
     }
 
     it("constructs decoders and encoders for all frequencies") {
       try {
+        Given("a set of sampling frequencies for the encoders and decoders")
         val freqs = List(8000, 12000, 16000, 24000, 48000)
+        When("they are constructed for different sample frequencies")
         val e = List(Encoder(Sf8000, 1), Encoder(Sf12000, 1), Encoder(Sf16000, 1), Encoder(Sf24000, 1), Encoder(Sf48000, 1))
         val d = List(Decoder(Sf8000, 1), Decoder(Sf12000, 1), Decoder(Sf16000, 1), Decoder(Sf24000, 1), Decoder(Sf48000, 1))
+        Then("the encoder structures return the correct sample frequency it was configured for")
         for ((f, t) <- freqs zip e) {
           t.getSampleRate should equal(f)
         }
         e.map(_.cleanup())
+        And("the decoder structures return the correct frequencies")
         for ((f, t) <- freqs zip d) {
           t.getSampleRate should equal(f)
         }
@@ -151,7 +164,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       enc.reset
       dec.reset
       val coded = for (c <- chunks) yield enc.encode(c)
-      val decoded = // Decode, dropping every 100th packet
+      val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
           p = if (i % 10 == 1) dec.decode() else dec.decode(c)
@@ -162,24 +175,24 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val eOut = for (a <- out) yield energy(a)
       val rho = correlate(eIn, eOut)
       //writeAudioFile("test-short-erasure.raw",decoded.toArray.flatten)
-      rho should be > 0.92
+      rho should be > 0.91
     }
 
     it("decode erased packets for Float data") {
       enc.reset
       dec.reset
       val coded = for (c <- chunksFloat) yield enc.encode(c)
-      val decoded = // Decode, dropping every 100th packet
+      val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if ( i % 10 == 1) dec.decodeFloat() else dec.decodeFloat(c)
+          p = if (i % 10 == 1) dec.decodeFloat() else dec.decodeFloat(c)
         } yield p
       val in = chunksFloat.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
       val eOut = for (a <- out) yield energy(a)
       val rho = correlate(eIn, eOut)
-      rho should be > 0.92
+      rho should be > 0.91
     }
   }
 
