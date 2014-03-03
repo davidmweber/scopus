@@ -24,7 +24,7 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
   }
   val decodedShortPtr = Pointer.allocateShorts(2880*channels) // 60ms of audio at 48kHz
   val decodedFloatPtr = Pointer.allocateFloats(2880*channels) // 60ms of audio at 48kHz
-
+  var clean = false
   /**
    * Decode an audio packet to an array of Shorts
    * @param compressedAudio The incoming audio packet
@@ -76,9 +76,12 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
    * when you are done with the encoder as finalise() is what it is in the JVM
    */
   def cleanup() : Unit = {
-    decodedFloatPtr.release()
-    decodedShortPtr.release()
-    opus_decoder_destroy(decoder)
+    if (!clean) {
+      decodedFloatPtr.release()
+      decodedShortPtr.release()
+      opus_decoder_destroy(decoder)
+      clean = true
+    }
   }
 
   override def finalize() = cleanup()

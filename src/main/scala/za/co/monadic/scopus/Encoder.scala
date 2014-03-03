@@ -31,6 +31,7 @@ class Encoder(sampleFreq:SampleFrequency, channels:Int, bufferSize: Int = 8192) 
     throw new RuntimeException(s"Failed to initialise the Opus encoder")
   }
 
+  var clean = false
   /**
    * Encode a block of raw audio  in integer format using the configured encoder
    * @param audio Audio data arranged as a contiguous block interleaved array of short integers
@@ -62,8 +63,11 @@ class Encoder(sampleFreq:SampleFrequency, channels:Int, bufferSize: Int = 8192) 
    * when you are done with the encoder as finalise() is what it is in the JVM
    */
   def cleanup() = {
-    opus_encoder_destroy(encoder)
-    decodePtr.release()
+    if (!clean) {
+      opus_encoder_destroy(encoder)
+      decodePtr.release()
+      clean = true
+    }
   }
 
   override def finalize() = cleanup()
