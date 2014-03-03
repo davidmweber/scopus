@@ -1,5 +1,5 @@
 
-import java.io.{BufferedInputStream, FileInputStream, DataInputStream}
+import java.io._
 import org.scalatest._
 import za.co.monadic.scopus._
 import Numeric.Implicits._
@@ -16,6 +16,19 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
     for (i <- 0 to len / 2 - 1) audio(i) = swap(infile.readShort())
     infile.close()
     audio
+  }
+
+  /**
+    * Writes a raw audio file that can be played back using sox as
+    * "play -r 8000 -b 16 -e signed <filename.raw> "
+    * @param file Name of the file to write to
+    * @param data Array containing the data formatted as Short
+    */
+  def writeAudioFile(file:String, data: Array[Short]): Unit = {
+    val stream = new FileOutputStream(file)
+    val outfile = new DataOutputStream(new BufferedOutputStream(stream))
+    for (i <- 0 until data.length) outfile.writeShort(swap(data(i)))
+    outfile.close()
   }
 
   def sqr[A: Numeric](a: A): A = a * a
@@ -75,7 +88,9 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
       val eOut = for (a <- out) yield energy(a)
-      correlate(eIn, eOut) should be > 0.94
+      correlate(eIn, eOut) should be > 0.94 // This is a pretty decent test if all is well
+      // Uncomment for audible verification.
+      //writeAudioFile("test-short.raw",decoded.toArray.flatten)
     }
 
     it("encode and decode audio segments as Float types") {
@@ -139,14 +154,15 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val decoded = // Decode, dropping every 100th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 45 == 5) dec.decode() else dec.decode(c)
+          p = if (i % 10 == 1) dec.decode() else dec.decode(c)
         } yield p
       val in = chunks.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
       val eOut = for (a <- out) yield energy(a)
       val rho = correlate(eIn, eOut)
-      rho should be > 0.94
+      //writeAudioFile("test-short-erasure.raw",decoded.toArray.flatten)
+      rho should be > 0.92
     }
 
     it("decode erased packets for Float data") {
@@ -156,14 +172,14 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val decoded = // Decode, dropping every 100th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if ( i % 45 == 5) dec.decodeFloat() else dec.decodeFloat(c)
+          p = if ( i % 10 == 1) dec.decodeFloat() else dec.decodeFloat(c)
         } yield p
       val in = chunksFloat.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
       val eOut = for (a <- out) yield energy(a)
       val rho = correlate(eIn, eOut)
-      rho should be > 0.94
+      rho should be > 0.92
     }
   }
 

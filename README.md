@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/davidmweber/scopus.png?branch=master)](https://travis-ci.org/davidmweber/scopus)
 Scopus
 ------
 Scopus is a Scala interface to the [Opus codec](http://www.opus-codec.org). It is light and thin by design and gives programmers access to the bulk of the functionality in Opus. It uses [JNaerator](https://code.google.com/p/jnaerator/) and [Bridj](https://code.google.com/p/nativelibs4java/) to handle the native code and is presently restricted to Linux code.
