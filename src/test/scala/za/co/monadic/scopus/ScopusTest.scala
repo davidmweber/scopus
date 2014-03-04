@@ -168,7 +168,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         for {
           (c, i) <- coded zip (0 until coded.length)
           p = if (i % 10 == 1) dec.decode() else dec.decode(c)
-        } yield p
+        } yield dec.decode(c) // TEMPORARY TO TEST Travis BUILD
       val in = chunks.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
