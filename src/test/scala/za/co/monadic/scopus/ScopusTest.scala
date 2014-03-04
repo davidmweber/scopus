@@ -57,8 +57,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
   }
 
   val audio = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
-  val audioFloat = audio.map(_.toFloat / (1 << 15))
-  // Normalise to +-1.0
+  val audioFloat = audio.map(_.toFloat / (1 << 15))  // Normalise to +-1.0
   val nChunks = (audio.length / 160) * 160
   // A list of 20ms chunks of audio rounded up to a whole number of blocks. Gotta love Scala :)
   val chunks = audio.slice(0, nChunks).grouped(160).toList
@@ -167,8 +166,8 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 10 == 1) dec.decode() else dec.decode(c)
-        } yield dec.decode(c) // TEMPORARY TO TEST Travis BUILD
+          p = if (i % 100 == 1) dec.decode() else dec.decode(c)
+        } yield p
       val in = chunks.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
