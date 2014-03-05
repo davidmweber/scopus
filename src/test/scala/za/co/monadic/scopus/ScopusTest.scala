@@ -58,10 +58,10 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
   val audio = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
   val audioFloat = audio.map(_.toFloat / (1 << 15))  // Normalise to +-1.0
-  val nChunks = (audio.length / 160) * 160
+  val nSamples = (audio.length / 160) * 160
   // A list of 20ms chunks of audio rounded up to a whole number of blocks. Gotta love Scala :)
-  val chunks = audio.slice(0, nChunks).grouped(160).toList
-  val chunksFloat = audioFloat.slice(0, nChunks).grouped(160).toList
+  val chunks = audio.slice(0, nSamples).grouped(160).toList
+  val chunksFloat = audioFloat.slice(0, nSamples).grouped(160).toList
 
   val enc = Encoder(Sf8000, 1)
   val dec = Decoder(Sf8000, 1)
@@ -193,6 +193,38 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val rho = correlate(eIn, eOut)
       rho should be > 0.91
     }
+  }
+
+  describe("Performance test will") {
+
+    val repeats = 50
+
+    it("meet basic encoder speed requirements"){
+      enc.reset
+      val tStart = System.currentTimeMillis()
+      for ( i <- 0 until repeats) {
+        for (c <- chunks) enc.encode(c)
+      }
+      val duration = (System.currentTimeMillis() - tStart)/1000.0 // Seconds
+      val speed = repeats*nSamples/duration/8000.0  // Samples per second
+      speed should be > 100.0
+      info(f"Encoder runs at $speed%5.1f times real time")
+    }
+
+    it("meets basic decoder speed requirements"){
+      enc.reset
+      dec.reset
+      val tStart = System.currentTimeMillis()
+      val coded = for (c <- chunks) yield enc.encode(c)
+      for ( i <- 0 until repeats) {
+        for (c <- coded) dec.decode(c)
+      }
+      val duration = (System.currentTimeMillis() - tStart)/1000.0 // Seconds
+      val speed = repeats*nSamples/duration/8000.0  // Samples per second
+      speed should be > 1000.0
+      info(f"Decoder runs at $speed%5.1f times real time")
+    }
+
   }
 
 }
