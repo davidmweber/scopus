@@ -7,7 +7,7 @@
 int main() {
 
   FILE *fp;
-  fp = fopen("torvalds-says-linux.int.raw","rb");
+  fp = fopen("../audio_samples/torvalds-says-linux.int.raw","rb");
   fseek(fp, 0L, SEEK_END);
   int sz = ftell(fp)/2;
   fseek(fp, 0L, SEEK_SET);
@@ -21,6 +21,10 @@ int main() {
   OpusEncoder *enc;
   enc = opus_encoder_create(8000, 1, OPUS_APPLICATION_VOIP, &error);
   if (error == 0) {
+    int ret = 0;
+    error = opus_encoder_ctl(enc,OPUS_SET_COMPLEXITY(2));
+    error = opus_encoder_ctl(enc,OPUS_SET_SIGNAL(OPUS_SIGNAL_VOICE));
+    printf("Complexity = %d\n", ret);
     int count = 0;
     int i = 0;
     struct timeval t1,t2;

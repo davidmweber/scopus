@@ -201,6 +201,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
     it("meet basic encoder speed requirements"){
       enc.reset
+      enc.setComplexity(2)
       val tStart = System.currentTimeMillis()
       for ( i <- 0 until repeats) {
         for (c <- chunks) enc.encode(c)
@@ -221,7 +222,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       }
       val duration = (System.currentTimeMillis() - tStart)/1000.0 // Seconds
       val speed = repeats*nSamples/duration/8000.0  // Samples per second
-      speed should be > 1000.0
+      speed should be > 500.0
       info(f"Decoder runs at $speed%5.1f times real time")
     }
 
