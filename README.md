@@ -1,11 +1,11 @@
-<!-- [![Build Status](https://travis-ci.org/davidmweber/scopus.png?branch=master)](https://travis-ci.org/davidmweber/scopus) --!>
+<!-- [![Build Status](https://travis-ci.org/davidmweber/scopus.png?branch=master)](https://travis-ci.org/davidmweber/scopus) -->
 Scopus
 ------
 Scopus is a Scala interface to the [Opus codec](http://www.opus-codec.org). It is light and thin by design and gives
 programmers access to the bulk of the functionality in Opus.
 It uses [JNaerator](https://code.google.com/p/jnaerator/) to handle the native code and is presently restricted to Linux code.
 Benchmarks performed on the encoder show that it is 9% slower than a native C implementation. On a 3.5Ghz i5, it runs
-at 120 times real time. The decoder runs at around 1300 times real time.
+at 300 times real time (complexity factor set to 2). The decoder runs at around 1300 times real time.
 
 The relevant headers for [Opus](http://www.opus-codec.org) are included in the source code as is the Linux 64bit library.
 The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/).

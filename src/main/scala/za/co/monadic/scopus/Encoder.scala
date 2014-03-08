@@ -18,7 +18,6 @@ class Encoder(sampleFreq:SampleFrequency, channels:Int, bufferSize: Int = 8192) 
   val errorPtr : Pointer[Integer] = Pointer.allocateInts(1)
   val decodePtr = Pointer.allocateBytes(bufferSize)
 
-  //TODO: Not sure how to handle the cleanup for this pointer. Cannot trust finalize it seems....
   val encoder = opus_encoder_create(sampleFreq(),channels,OPUS_APPLICATION_VOIP,errorPtr)
   val error = errorPtr.get()
   errorPtr.release()

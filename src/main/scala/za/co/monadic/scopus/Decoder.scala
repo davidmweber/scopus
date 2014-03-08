@@ -45,7 +45,10 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
   def decode(): Array[Short] = {
     val len = opus_decode(decoder,nullBytePtr,0,decodedShortPtr,bufferLen, fec)
     if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${errorString(len)}")
-    decodedShortPtr.getShorts(len)
+    val temp = decodedShortPtr.getShorts(len)
+    for (i <- 0 until 20) print(s"${temp(i)}, ")
+    println()
+    temp
   }
 
   /**
@@ -128,7 +131,6 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
   def getFec(useFec: Boolean) = {
     fec == 1
   }
-
 }
 
 object Decoder {
