@@ -73,7 +73,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
   describe("Opus codec can") {
 
-    it("encode and decode audio segments as Short types") {
+    ignore("encode and decode audio segments as Short types") {
       Given("a PCM file coded as an array of short integers and a codec pair")
       enc.reset
       dec.reset
@@ -101,7 +101,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       //writeAudioFile("test-short.raw",decoded.toArray.flatten)
     }
 
-    it("encode and decode audio segments as Float types") {
+    ignore("encode and decode audio segments as Float types") {
       Given("a PCM file coded as an array of short integers and a codec pair")
       enc.reset
       dec.reset
@@ -199,7 +199,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
     val repeats = 50
 
-    it("meet basic encoder speed requirements"){
+    ignore("meet basic encoder speed requirements"){
       enc.reset
       enc.setComplexity(2)
       val tStart = System.currentTimeMillis()
@@ -212,7 +212,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       info(f"Encoder runs at $speed%5.1f times real time")
     }
 
-    it("meets basic decoder speed requirements"){
+    ignore("meets basic decoder speed requirements"){
       enc.reset
       dec.reset
       val tStart = System.currentTimeMillis()

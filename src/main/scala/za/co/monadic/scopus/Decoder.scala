@@ -25,6 +25,7 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
   val decodedShortPtr = Pointer.allocateShorts(2880*channels) // 60ms of audio at 48kHz
   val decodedFloatPtr = Pointer.allocateFloats(2880*channels) // 60ms of audio at 48kHz
   var clean = false
+
   /**
    * Decode an audio packet to an array of Shorts
    * @param compressedAudio The incoming audio packet
@@ -35,7 +36,12 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
     val len = opus_decode(decoder,inPtr,compressedAudio.length,decodedShortPtr,bufferLen, fec)
     inPtr.release()
     if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${errorString(len)}")
-    decodedShortPtr.getShorts(len)
+    //decodedShortPtr.getShorts(len)
+    val temp = decodedShortPtr.getShorts(len)
+    print("-->")
+    for (i <- 0 until 20) print(s"${temp(i)}, ")
+    println()
+    temp
   }
 
   /**
@@ -46,6 +52,7 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
     val len = opus_decode(decoder,nullBytePtr,0,decodedShortPtr,bufferLen, fec)
     if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${errorString(len)}")
     val temp = decodedShortPtr.getShorts(len)
+    print("*->")
     for (i <- 0 until 20) print(s"${temp(i)}, ")
     println()
     temp
