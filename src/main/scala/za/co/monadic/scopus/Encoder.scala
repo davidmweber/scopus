@@ -1,6 +1,6 @@
+package za.co.monadic.scopus
 
 import org.bridj.Pointer
-import za.co.monadic.scopus._
 import org.opuscodec.OpusLibrary._
 
 /**
