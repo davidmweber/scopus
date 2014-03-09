@@ -1,9 +1,0 @@
--library opus
-///-arch linux_x64
--jar ../lib/opus.jar
--package org.opuscodec
-include/opus/opus.h
-include/opus/opus_multistream.h
-lib/libopus.so
--mode StandaloneJar
-
