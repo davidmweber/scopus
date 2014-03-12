@@ -1,5 +1,6 @@
 package za.co.monadic.scopus
 
+
 /**
  * Scala interface to the Opus codec API. With the exception of the *_ctl() commands, this
  * is pretty much a 1:1 mapping from Scala to the C API. See the Opus documentation for
@@ -8,8 +9,16 @@ package za.co.monadic.scopus
 object Opus {
 
   /**
-   * Loads the native JNI library.
+   * Loads the native JNI library. It uses a very clever trick to reload the java.library.path
+   * at runtime. Details are at:
+   * http://blog.cedarsoft.com/2010/11/setting-java-library-path-programmatically/
    */
+
+  System.setProperty( "java.library.path", "/home/dave/work/scopus/lib/native/linux-64/" )
+
+  val fieldSysPath = classOf[ClassLoader].getDeclaredField( "sys_paths" )
+  fieldSysPath.setAccessible( true )
+  fieldSysPath.set( null, null )
   System.loadLibrary("jni_opus")
 
   @native
@@ -118,5 +127,5 @@ object Opus {
   final val OPUS_BANDWIDTH_WIDEBAND: Int = 1103
   final val OPUS_INVALID_PACKET: Int = -4
   final val OPUS_ALLOC_FAIL: Int = -7
-  final val OPUS_OK: Int = 0  
+  final val OPUS_OK: Int = 0
 }

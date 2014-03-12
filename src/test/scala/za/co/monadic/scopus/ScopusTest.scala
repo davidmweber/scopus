@@ -176,7 +176,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       rho should be > 0.91
     }
 
-    it("decode erased packets for Float data") {
+    ignore("decode erased packets for Float data") {
       enc.reset
       dec.reset
       val coded = for (c <- chunksFloat) yield enc.encode(c)
@@ -198,7 +198,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
     val repeats = 50
 
-    ignore("meet basic encoder speed requirements"){
+    it("meet basic encoder speed requirements"){
       enc.reset
       enc.setComplexity(2)
       val tStart = System.currentTimeMillis()
@@ -211,7 +211,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       info(f"Encoder runs at $speed%5.1f times real time")
     }
 
-    ignore("meets basic decoder speed requirements"){
+    it("meets basic decoder speed requirements"){
       enc.reset
       dec.reset
       val tStart = System.currentTimeMillis()
