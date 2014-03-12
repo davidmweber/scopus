@@ -17,18 +17,18 @@ JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1create
 
 /*
  * Class:     za_co_monadic_scopus_Opus__
- * Method:    decode
+ * Method:    decode_short
  * Signature: (J[BI[SII)I
  */
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decode__J_3BI_3SII
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decode_1short
   (JNIEnv *, jobject, jlong, jbyteArray, jint, jshortArray, jint, jint);
 
 /*
  * Class:     za_co_monadic_scopus_Opus__
- * Method:    decode
+ * Method:    decode_float
  * Signature: (J[BI[FII)I
  */
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decode__J_3BI_3FII
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decode_1float
   (JNIEnv *, jobject, jlong, jbyteArray, jint, jfloatArray, jint, jint);
 
 /*
@@ -42,41 +42,41 @@ JNIEXPORT void JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1destroy
 /*
  * Class:     za_co_monadic_scopus_Opus__
  * Method:    decoder_get_ctl
- * Signature: (J[I)I
+ * Signature: (JI[I)I
  */
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1get_1ctl
-  (JNIEnv *, jobject, jlong, jintArray);
+  (JNIEnv *, jobject, jlong, jint, jintArray);
 
 /*
  * Class:     za_co_monadic_scopus_Opus__
  * Method:    decoder_set_ctl
- * Signature: (JI)V
+ * Signature: (JII)I
  */
-JNIEXPORT void JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1set_1ctl
-  (JNIEnv *, jobject, jlong, jint);
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1set_1ctl
+  (JNIEnv *, jobject, jlong, jint, jint);
 
 /*
  * Class:     za_co_monadic_scopus_Opus__
  * Method:    encoder_create
- * Signature: (II[I)J
+ * Signature: (III[I)J
  */
 JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1create
-  (JNIEnv *, jobject, jint, jint, jintArray);
+  (JNIEnv *, jobject, jint, jint, jint, jintArray);
 
 /*
  * Class:     za_co_monadic_scopus_Opus__
- * Method:    encode
+ * Method:    encode_short
  * Signature: (J[SI[BI)I
  */
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encode__J_3SI_3BI
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encode_1short
   (JNIEnv *, jobject, jlong, jshortArray, jint, jbyteArray, jint);
 
 /*
  * Class:     za_co_monadic_scopus_Opus__
- * Method:    encode
+ * Method:    encode_float
  * Signature: (J[FI[BI)I
  */
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encode__J_3FI_3BI
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encode_1float
   (JNIEnv *, jobject, jlong, jfloatArray, jint, jbyteArray, jint);
 
 /*
@@ -90,18 +90,18 @@ JNIEXPORT void JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1destroy
 /*
  * Class:     za_co_monadic_scopus_Opus__
  * Method:    encoder_get_ctl
- * Signature: (J[I)I
+ * Signature: (JI[I)I
  */
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1get_1ctl
-  (JNIEnv *, jobject, jlong, jintArray);
+  (JNIEnv *, jobject, jlong, jint, jintArray);
 
 /*
  * Class:     za_co_monadic_scopus_Opus__
  * Method:    encoder_set_ctl
- * Signature: (JI)V
+ * Signature: (JII)I
  */
-JNIEXPORT void JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1set_1ctl
-  (JNIEnv *, jobject, jlong, jint);
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1set_1ctl
+  (JNIEnv *, jobject, jlong, jint, jint);
 
 /*
  * Class:     za_co_monadic_scopus_Opus__

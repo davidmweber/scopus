@@ -1,11 +1,15 @@
 package za.co.monadic.scopus
 
+/**
+ * Scala interface to the Opus codec API. With the exception of the *_ctl() commands, this
+ * is pretty much a 1:1 mapping from Scala to the C API. See the Opus documentation for
+ * details on these calls.
+ */
 object Opus {
 
   /**
    * Loads the native JNI library.
    */
-  //System.loadLibrary("opus")
   System.loadLibrary("jni_opus")
 
   @native

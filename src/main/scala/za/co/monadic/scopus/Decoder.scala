@@ -1,14 +1,15 @@
 package za.co.monadic.scopus
 
 import za.co.monadic.scopus.Opus._
-class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
+
+class Decoder(Fs:SampleFrequency, channels:Int) {
 
   val bufferLen: Int = math.round(0.120f*Fs()*channels)
   var fec = 0
   val error = Array[Int](0)
   val decoder = decoder_create(Fs(), channels, error)
   if (error(0) != OPUS_OK) {
-    throw new RuntimeException(s"Failed to create the Opus encoder: ${error_string(error)}")
+    throw new RuntimeException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
   }
 
   val decodedShortBuf = new Array[Short](2880*channels) // 60ms of audio at 48kHz
@@ -21,7 +22,6 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
    * @return Decoded audio packet
    */
   def decode(compressedAudio: Array[Byte] ): Array[Short] = {
-
     val len = decode_short(decoder,compressedAudio,compressedAudio.length,decodedShortBuf,bufferLen, fec)
     if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${error_string(len)}")
     decodedShortBuf.slice(0,len)
@@ -43,11 +43,9 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
    * @return Decoded audio packet
    */
   def decodeFloat(compressedAudio: Array[Byte] ): Array[Float] = {
-    val inPtr = Pointer.pointerToArray[java.lang.Byte](compressedAudio)
-    val len = opus_decode_float(decoder,inPtr,compressedAudio.length,decodedFloatBuf, bufferLen, fec)
-    inPtr.release()
-    if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${errorString(len)}")
-    decodedFloatBuf.getFloats(len)
+    val len = decode_float(decoder,compressedAudio,compressedAudio.length,decodedFloatBuf, bufferLen, fec)
+    if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${error_string(len)}")
+    decodedFloatBuf.slice(0,len)
   }
 
   /**
@@ -55,9 +53,9 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
    * @return The decompressed audio for this packet
    */
   def decodeFloat(): Array[Float] = {
-    val len = opus_decode_float(decoder, nullBytePtr,0,decodedFloatBuf, bufferLen, fec)
-    if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${errorString(len)}")
-    decodedFloatBuf.getFloats(len)
+    val len = decode_float(decoder, Array[Byte](0),0,decodedFloatBuf, bufferLen, fec)
+    if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${error_string(len)}")
+    decodedFloatBuf.slice(0,len)
   }
 
   /**
@@ -66,9 +64,7 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
    */
   def cleanup() : Unit = {
     if (!clean) {
-      decodedFloatBuf.release()
-      decodedShortBuf.release()
-      opus_decoder_destroy(decoder)
+      decoder_destroy(decoder)
       clean = true
     }
   }
@@ -77,21 +73,19 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
 
   private def getter(command: Int) : Int = {
     assert(command %2 == 1) // Getter commands are all odd
-    val result : Pointer[Integer] = Pointer.allocateInts(1)
-    val err: Int = opus_decoder_ctl(decoder,command,result)
-    val ret = result.get()
-    result.release()
-    if (err != OPUS_OK) throw new RuntimeException(s"opus_decoder_ctl failed for command $command: ${errorString(err)}")
-    ret
+    val result = Array[Int](0)
+    val err: Int = decoder_get_ctl(decoder,command,result)
+    if (err != OPUS_OK) throw new RuntimeException(s"opus_decoder_ctl failed for command $command: ${error_string(err)}")
+    result(0)
   }
 
   private def setter(command: Integer, parameter: Integer): Unit = {
     assert(command %2 == 0) // Setter commands are even
-    val err = opus_decoder_ctl(decoder, command, parameter)
-    if (err != OPUS_OK) throw new RuntimeException(s"opus_decoder_ctl setter failed for command $command: ${errorString(err)}")
+    val err = decoder_set_ctl(decoder, command, parameter)
+    if (err != OPUS_OK) throw new RuntimeException(s"opus_decoder_ctl setter failed for command $command: ${error_string(err)}")
   }
 
-  def reset = opus_decoder_ctl(decoder, OPUS_RESET_STATE)
+  def reset =  decoder_set_ctl(decoder, OPUS_RESET_STATE,0)
 
   def getSampleRate = getter(OPUS_GET_SAMPLE_RATE_REQUEST)
   def getLookAhead = getter(OPUS_GET_LOOKAHEAD_REQUEST)
