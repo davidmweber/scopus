@@ -100,7 +100,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       //writeAudioFile("test-short.raw",decoded.toArray.flatten)
     }
 
-    ignore("encode and decode audio segments as Float types") {
+    it("encode and decode audio segments as Float types") {
       Given("a PCM file coded as an array of short integers and a codec pair")
       enc.reset
       dec.reset
@@ -176,7 +176,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       rho should be > 0.91
     }
 
-    ignore("decode erased packets for Float data") {
+    it("decode erased packets for Float data") {
       enc.reset
       dec.reset
       val coded = for (c <- chunksFloat) yield enc.encode(c)

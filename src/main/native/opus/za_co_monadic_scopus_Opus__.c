@@ -3,13 +3,13 @@
 
 JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1create
   (JNIEnv *env, jobject clazz, jint Fs, jint channels, jintArray err){
-      int error;
-      OpusDecoder *decoder = opus_decoder_create(Fs, channels, &error);
-      int *err_ret = (*env)->GetPrimitiveArrayCritical(env, err, 0);
-      err_ret[0] = error;
-      (*env)->ReleasePrimitiveArrayCritical(env, err, err_ret, 0);
-      return (jlong) decoder;
-  }
+  int error;
+  OpusDecoder *decoder = opus_decoder_create(Fs, channels, &error);
+  int *err_ret = (*env)->GetPrimitiveArrayCritical(env, err, 0);
+  err_ret[0] = error;
+  (*env)->ReleasePrimitiveArrayCritical(env, err, err_ret, 0);
+  return (jlong) decoder;
+}
 
 
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decode_1short
@@ -33,7 +33,20 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decode_1short
 
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decode_1float
   (JNIEnv *env, jobject clazz, jlong decoder, jbyteArray input, jint len_in, jfloatArray decoded, jint len_out, jint fec) {
-    return -1;
+  jbyte *in_ptr;
+  jbyte *dec_ptr;
+  jint ret;
+  in_ptr = (*env)->GetPrimitiveArrayCritical(env, input, 0);
+  if (in_ptr == 0) return OPUS_ALLOC_FAIL;
+  dec_ptr = (*env)->GetPrimitiveArrayCritical(env, decoded, 0);
+  if (dec_ptr == 0) {
+    (*env)->ReleasePrimitiveArrayCritical(env, input, in_ptr, 0);
+    return OPUS_ALLOC_FAIL;
+  }
+  ret = opus_decode_float( (OpusDecoder *) decoder, (unsigned char *) in_ptr, len_in, (float *) dec_ptr, len_out, fec);
+  (*env)->ReleasePrimitiveArrayCritical(env, decoded, dec_ptr, 0);
+  (*env)->ReleasePrimitiveArrayCritical(env, input, in_ptr, 0);
+  return ret;
 }
 
 JNIEXPORT void JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1destroy
@@ -59,7 +72,6 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1set_1ctl
   return error;
 }
 
-
 JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1create
   (JNIEnv *env, jobject clazz, jint Fs, jint channels, jint application, jintArray err) {
   int error;
@@ -69,8 +81,6 @@ JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1create
   (*env)->ReleasePrimitiveArrayCritical(env, err, err_ret, 0);
   return (jlong) enc;
 }
-
-
 
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encode_1short
   (JNIEnv *env, jobject clazz, jlong encoder, jshortArray input, jint len_in, jbyteArray coded, jint len_out) {
@@ -89,16 +99,29 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encode_1short
   (*env)->ReleasePrimitiveArrayCritical(env, input, in_ptr, 0);
   return ret;
 }
-/*
+
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encode_1float
-  (JNIEnv *env, jobject clazz, jlong, jfloatArray, jint, jbyteArray, jint);
-*/
+  (JNIEnv *env, jobject clazz, jlong encoder, jfloatArray input, jint len_in, jbyteArray coded, jint len_out) {
+  jshort *in_ptr;
+  jbyte *cod_ptr;
+  jint ret;
+  in_ptr = (*env)->GetPrimitiveArrayCritical(env, input, 0);
+  if (in_ptr == 0) return OPUS_ALLOC_FAIL;
+  cod_ptr = (*env)->GetPrimitiveArrayCritical(env, coded, 0);
+  if (cod_ptr == 0) {
+    (*env)->ReleasePrimitiveArrayCritical(env, input, in_ptr, 0);
+    return OPUS_ALLOC_FAIL;
+  }
+  ret = opus_encode_float( (OpusEncoder *) encoder, (float *) in_ptr, len_in, (unsigned char *) cod_ptr, len_out );
+  (*env)->ReleasePrimitiveArrayCritical(env, coded, cod_ptr, 0);
+  (*env)->ReleasePrimitiveArrayCritical(env, input, in_ptr, 0);
+  return ret;
+}
 
 JNIEXPORT void JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1destroy
   (JNIEnv *env, jobject clazz, jlong enc) {
   opus_encoder_destroy((OpusEncoder *) enc);
 }
-
 
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1get_1ctl
   (JNIEnv *env, jobject clazz, jlong encoder, jint command, jintArray result) {
