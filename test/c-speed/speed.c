@@ -14,12 +14,15 @@ int main() {
   printf("%d\n",sz);
   short *audio = (short *)calloc(sz,sizeof(short));
   unsigned char *decoded = malloc(1000);
+  short *coded = (short *)calloc(1000,sizeof(short));
   int n = fread(audio, sizeof(short), sz, fp);
   printf("%d\n",n);
 
   int error;
   OpusEncoder *enc;
+  OpusDecoder *dec;
   enc = opus_encoder_create(8000, 1, OPUS_APPLICATION_VOIP, &error);
+  dec = opus_decoder_create(8000, 1, &error);
   if (error == 0) {
     int ret = 0;
     error = opus_encoder_ctl(enc,OPUS_SET_COMPLEXITY(2));
@@ -30,9 +33,20 @@ int main() {
     struct timeval t1,t2;
     float duration;
     gettimeofday(&t1,NULL);
+    int j = 0;
     for (i = 0; i < 100; i++) {
       while ((count + 160) < sz) {
 	int len = opus_encode(enc,audio+count,160,decoded,1000);
+/*
+	if (j % 20 == 3) {
+	   //opus_decoder_ctl(dec,OPUS_RESET_STATE);
+	   len = opus_decode(dec,0,0,coded,1000,0);
+	} else {
+	   len = opus_decode(dec,decoded,len,coded,1000,0);
+	}
+	j++;
+	printf("%d\n",len);
+*/
 	count += 160;
       }
       count = 0;

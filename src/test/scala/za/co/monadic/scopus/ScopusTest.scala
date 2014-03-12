@@ -57,10 +57,11 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
   val audio = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
   val audioFloat = audio.map(_.toFloat / (1 << 15))  // Normalise to +-1.0
-  val nSamples = (audio.length / 160) * 160
+  val chunkSize = 160
+  val nSamples = (audio.length / chunkSize) * chunkSize
   // A list of 20ms chunks of audio rounded up to a whole number of blocks. Gotta love Scala :)
-  val chunks = audio.slice(0, nSamples).grouped(160).toList
-  val chunksFloat = audioFloat.slice(0, nSamples).grouped(160).toList
+  val chunks = audio.slice(0, nSamples).grouped(chunkSize).toList
+  val chunksFloat = audioFloat.slice(0, nSamples).grouped(chunkSize).toList
 
   val enc = Encoder(Sf8000, 1)
   val dec = Decoder(Sf8000, 1)
@@ -146,22 +147,27 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       }
     }
 
-    it("get and set the encoder parameters (tests opus_encoder_ctl call only)") {
+    it("get and set the encoder parameters (tests opus_encoder_set/get_ctl call only)") {
       enc.setUseDtx(1)
       enc.getUseDtx should equal(1)
       enc.setUseDtx(0)
       enc.getUseDtx should equal(0)
     }
 
-    it("get and set decoder parameters (tests opus_decoder_ctl call only)") {
+    it("get and set decoder parameters (tests opus_decoder_set/get_ctl call only)") {
       dec.setGain(10)
       dec.getGain should equal(10)
     }
 
     it("decodes erased packets to the same length as regular packets") {
-      enc.reset
       dec.reset
-      chunks.head.length should equal (dec.decode().length)
+      enc.reset
+      val coded = for (c <- chunks) yield enc.encode(c)
+      for (d <- coded) {
+        dec.decode(d)
+      }
+      dec.getSampleRate should equal(8000)
+      dec.decode(chunkSize).length should equal(chunkSize)
     }
 
     it("decode erased packets for Short data") {
@@ -171,14 +177,14 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 3 == 1) dec.decode() else dec.decode(c)
+          p = if (i % 15 == 1) dec.decode(chunkSize) else dec.decode(c)
         } yield p
       val in = chunks.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
       val eOut = for (a <- out) yield energy(a)
       val rho = correlate(eIn, eOut)
-      writeAudioFile("test-short-erasure.raw",decoded.toArray.flatten)
+      //writeAudioFile("test-short-erasure.raw",decoded.toArray.flatten)
       rho should be > 0.91
     }
 
@@ -189,7 +195,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 20 == 5) dec.decodeFloat() else dec.decodeFloat(c)
+          p = if (i % 15 == 1) dec.decodeFloat(chunkSize) else dec.decodeFloat(c)
         } yield p
       val in = chunksFloat.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
