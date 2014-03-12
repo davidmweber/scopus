@@ -3,9 +3,10 @@ Scopus
 ------
 Scopus is a Scala interface to the [Opus codec](http://www.opus-codec.org). It is light and thin by design and gives
 programmers access to the bulk of the functionality in Opus.
-It uses [JNaerator](https://code.google.com/p/jnaerator/) to handle the native code and is presently restricted to Linux code.
+It uses JNI to handle the native code and is presently restricted to Linux code. JNA and Bridj both proved to
+be slower than JNI and have some awkward limitations to boot.
 Benchmarks performed on the encoder show that it is 9% slower than a native C implementation. On a 3.5Ghz i5, it runs
-at 300 times real time (complexity factor set to 2). The decoder runs at around 1300 times real time.
+at 380 times real time (complexity factor set to 2). The decoder runs at around 1580 times real time.
 
 The relevant headers for [Opus](http://www.opus-codec.org) are included in the source code as is the Linux 64bit library.
 The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/).
@@ -18,21 +19,21 @@ files in the `opus-1.1/include` directory which are subject to the [Opus License
 Building
 --------
 Clone the sources and do a `sbt test`. Once it works on multiple architectures, I'll put it on Maven Central.
-Using JNaerator is pretty simple (thanks Oliver!). The following steps should see you through to obtaining a
-Java interface to the Opus native library:
 
-First, [download the JNaerator jar](https://code.google.com/p/jnaerator/downloads/list). I used the `shaded-0.11`
-version but the latest snapshot (July 2013) works.
+The native libraries can be built using the makefile in the src/native/opus directory. You may have
+to customise the paths to the include file (jni.h) a little. It also assumes you have opus-1.1 built
+and installed. Both libjni-opus.so and libopus.so should be placed in the appropriate directory in the lib
+directory. Getting the libs located on an architecture independent way is work in progress.
+
+If you feel the need to generate header prototypes, build the Scala code then run `javah` from the root directory
+of the project as follows:
+
 ```bash
-cd opus-1.1
-java -jar <path to jnaerator>/jnaerator-0.11-shaded.jar
+javah  -classpath target/scala-2.10/classes:/usr/local/lib/scala-2.10.3/lib/*\
+    -d src/main/native/opus/ -stubs  za.co.monadic.scopus.Opus$
 ```
 
-You should end up with an new version of `opus.jar` in the `lib` directory.The parameters used for the build are in `opus-1.1/config.jnaerator`.
-
-Note that it uses [Bridj](https://code.google.com/p/nativelibs4java/) instead of [JNA](https://github.com/twall/jna) because
-straight JNA is significantly slower than Bridj and "direct" JNA does not support the varargs needed for certain Opus functions.
-
+You may have to adjust your classpath for your Scala installation.
 
 Usage
 -----
@@ -68,4 +69,5 @@ Smaller values obviously give less delay but at the expense of slightly less eff
 
 Caveats
 -------
-Some functions in the Opus native library do not resolve properly and are not accessible. JNaerator emits warnings for these functions. Fortunately, the crucial functions for mono and stereo coding do resolve correctly.
+The erased packet functionality does not pass the test case I have set. It will be looked into. Also, my library searches from
+the JVM need some work.

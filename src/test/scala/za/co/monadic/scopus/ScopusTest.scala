@@ -158,6 +158,12 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       dec.getGain should equal(10)
     }
 
+    it("decodes erased packets to the same length as regular packets") {
+      enc.reset
+      dec.reset
+      chunks.head.length should equal (dec.decode().length)
+    }
+
     it("decode erased packets for Short data") {
       enc.reset
       dec.reset
@@ -165,14 +171,14 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 10 == 1) dec.decode() else dec.decode(c)
+          p = if (i % 3 == 1) dec.decode() else dec.decode(c)
         } yield p
       val in = chunks.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
       val eOut = for (a <- out) yield energy(a)
       val rho = correlate(eIn, eOut)
-      //writeAudioFile("test-short-erasure.raw",decoded.toArray.flatten)
+      writeAudioFile("test-short-erasure.raw",decoded.toArray.flatten)
       rho should be > 0.91
     }
 
@@ -183,7 +189,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 10 == 1) dec.decodeFloat() else dec.decodeFloat(c)
+          p = if (i % 20 == 5) dec.decodeFloat() else dec.decodeFloat(c)
         } yield p
       val in = chunksFloat.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
