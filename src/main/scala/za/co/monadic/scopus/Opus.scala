@@ -32,8 +32,8 @@ object Opus {
   /**
    * Loads the native JNI library.
    */
-
-  System.loadLibrary("jnopus")
+  System.loadLibrary("opus")
+  System.loadLibrary("jni_opus")
 
   @native
   def decoder_create(Fs: Int, channels: Int): Long

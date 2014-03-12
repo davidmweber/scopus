@@ -1,4 +1,4 @@
-
+/*
 import java.io._
 import org.scalatest._
 import za.co.monadic.scopus._
@@ -229,3 +229,4 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
   }
 
 }
+*/

@@ -1,5 +1,5 @@
 package za.co.monadic.scopus
-
+/*
 import org.bridj.Pointer
 import org.opuscodec.OpusLibrary._
 
@@ -128,3 +128,4 @@ class Encoder(sampleFreq:SampleFrequency, channels:Int, bufferSize: Int = 8192) 
 object Encoder {
   def apply(sampleFreq:SampleFrequency, channels:Int, bufferSize: Int = 8192) = new Encoder(sampleFreq,channels,bufferSize)
 }
+*/

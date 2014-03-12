@@ -1,5 +1,5 @@
 package za.co.monadic.scopus
-
+/*
 import org.opuscodec.OpusLibrary._
 import org.bridj.Pointer
 
@@ -143,3 +143,4 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
 object Decoder {
   def apply(Fs:SampleFrequency, channels:Int) = new Decoder(Fs,channels)
 }
+*/
