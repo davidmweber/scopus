@@ -6,7 +6,8 @@ programmers access to the bulk of the functionality in Opus.
 It uses JNI to handle the native code and is presently restricted to Linux code. JNA and Bridj both proved to
 be slower than JNI and have some awkward limitations to boot.
 Benchmarks performed on the encoder show that it is 9% slower than a native C implementation. On a 3.5Ghz i5, it runs
-at 380 times real time (complexity factor set to 2). The decoder runs at around 1580 times real time.
+at 380 times real time (complexity factor set to 2). The decoder runs at around 1600 times real time. A native
+benchmark shows the encoder to run at 412 times real time.
 
 The relevant headers for [Opus](http://www.opus-codec.org) are included in the source code as is the Linux 64bit library.
 The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/).

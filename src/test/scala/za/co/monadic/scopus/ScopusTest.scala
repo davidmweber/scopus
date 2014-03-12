@@ -56,7 +56,8 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
   }
 
   val audio = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
-  val audioFloat = audio.map(_.toFloat / (1 << 15))  // Normalise to +-1.0
+  val audioFloat = audio.map(_.toFloat / (1 << 15))
+  // Normalise to +-1.0
   val chunkSize = 160
   val nSamples = (audio.length / chunkSize) * chunkSize
   // A list of 20ms chunks of audio rounded up to a whole number of blocks. Gotta love Scala :)
@@ -210,29 +211,29 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
     val repeats = 50
 
-    it("meet basic encoder speed requirements"){
+    it("meet basic encoder speed requirements") {
       enc.reset
       enc.setComplexity(2)
       val tStart = System.currentTimeMillis()
-      for ( i <- 0 until repeats) {
+      for (i <- 0 until repeats) {
         for (c <- chunks) enc.encode(c)
       }
-      val duration = (System.currentTimeMillis() - tStart)/1000.0 // Seconds
-      val speed = repeats*nSamples/duration/8000.0  // multiple of real time
+      val duration = (System.currentTimeMillis() - tStart) / 1000.0 // Seconds
+      val speed = repeats * nSamples / duration / 8000.0 // multiple of real time
       speed should be > 100.0
       info(f"Encoder runs at $speed%5.1f times real time")
     }
 
-    it("meets basic decoder speed requirements"){
+    it("meets basic decoder speed requirements") {
       enc.reset
       dec.reset
       val tStart = System.currentTimeMillis()
       val coded = for (c <- chunks) yield enc.encode(c)
-      for ( i <- 0 until repeats) {
+      for (i <- 0 until repeats) {
         for (c <- coded) dec.decode(c)
       }
-      val duration = (System.currentTimeMillis() - tStart)/1000.0 // Seconds
-      val speed = repeats*nSamples/duration/8000.0  // multiple of real time
+      val duration = (System.currentTimeMillis() - tStart) / 1000.0 // Seconds
+      val speed = repeats * nSamples / duration / 8000.0 // multiple of real time
       speed should be > 500.0
       info(f"Decoder runs at $speed%5.1f times real time")
     }

@@ -14,21 +14,21 @@ object Opus {
    * http://blog.cedarsoft.com/2010/11/setting-java-library-path-programmatically/
    */
 
-  System.setProperty( "java.library.path", "/home/dave/work/scopus/lib/native/linux-64/" )
+  System.setProperty("java.library.path", "/home/dave/work/scopus/lib/native/linux-64/")
 
-  val fieldSysPath = classOf[ClassLoader].getDeclaredField( "sys_paths" )
-  fieldSysPath.setAccessible( true )
-  fieldSysPath.set( null, null )
+  val fieldSysPath = classOf[ClassLoader].getDeclaredField("sys_paths")
+  fieldSysPath.setAccessible(true)
+  fieldSysPath.set(null, null)
   System.loadLibrary("jni_opus")
 
   @native
   def decoder_create(Fs: Int, channels: Int, error: Array[Int]): Long
 
   @native
-  def decode_short(decoder: Long, input: Array[Byte], inSize: Int, output: Array[Short],  outSize: Int, decodeFEC: Int): Int
+  def decode_short(decoder: Long, input: Array[Byte], inSize: Int, output: Array[Short], outSize: Int, decodeFEC: Int): Int
 
   @native
-  def decode_float(decoder: Long, input: Array[Byte], inSize: Int, output: Array[Float],  outSize: Int, decodeFEC: Int): Int
+  def decode_float(decoder: Long, input: Array[Byte], inSize: Int, output: Array[Float], outSize: Int, decodeFEC: Int): Int
 
   @native
   def decoder_destroy(decoder: Long)
