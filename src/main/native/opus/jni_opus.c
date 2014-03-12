@@ -62,12 +62,13 @@ Java_za_co_monadic_scopus_scopus_Opus_00024_decode
 
 JNIEXPORT jlong JNICALL
 Java_za_co_monadic_scopus_Opus_00024_decoder_1create
-    (JNIEnv *env, jclass clazz, jint Fs, jint channels)
+    (JNIEnv *env, jclass clazz, jint Fs, jint channels, jintArray err)
 {
     int error;
     OpusDecoder *decoder = opus_decoder_create(Fs, channels, &error);
-
-    if (OPUS_OK != error) decoder = 0;
+    int *err_ret = (*env)->GetPrimitiveArrayCritical(env, err, 0);
+    err_ret[0] = error;
+    (*env)->ReleasePrimitiveArrayCritical(env, err, err_ret, 0);
     return (jlong) decoder;
 }
 

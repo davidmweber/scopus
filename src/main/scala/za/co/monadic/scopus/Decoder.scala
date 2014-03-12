@@ -1,29 +1,18 @@
 package za.co.monadic.scopus
-/*
-import org.opuscodec.OpusLibrary._
-import org.bridj.Pointer
 
-
+import za.co.monadic.scopus.Opus._
 class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
 
   val bufferLen: Int = math.round(0.120f*Fs()*channels)
   var fec = 0
-  val nullBytePtr = Pointer.NULL.asInstanceOf[Pointer[java.lang.Byte]]
-  val errorPtr : Pointer[Integer] = Pointer.allocateInts(1)
-  val decoder = opus_decoder_create(Fs(), channels, errorPtr)
-  val error = errorPtr.get()
-  errorPtr.release()
-  if (error != OPUS_OK) {
-    throw new RuntimeException(s"Failed to create the Opus encoder: ${errorString(error)}")
+  val error = Array[Int](0)
+  val decoder = decoder_create(Fs(), channels, error)
+  if (error(0) != OPUS_OK) {
+    throw new RuntimeException(s"Failed to create the Opus encoder: ${error_string(error)}")
   }
 
-  val ret = opus_decoder_init(decoder,Fs(),channels)
-  if (ret != OPUS_OK) {
-    decoder.release()
-    throw new RuntimeException(s"Failed to initialise the Opus encoder")
-  }
-  val decodedShortPtr = Pointer.allocateShorts(2880*channels) // 60ms of audio at 48kHz
-  val decodedFloatPtr = Pointer.allocateFloats(2880*channels) // 60ms of audio at 48kHz
+  val decodedShortBuf = new Array[Short](2880*channels) // 60ms of audio at 48kHz
+  val decodedFloatBuf = new Array[Float](2880*channels) // 60ms of audio at 48kHz
   var clean = false
 
   /**
@@ -32,16 +21,10 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
    * @return Decoded audio packet
    */
   def decode(compressedAudio: Array[Byte] ): Array[Short] = {
-    val inPtr = Pointer.pointerToArray[java.lang.Byte](compressedAudio)
-    val len = opus_decode(decoder,inPtr,compressedAudio.length,decodedShortPtr,bufferLen, fec)
-    inPtr.release()
-    if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${errorString(len)}")
-    //decodedShortPtr.getShorts(len)
-    val temp = decodedShortPtr.getShorts(len)
-    print("-->")
-    for (i <- 0 until 20) print(s"${temp(i)}, ")
-    println()
-    temp
+
+    val len = decode_short(decoder,compressedAudio,compressedAudio.length,decodedShortBuf,bufferLen, fec)
+    if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${error_string(len)}")
+    decodedShortBuf.slice(0,len)
   }
 
   /**
@@ -49,13 +32,9 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
    * @return The decompressed audio for this packet
    */
   def decode(): Array[Short] = {
-    val len = opus_decode(decoder,nullBytePtr,0,decodedShortPtr,bufferLen, fec)
-    if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${errorString(len)}")
-    val temp = decodedShortPtr.getShorts(len)
-    print("*->")
-    for (i <- 0 until 20) print(s"${temp(i)}, ")
-    println()
-    temp
+    val len =  decode_short(decoder,Array[Byte](0),0,decodedShortBuf,bufferLen, fec)
+    if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${error_string(len)}")
+    decodedShortBuf.slice(0,len)
   }
 
   /**
@@ -65,10 +44,10 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
    */
   def decodeFloat(compressedAudio: Array[Byte] ): Array[Float] = {
     val inPtr = Pointer.pointerToArray[java.lang.Byte](compressedAudio)
-    val len = opus_decode_float(decoder,inPtr,compressedAudio.length,decodedFloatPtr, bufferLen, fec)
+    val len = opus_decode_float(decoder,inPtr,compressedAudio.length,decodedFloatBuf, bufferLen, fec)
     inPtr.release()
     if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${errorString(len)}")
-    decodedFloatPtr.getFloats(len)
+    decodedFloatBuf.getFloats(len)
   }
 
   /**
@@ -76,9 +55,9 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
    * @return The decompressed audio for this packet
    */
   def decodeFloat(): Array[Float] = {
-    val len = opus_decode_float(decoder, nullBytePtr,0,decodedFloatPtr, bufferLen, fec)
+    val len = opus_decode_float(decoder, nullBytePtr,0,decodedFloatBuf, bufferLen, fec)
     if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${errorString(len)}")
-    decodedFloatPtr.getFloats(len)
+    decodedFloatBuf.getFloats(len)
   }
 
   /**
@@ -87,8 +66,8 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
    */
   def cleanup() : Unit = {
     if (!clean) {
-      decodedFloatPtr.release()
-      decodedShortPtr.release()
+      decodedFloatBuf.release()
+      decodedShortBuf.release()
       opus_decoder_destroy(decoder)
       clean = true
     }
@@ -143,4 +122,3 @@ class Decoder(Fs:SampleFrequency, channels:Int) extends Opus {
 object Decoder {
   def apply(Fs:SampleFrequency, channels:Int) = new Decoder(Fs,channels)
 }
-*/

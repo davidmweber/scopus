@@ -1,75 +1,48 @@
 package za.co.monadic.scopus
 
-/**
- * Base class for supported sample frequencies
- */
-abstract class SampleFrequency {
-  def apply(): Int
-}
-
-object Sf8000 extends SampleFrequency {
-  def apply(): Int = 8000
-}
-
-object Sf12000 extends SampleFrequency {
-  def apply(): Int = 12000
-}
-
-object Sf16000 extends SampleFrequency {
-  def apply(): Int = 16000
-}
-
-object Sf24000 extends SampleFrequency {
-  def apply(): Int = 24000
-}
-
-object Sf48000 extends SampleFrequency {
-  def apply(): Int = 48000
-}
-
 object Opus {
 
   /**
    * Loads the native JNI library.
    */
-  System.loadLibrary("opus")
+  //System.loadLibrary("opus")
   System.loadLibrary("jni_opus")
 
   @native
-  def decoder_create(Fs: Int, channels: Int): Long
+  def decoder_create(Fs: Int, channels: Int, error: Array[Int]): Long
 
   @native
-  def decode(decoder: Long, input: Array[Byte], inSize: Int, output: Array[Short],  outSize: Int, decodeFEC: Int): Int
+  def decode_short(decoder: Long, input: Array[Byte], inSize: Int, output: Array[Short],  outSize: Int, decodeFEC: Int): Int
 
   @native
-  def decode(decoder: Long, input: Array[Byte], inSize: Int, output: Array[Float],  outSize: Int, decodeFEC: Int): Int
+  def decode_float(decoder: Long, input: Array[Byte], inSize: Int, output: Array[Float],  outSize: Int, decodeFEC: Int): Int
 
   @native
   def decoder_destroy(decoder: Long)
 
   @native
-  def decoder_get_ctl(decoder: Long, param: Int): Int
+  def decoder_get_ctl(decoder: Long, command: Int, param: Array[Int]): Int
 
   @native
-  def decoder_set_ctl(decoder: Long, param: Int): Unit
+  def decoder_set_ctl(decoder: Long, command: Int, param: Int): Int
 
   @native
-  def encoder_create(Fs: Int, channels: Int): Long
+  def encoder_create(Fs: Int, channels: Int, application: Int, error: Array[Int]): Long
 
   @native
-  def encode(encoder: Long, input: Array[Short], inSize: Int, output: Array[Byte], outSize: Int): Int
+  def encode_short(encoder: Long, input: Array[Short], inSize: Int, output: Array[Byte], outSize: Int): Int
 
   @native
-  def encode(encoder: Long, input: Array[Float], inSize: Int, output: Array[Byte], outSize: Int): Int
+  def encode_float(encoder: Long, input: Array[Float], inSize: Int, output: Array[Byte], outSize: Int): Int
 
   @native
   def encoder_destroy(encoder: Long)
 
   @native
-  def encoder_get_ctl(decoder: Long, param: Int): Int
+  def encoder_get_ctl(encoder: Long, command: Int, param: Array[Int]): Int
 
   @native
-  def encoder_set_ctl(decoder: Long, param: Int): Unit
+  def encoder_set_ctl(encoder: Long, command: Int, param: Int): Int
 
   @native
   def error_string(error: Int): String
