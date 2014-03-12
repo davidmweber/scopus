@@ -1,4 +1,3 @@
-/*
 import java.io._
 import org.scalatest._
 import za.co.monadic.scopus._
@@ -73,7 +72,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
   describe("Opus codec can") {
 
-    ignore("encode and decode audio segments as Short types") {
+    it("encode and decode audio segments as Short types") {
       Given("a PCM file coded as an array of short integers and a codec pair")
       enc.reset
       dec.reset
@@ -229,4 +228,3 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
   }
 
 }
-*/

@@ -8,5 +8,5 @@ object Stub extends App {
   val tem = Opus.decoder_create(8000,1,err)
 
   println(s"foo: ${err(0)} -> $tem")
-
+  Opus.decoder_destroy(tem)
 }

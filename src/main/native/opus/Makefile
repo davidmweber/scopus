@@ -3,7 +3,7 @@ CC=gcc
 CFLAGS = -Ofast -Wall -I/usr/lib/jvm/java-7-openjdk-amd64/include/ -I/usr/local/include -fPIC
 LDFLAGS = -Wl,-soname,libjni_opus.so -shared 
 LIBS = -lopus -lc
-SOURCES = jni_opus.c
+SOURCES = za_co_monadic_scopus_Opus__.c
 TARGETLIB = libjni_opus.so
 
 all: libjni_opus.so
