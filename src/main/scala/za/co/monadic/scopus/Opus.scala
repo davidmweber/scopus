@@ -1,6 +1,7 @@
 package za.co.monadic.scopus
 
 import java.io.{FileOutputStream, File }
+import java.util.UUID
 
 
 /**
@@ -11,21 +12,14 @@ import java.io.{FileOutputStream, File }
  */
 object LibLoader {
 
-  val tempPath = "foo" // Make this smarter
+  val tempPath = UUID.randomUUID.toString.split("-").last
   val path = "native/"+System.getProperty("os.name") + "/" + System.getProperty("os.arch")
   val destDir = System.getProperty("java.io.tmpdir") + "/" + tempPath + "/"
   new File(destDir).mkdirs() // Create the temporary directory
 
-  private def localizeLib(name: String) : String = System.getProperty("os.name") match {
-    case "Linux" => "lib"+name+".so"
-    case "Mac OS X" => "lib"+name+".dylib"
-    case _ => throw new UnknownError("Unsupported operating system")
-  }
-
   def apply(libName: String, load: Boolean = true): Unit = {
-    val llib = localizeLib(libName)
-    val source = Opus.getClass.getClassLoader.getResourceAsStream(path + "/" + llib )
-    val fileOut = new File(destDir, llib )
+    val source = Opus.getClass.getClassLoader.getResourceAsStream(path + "/" + libName )
+    val fileOut = new File(destDir, libName )
     val dest = new FileOutputStream(fileOut)
     val buf = new Array[Byte](8192)
     var bytesRead: Int = 0
@@ -39,7 +33,9 @@ object LibLoader {
 
     // Tee up deletion of the temporary library file when we quit
     sys.addShutdownHook {
-      new File(destDir, llib).delete()
+      new File(destDir, libName).delete
+      // Attempt to delete the directory also. It goes if the directory is empty
+      new File(destDir).delete
     }
     if (load) System.load(fileOut.getAbsolutePath)
   }
@@ -52,8 +48,8 @@ object LibLoader {
  */
 object Opus {
 
-  LibLoader("opus",load = false) // Don't load this as it is dynamically found by the linker in Linux
-  LibLoader("jni_opus")
+  LibLoader("libopus.so.0",load = false) // Don't load this as it is dynamically found by the linker in Linux
+  LibLoader("libjni_opus.so")
 
   @native
   def decoder_create(Fs: Int, channels: Int, error: Array[Int]): Long
