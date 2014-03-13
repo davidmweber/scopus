@@ -160,14 +160,13 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       dec.getGain should equal(10)
     }
 
-    it("decodes erased packets to the same length as regular packets") {
+    it("correctly returns error messages for a given error condition"){
+      val msg = Opus.error_string(-3)
+      msg should equal("internal error")
+    }
+
+    it("decodes erased packets to the specified number of samples") {
       dec.reset
-      enc.reset
-      val coded = for (c <- chunks) yield enc.encode(c)
-      for (d <- coded) {
-        dec.decode(d)
-      }
-      dec.getSampleRate should equal(8000)
       dec.decode(chunkSize).length should equal(chunkSize)
     }
 

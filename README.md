@@ -22,9 +22,13 @@ Building
 Clone the sources and do a `sbt test`. Once it works on multiple architectures, I'll put it on Maven Central.
 
 The native libraries can be built using the makefile in the src/native/opus directory. You may have
-to customise the paths to the include file (jni.h) a little. It also assumes you have opus-1.1 built
-and installed. Both libjni-opus.so and libopus.so should be placed in the appropriate directory in the lib
-directory. Getting the libs located on an architecture independent way is work in progress.
+to customise the paths to the include file (jni.h) a little. Both libjni-opus.so and libopus.so should
+be placed in the appropriate native library directory. Getting the libs located on an architecture
+independent way is work in progress. Some resources to understanding this process are:
+
+* [Benson Margulies' JNI test bed](https://github.com/bimargulies/jni-origin-testbed) shows how to avoid `LD_LIBRARY_PATH` hell.
+* Read the `ld` man page
+* For now, avoid Windows....
 
 If you feel the need to generate header prototypes, build the Scala code then run `javah` from the root directory
 of the project as follows:

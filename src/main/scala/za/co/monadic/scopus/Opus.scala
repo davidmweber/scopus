@@ -14,12 +14,8 @@ object Opus {
    * http://blog.cedarsoft.com/2010/11/setting-java-library-path-programmatically/
    */
 
-  System.setProperty("java.library.path", "/home/dave/work/scopus/lib/native/linux-64/")
-
-  val fieldSysPath = classOf[ClassLoader].getDeclaredField("sys_paths")
-  fieldSysPath.setAccessible(true)
-  fieldSysPath.set(null, null)
-  System.loadLibrary("jni_opus")
+  val os = System.getProperty("os.name") + "-" + System.getProperty("os.arch")
+  System.load("/home/dave/work/scopus/lib/native/linux-64/libjni_opus.so")
 
   @native
   def decoder_create(Fs: Int, channels: Int, error: Array[Int]): Long
