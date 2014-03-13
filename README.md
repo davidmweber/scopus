@@ -1,4 +1,4 @@
-<!-- [![Build Status](https://travis-ci.org/davidmweber/scopus.png?branch=master)](https://travis-ci.org/davidmweber/scopus) -->
+[![Build Status](https://travis-ci.org/davidmweber/scopus.png?branch=master)](https://travis-ci.org/davidmweber/scopus)
 Scopus
 ------
 Scopus is a Scala interface to the [Opus codec](http://www.opus-codec.org). It is light and thin by design and gives
