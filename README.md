@@ -9,26 +9,26 @@ Benchmarks performed on the encoder show that it is 9% slower than a native C im
 at 380 times real time (complexity factor set to 2). The decoder runs at around 1600 times real time. A native
 benchmark shows the encoder to run at 412 times real time.
 
-The relevant headers for [Opus](http://www.opus-codec.org) are included in the source code as is the Linux 64bit library.
 The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/).
 
 Licensing
 ---------
-Scopus is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/) with the exception of
-files in the `opus-1.1/include` directory which are subject to the [Opus License](http://www.opus-codec.org/license/).
+Scopus is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
 
 Building
 --------
 Clone the sources and do a `sbt test`. Once it works on multiple architectures, I'll put it on Maven Central.
 
-The native libraries can be built using the makefile in the src/native/opus directory. You may have
-to customise the paths to the include file (jni.h) a little. Both libjni-opus.so and libopus.so should
-be placed in the appropriate native library directory. Getting the libs located on an architecture
-independent way is work in progress. Some resources to understanding this process are:
+The native libraries can be built using the makefile in the src/native/opus directory. You do need to have the
+Opus libraries and headers installed. You may have to customise the paths to the include file (jni.h) a little.
+Both libjni-opus.so and libopus.so should be placed in the appropriate `resources/native/` directory. Getting the
+libs located on an architecture independent way is a work in progress. Some resources to understanding this process are:
 
 * [Benson Margulies' JNI test bed](https://github.com/bimargulies/jni-origin-testbed) shows how to avoid `LD_LIBRARY_PATH` hell.
-* Read the `ld` man page
-* For now, avoid Windows....
+* Read the `ld` man page, especially the bit about -rpath=$ORIGIN. It makes the magic work.
+
+This library explicitly copies the dynamic libraries out of the resources directory in the jar file to
+a unique location (`/tmp/somethingunique` in Unix systems) from where it loads them.
 
 If you feel the need to generate header prototypes, build the Scala code then run `javah` from the root directory
 of the project as follows:

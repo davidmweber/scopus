@@ -167,7 +167,9 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
     it("decodes erased packets to the specified number of samples") {
       dec.reset
-      dec.decode(chunkSize).length should equal(chunkSize)
+      enc.reset
+      dec.decode(enc.encode(chunks.head)) // Prime the decoder so it get the decoder state
+      dec.decode().length should equal(chunkSize)
     }
 
     it("decode erased packets for Short data") {
@@ -177,7 +179,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 15 == 1) dec.decode(chunkSize) else dec.decode(c)
+          p = if (i % 15 == 1) dec.decode() else dec.decode(c)
         } yield p
       val in = chunks.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
@@ -195,7 +197,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 15 == 1) dec.decodeFloat(chunkSize) else dec.decodeFloat(c)
+          p = if (i % 15 == 1) dec.decodeFloat() else dec.decodeFloat(c)
         } yield p
       val in = chunksFloat.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList

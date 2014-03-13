@@ -1,5 +1,49 @@
 package za.co.monadic.scopus
 
+import java.io.{FileOutputStream, File }
+
+
+/**
+ * General loader for dynamic libraries from the resources directory in the jar file.
+ * It copies the required library from the jar to the target temporary directory and then
+ * optionally loads the file using System.load(). It is clever enough to find the correct
+ * native version of the library (although this is untested).
+ */
+object LibLoader {
+
+  val tempPath = "foo" // Make this smarter
+  val path = "native/"+System.getProperty("os.name") + "/" + System.getProperty("os.arch")
+  val destDir = System.getProperty("java.io.tmpdir") + "/" + tempPath + "/"
+  new File(destDir).mkdirs() // Create the temporary directory
+
+  private def localizeLib(name: String) : String = System.getProperty("os.name") match {
+    case "Linux" => "lib"+name+".so"
+    case "Mac OS X" => "lib"+name+".dylib"
+    case _ => throw new UnknownError("Unsupported operating system")
+  }
+
+  def apply(libName: String, load: Boolean = true): Unit = {
+    val llib = localizeLib(libName)
+    val source = Opus.getClass.getClassLoader.getResourceAsStream(path + "/" + llib )
+    val fileOut = new File(destDir, llib )
+    val dest = new FileOutputStream(fileOut)
+    val buf = new Array[Byte](8192)
+    var bytesRead: Int = 0
+    // Actually copy the thing
+    do {
+      bytesRead = source.read(buf)
+      if (bytesRead > 0 ) dest.write(buf, 0, bytesRead)
+    } while (bytesRead > 0)
+    source.close()
+    dest.close()
+
+    // Tee up deletion of the temporary library file when we quit
+    sys.addShutdownHook {
+      new File(destDir, llib).delete()
+    }
+    if (load) System.load(fileOut.getAbsolutePath)
+  }
+}
 
 /**
  * Scala interface to the Opus codec API. With the exception of the *_ctl() commands, this
@@ -8,14 +52,8 @@ package za.co.monadic.scopus
  */
 object Opus {
 
-  /**
-   * Loads the native JNI library. It uses a very clever trick to reload the java.library.path
-   * at runtime. Details are at:
-   * http://blog.cedarsoft.com/2010/11/setting-java-library-path-programmatically/
-   */
-
-  val os = System.getProperty("os.name") + "-" + System.getProperty("os.arch")
-  System.load("/home/dave/work/scopus/lib/native/linux-64/libjni_opus.so")
+  LibLoader("opus",load = false) // Don't load this as it is dynamically found by the linker in Linux
+  LibLoader("jni_opus")
 
   @native
   def decoder_create(Fs: Int, channels: Int, error: Array[Int]): Long

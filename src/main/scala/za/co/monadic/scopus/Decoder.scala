@@ -35,8 +35,8 @@ class Decoder(Fs: SampleFrequency, channels: Int) {
    * deal with the erasure appropriately.
    * @return The decompressed audio for this packet
    */
-  def decode(reqSamples: Int): Array[Short] = {
-    val len = decode_short(decoder, null, 0, decodedShortBuf, reqSamples, fec)
+  def decode(): Array[Short] = {
+    val len = decode_short(decoder, null, 0, decodedShortBuf, bufferLen, fec)
     if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${error_string(len)}")
     decodedShortBuf.slice(0, len)
   }
@@ -58,8 +58,8 @@ class Decoder(Fs: SampleFrequency, channels: Int) {
    * deal with the erasure appropriately.
    * @return The decompressed audio for this packet
    */
-  def decodeFloat(reqSamples: Int): Array[Float] = {
-    val len = decode_float(decoder, null, 0, decodedFloatBuf, reqSamples, fec)
+  def decodeFloat(): Array[Float] = {
+    val len = decode_float(decoder, null, 0, decodedFloatBuf, bufferLen, fec)
     if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${error_string(len)}")
     decodedFloatBuf.slice(0, len)
   }
