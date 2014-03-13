@@ -43,8 +43,7 @@ You may have to adjust your classpath for your Scala installation.
 Usage
 -----
 
-Encoding a stream is pretty simple. Java is big endian while most raw audio data are little endian (at least on Intel Architectures). Bridj takes
-care of most endian issues for you so trade in arrays of Short and Float. Encoding is simple:
+Encoding a stream is pretty simple.
 
 ```scala
   val enc = Encoder(Sf8000,1)
@@ -71,8 +70,5 @@ Decoding is just as simple:
 
 There are restrictions on the size of the input buffer. Audio frames may be one of the following durations: 2.5, 5, 10, 20, 40 or 60 ms.
 Smaller values obviously give less delay but at the expense of slightly less efficient compression.
-
-Caveats
--------
-The erased packet functionality does not pass the test case I have set. It will be looked into. Also, my library searches from
-the JVM need some work.
+Note that Java is big endian while most raw audio data are little endian (at least on Intel Architectures). This
+means you may have to do some byte swapping when reading audio streams from external sources.
