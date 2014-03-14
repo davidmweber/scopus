@@ -77,7 +77,7 @@ object Opus {
       LibLoader("libopus.so.0",load = false) // Don't load this as it is dynamically found by the linker in Linux
       LibLoader("libjni_opus.so")
     case "Mac OS X/x86_64" =>
-      LibLoader("libopus.0.dylib",load = true) // Don't load this as it is dynamically found by the linker in Linux
+      LibLoader("libopus.0.dylib",load = false) // Don't load this as it is dynamically found by the linker in Linux
       LibLoader("libjni_opus.dylib")
     case s: String =>
         println(s"Unknown OS/platform combination: $s")
