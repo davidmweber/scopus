@@ -1,0 +1,27 @@
+
+CC=cc
+NATIVE = ../../resources/native/Mac\ OS\ X/x86_64/
+INCLUDES = -I/Library/Java/JavaVirtualMachines/1.7.0.jdk/Contents/Home/include\
+	   -I/Library/Java/JavaVirtualMachines/1.7.0.jdk/Contents/Home/include/darwin\
+	   -I/usr/local/include
+CFLAGS = -Ofast -Wall -fPIC $(INCLUDES)
+LDFLAGS = -dynamiclib
+LDPATH = -L$(NATIVE)
+LIBS = -lopus
+SOURCES = za_co_monadic_scopus_Opus__.c
+TARGETLIB = libjni_opus.dylib
+
+all: $(TARGETLIB)
+
+clean:
+	rm -f *.o *~ $(TARGETLIB)
+
+$(TARGETLIB) : $(SOURCES:.c=.o)
+	$(CC) $(LDFLAGS) $(LDPATH) -o $@ $< $(LIBS)
+
+install: $(TARGETLIB)
+	cp $(TARGETLIB) $(NATIVE)
+
+.c.o:
+	$(CC) -c  $(CFLAGS) $< -o $@
+
