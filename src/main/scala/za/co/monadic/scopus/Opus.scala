@@ -25,7 +25,7 @@ import java.nio.channels.Channels
  * Libraries are stored in the resources/native/os.name/os.arch directory and copied
  * to the system temporary directory as indicated by the java.io.tmpdir property plus
  * a random one time directory name with the prefix "scopus_". In Linux, the temporary
- * directory would have a name like "/tmp/scopus_418af7c0b63b/". It should be
+ * directory would have a name like "/tmp/scopus_418af7c0b63b/".
  */
 object LibLoader {
 
@@ -81,11 +81,11 @@ object Opus {
       LibLoader("libopus.so.0",load = false) // Don't load this as it is dynamically found by the linker in Linux
       LibLoader("libjni_opus.so")
     case "Mac OS X/x86_64" =>
-      LibLoader("libopus.0.dylib",load = false) // Don't load this as it is dynamically found by the linker in Linux
+      LibLoader("libopus.0.dylib",load = false)
       LibLoader("libjni_opus.dylib")
     case s: String =>
         println(s"Unknown OS/platform combination: $s")
-        sys.exit()
+        sys.exit(-1)
   }
   @native
   def decoder_create(Fs: Int, channels: Int, error: Array[Int]): Long
