@@ -26,9 +26,11 @@ import java.nio.channels.Channels
 object LibLoader {
 
   val tempPath = "scopus_"+UUID.randomUUID.toString.split("-").last
-  val path = "native/"+System.getProperty("os.name") + "/" + System.getProperty("os.arch")
+  val path = "native/" + getOsArch
   val destDir = System.getProperty("java.io.tmpdir") + "/" + tempPath + "/"
   new File(destDir).mkdirs() // Create the temporary directory
+
+  def getOsArch = System.getProperty("os.name") + "/" + System.getProperty("os.arch")
 
   /**
    * Copy the OS dependent library from the resources dir in a JAR to a temporary location
@@ -70,7 +72,7 @@ object LibLoader {
 object Opus {
 
   // System dependent load of native libraries
-  System.getProperty("os.name") + "/" + System.getProperty("os.arch") match {
+  LibLoader.getOsArch match {
     case "Linux/amd64" =>
       LibLoader("libopus.so.0",load = false) // Don't load this as it is dynamically found by the linker in Linux
       LibLoader("libjni_opus.so")
