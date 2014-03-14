@@ -12,13 +12,13 @@ The sources for Opus can be downloaded [here](http://www.opus-codec.org/download
 
 Licensing
 ---------
-Scopus by David Weber is is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
+Scopus by David Weber is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
 
 Building
 --------
-Clone the sources and do a `sbt test`. Once it works on multiple architectures, I'll put it on Maven Central.
+Clone the sources and do a `sbt test`. Package and deploy as you see fit.
 
-The native libraries can be built using the makefiles in the src/native/opus directory. You do need to have the
+The native libraries can be built using the makefiles in the `src/native/opus directory`. You do need to have the
 Opus libraries and headers installed and copied to the appropriate native directories in the `resource` directory.
 You may have to customise the paths to the include file (jni.h) a little. Both libjni-opus.{so,dylib} and
 libopus.{so.0,0.dylib} should be placed in the appropriate `resources/native/` directory.
@@ -29,7 +29,8 @@ Some resources to understanding this process are:
 * For OSX, `otool` and `install_name_tool` are your friends. See [here](http://www.tribler.org/trac/wiki/MacBinaries) for more details.
 
 This library explicitly copies the dynamic libraries out of the resources directory in the jar file to
-a unique location (`/tmp/scopus_418af7c0b63` on Linux systems) from where it loads them. Note that if you have
+a unique location (something like `/tmp/scopus_418af7c0b63` on Linux systems) from where it loads them. The temporary
+files are deleted when the JVM exits. Note that if you have
 existing installations of Opus, the linker will likely find that library rather than the bundled one (demonstrated for
 Linux). This may cause the test cases to fail.
 
@@ -54,7 +55,7 @@ Encoding a stream is pretty simple.
 
   //...
 
-  val audio : Array[Soort] = getAudioFromSomewhere()
+  val audio : Array[Short] = getAudioFromSomewhere()
   val encoded = enc.encode(audio)
 
   // Send compressed audio to wherever
