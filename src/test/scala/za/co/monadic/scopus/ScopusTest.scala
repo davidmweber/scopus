@@ -1,3 +1,7 @@
+/*
+ * Copyright David Weber 2014
+ * Released under the Creative Commons License (http://creativecommons.org/licenses/by/4.0/legalcode)
+ */
 import java.io._
 import org.scalatest._
 import za.co.monadic.scopus._

@@ -1,3 +1,7 @@
+/*
+ * Copyright David Weber 2014
+ * Released under the Creative Commons License (http://creativecommons.org/licenses/by/4.0/legalcode)
+ */
 #include "za_co_monadic_scopus_Opus__.h"
 #include <opus/opus.h>
 
