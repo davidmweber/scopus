@@ -67,7 +67,7 @@ Decoding is just as simple:
 
   //...
   val packet: Array[Byte] = getCompressedPacket()
-  val audio = enc.encode(codedPacket)
+  val audio = dec.decode(codedPacket)
 
   // Play audio....
 ```
