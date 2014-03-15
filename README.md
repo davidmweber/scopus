@@ -51,7 +51,7 @@ Encoding a stream is pretty simple.
 
 ```scala
   val enc = Encoder(Sf8000,1)
-  enc.setSetDtx(1)
+  enc.setUseDtx(1) // Enable discontinuous transmission
 
   //...
 
