@@ -1,6 +1,8 @@
 name := "Scopus"
 
-version := "0.1"
+organization := "za.co.monadic"
+
+version := "0.1.0"
 
 scalaVersion := "2.10.3"
 
