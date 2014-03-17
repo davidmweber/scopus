@@ -5,6 +5,7 @@
 package za.co.monadic.scopus
 
 import za.co.monadic.scopus.Opus._
+import scala.util.{Success, Failure, Try}
 
 /**
  * Wrapper around the Opus codec's encoder subsystem.
@@ -29,23 +30,27 @@ class Encoder(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192
   /**
    * Encode a block of raw audio  in integer format using the configured encoder
    * @param audio Audio data arranged as a contiguous block interleaved array of short integers
-   * @return An array containing the compressed audio
+   * @return An array containing the compressed audio or the exception in case of a failure
    */
-  def encode(audio: Array[Short]): Array[Byte] = {
+  def apply(audio: Array[Short]): Try[Array[Byte]] = {
     val len: Int = encode_short(encoder, audio, audio.length, decodePtr, bufferSize)
-    if (len < 0) throw new RuntimeException(s"opus_encode() failed: ${error_string(len)}")
-    decodePtr.slice(0, len)
+    if (len < 0)
+      Failure(new RuntimeException(s"opus_encode() failed: ${error_string(len)}"))
+    else
+      Success(decodePtr.slice(0, len))
   }
 
   /**
    * Encode a block of raw audio  in float format using the configured encoder
    * @param audio Audio data arranged as a contiguous block interleaved array of floats
-   * @return An array containing the compressed audio
+   * @return An array containing the compressed audio or the exception in case of a failure
    */
-  def encode(audio: Array[Float]): Array[Byte] = {
+  def apply(audio: Array[Float]): Try[Array[Byte]] = {
     val len = encode_float(encoder, audio, audio.length, decodePtr, bufferSize)
-    if (len < 0) throw new RuntimeException(s"opus_encode_float() failed: ${error_string(len)}")
-    decodePtr.slice(0, len)
+    if (len < 0)
+      Failure(new RuntimeException(s"opus_encode_float() failed: ${error_string(len)}"))
+    else
+      Success(decodePtr.slice(0, len))
   }
 
   /**

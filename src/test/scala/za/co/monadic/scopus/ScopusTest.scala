@@ -70,6 +70,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
   val enc = Encoder(Sf8000, 1)
   val dec = Decoder(Sf8000, 1)
+  val decFloat = DecoderFloat(Sf8000,1)
 
   override def afterAll() = {
     enc.cleanup()
@@ -85,8 +86,8 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       enc.getSampleRate should equal(8000)
       dec.getSampleRate should equal(8000)
       When("the audio is encoded and then decoded")
-      val coded = for (c <- chunks) yield enc.encode(c)
-      val decoded = for (c <- coded) yield dec.decode(c)
+      val coded = for (c <- chunks) yield enc(c).get
+      val decoded = for (c <- coded) yield dec(c).get
 
       Then("the number of packets in the original, coded and decoded streams should be the same")
       coded.length should equal(chunks.length)
@@ -111,8 +112,8 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       enc.reset
       dec.reset
       When("the audio is encoded and then decoded")
-      val coded = for (c <- chunksFloat) yield enc.encode(c)
-      val decoded = for (c <- coded) yield dec.decodeFloat(c)
+      val coded = for (c <- chunksFloat) yield enc(c).get
+      val decoded = for (c <- coded) yield decFloat(c).get
 
       Then("the number of packets in the original, coded and decoded streams should be the same")
       coded.length should equal(chunksFloat.length)
@@ -172,19 +173,19 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
     it("decodes erased packets to the specified number of samples") {
       dec.reset
       enc.reset
-      dec.decode(enc.encode(chunks.head)) // Prime the decoder so it get the decoder state
-      dec.decode(chunkSize).length should equal(chunkSize)
+      dec(enc(chunks.head).get) // Prime the decoder so it get the decoder state
+      dec(chunkSize).get.length should equal(chunkSize)
     }
 
     it("decode erased packets for Short data") {
       enc.reset
       dec.reset
-      val coded = for (c <- chunks) yield enc.encode(c)
+      val coded = for (c <- chunks) yield enc(c).get
       val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 15 == 1) dec.decode(chunkSize) else dec.decode(c)
-        } yield p
+          p = if (i % 15 == 1) dec(chunkSize) else dec(c)
+        } yield p.get
       val in = chunks.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
@@ -197,12 +198,12 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
     it("decode erased packets for Float data") {
       enc.reset
       dec.reset
-      val coded = for (c <- chunksFloat) yield enc.encode(c)
+      val coded = for (c <- chunksFloat) yield enc(c).get
       val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 15 == 1) dec.decodeFloat(chunkSize) else dec.decodeFloat(c)
-        } yield p
+          p = if (i % 15 == 1) decFloat(chunkSize) else decFloat(c)
+        } yield p.get
       val in = chunksFloat.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
@@ -221,7 +222,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       enc.setComplexity(2)
       val tStart = System.currentTimeMillis()
       for (i <- 0 until repeats) {
-        for (c <- chunks) enc.encode(c)
+        for (c <- chunks) enc(c)
       }
       val duration = (System.currentTimeMillis() - tStart) / 1000.0 // Seconds
       val speed = repeats * nSamples / duration / 8000.0 // multiple of real time
@@ -233,9 +234,9 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       enc.reset
       dec.reset
       val tStart = System.currentTimeMillis()
-      val coded = for (c <- chunks) yield enc.encode(c)
+      val coded = for (c <- chunks) yield enc(c).get
       for (i <- 0 until repeats) {
-        for (c <- coded) dec.decode(c)
+        for (c <- coded) dec(c)
       }
       val duration = (System.currentTimeMillis() - tStart) / 1000.0 // Seconds
       val speed = repeats * nSamples / duration / 8000.0 // multiple of real time
