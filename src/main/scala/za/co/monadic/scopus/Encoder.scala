@@ -35,7 +35,7 @@ class Encoder(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192
   def apply(audio: Array[Short]): Try[Array[Byte]] = {
     val len: Int = encode_short(encoder, audio, audio.length, decodePtr, bufferSize)
     if (len < 0)
-      Failure(new RuntimeException(s"opus_encode() failed: ${error_string(len)}"))
+      Failure(new IllegalArgumentException(s"opus_encode() failed: ${error_string(len)}"))
     else
       Success(decodePtr.slice(0, len))
   }
@@ -149,5 +149,5 @@ class Encoder(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192
 }
 
 object Encoder {
-  def apply(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192) = new Encoder(sampleFreq, channels, bufferSize)
+  def apply(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192) = Try(new Encoder(sampleFreq, channels, bufferSize))
 }

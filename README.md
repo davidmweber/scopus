@@ -47,29 +47,31 @@ You may have to adjust your classpath for your Scala installation.
 Usage
 -----
 
-Encoding a stream is pretty simple.
+Encoding a stream is pretty simple. Return types are Scala are wrapped in a Try[_]
+so it is up to you to manage errors reported by the decoder or the encoder. Getters and
+setters for the codec state do throw exceptions. There is no real way to communicate
+setter errors other than an exception thus they both throw. The construction process can
+also throw an exception
 
 ```scala
-  val enc = Encoder(Sf8000,1)
-  enc.setUseDtx(1) // Enable discontinuous transmission
+   val enc = Encoder(Sf8000, 1) match {
+     case Success(e) => e
+     case Failure(f) => throw f
+   }
+   enc.setUseDtx(1)  // Transmit special short packets if silence is detected
 
-  //...
+   val dec = Decoder(Sf8000, 1) match {
+     case Success(e) => e
+     case Failure(f) => throw f
+   }
 
-  val audio : Array[Short] = getAudioFromSomewhere()
-  val encoded = enc.encode(audio)
+   val coded: Try[Array[Byte]] = enc(new Array[Short](160))
+   // Transmit
 
-  // Send compressed audio to wherever
-```
+   // On receive end
+   val decoded: Try[Array[Short]] = dec(coded.get)
 
-Decoding is just as simple:
-```scala
-  val dec = Decoder(Sf8000,1)
-
-  //...
-  val packet: Array[Byte] = getCompressedPacket()
-  val audio = dec.decode(codedPacket)
-
-  // Play audio....
+   // Send decoded packet off
 ```
 
 There are restrictions on the size of the input buffer. Audio frames may be one of the following durations: 2.5, 5, 10, 20, 40 or 60 ms.

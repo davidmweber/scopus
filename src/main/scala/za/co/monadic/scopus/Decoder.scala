@@ -7,7 +7,7 @@ package za.co.monadic.scopus
 import za.co.monadic.scopus.Opus._
 import scala.util.{Failure, Try, Success}
 
-sealed trait DecoderBase {
+trait DecoderBase {
 
   val Fs: SampleFrequency
   val channels: Int
@@ -17,7 +17,7 @@ sealed trait DecoderBase {
   val error = Array[Int](0)
   val decoder = decoder_create(Fs(), channels, error)
   if (error(0) != OPUS_OK) {
-    throw new RuntimeException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
+    throw new IllegalArgumentException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
   }
   var clean = false
 
@@ -115,7 +115,7 @@ class DecoderShort(val Fs: SampleFrequency, val channels: Int) extends DecoderBa
 }
 
 object Decoder {
-  def apply(Fs: SampleFrequency, channels: Int) = new DecoderShort(Fs, channels)
+  def apply(Fs: SampleFrequency, channels: Int) = Try(new DecoderShort(Fs, channels))
 }
 
 class DecoderFloat(val Fs: SampleFrequency, val channels: Int) extends DecoderBase  {
@@ -151,6 +151,6 @@ class DecoderFloat(val Fs: SampleFrequency, val channels: Int) extends DecoderBa
 }
 
 object DecoderFloat {
-  def apply(Fs: SampleFrequency, channels: Int) = new DecoderFloat(Fs, channels)
+  def apply(Fs: SampleFrequency, channels: Int) = Try(new DecoderFloat(Fs, channels))
 }
 
