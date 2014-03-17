@@ -7,11 +7,12 @@ package za.co.monadic.scopus
 import za.co.monadic.scopus.Opus._
 import scala.util.{Failure, Try, Success}
 
-trait DecoderBase {
+sealed trait DecoderBase {
 
   val Fs: SampleFrequency
   val channels: Int
 
+  // 60ms of audio is the longest possible buffer we will need for the decoder
   val bufferLen: Int = math.round(0.120f * Fs() * channels)
   var fec = 0
   val error = Array[Int](0)
@@ -21,7 +22,7 @@ trait DecoderBase {
   }
   var clean = false
 
-   /**
+  /**
    * Release all pointers allocated for the decoder. Make every attempt to call this
    * when you are done with the encoder as finalise() is what it is in the JVM
    */
@@ -81,11 +82,10 @@ trait DecoderBase {
   }
 }
 
-class DecoderShort(val Fs: SampleFrequency, val channels: Int) extends DecoderBase  {
+class DecoderShort(val Fs: SampleFrequency, val channels: Int) extends DecoderBase {
 
   val decodedBuf = new Array[Short](2880 * channels)
 
-  // 60ms of audio at 48kHz
   /**
    * Decode an audio packet to an array of Shorts
    * @param compressedAudio The incoming audio packet
@@ -118,7 +118,7 @@ object Decoder {
   def apply(Fs: SampleFrequency, channels: Int) = Try(new DecoderShort(Fs, channels))
 }
 
-class DecoderFloat(val Fs: SampleFrequency, val channels: Int) extends DecoderBase  {
+class DecoderFloat(val Fs: SampleFrequency, val channels: Int) extends DecoderBase {
 
   val decodedBuf = new Array[Float](2880 * channels)
 

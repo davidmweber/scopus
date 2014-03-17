@@ -124,6 +124,10 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         case Success(ok) => fail("Encoder constructor did not fail on bad construction")
         case Failure(f) => f.getMessage should equal("Failed to create the Opus encoder: invalid argument")
       }
+      Encoder(Sf8000, 1, -1 ) match {
+        case Success(ok) => fail("Encoder constructor did not fail on bad construction")
+        case Failure(f) => f.getMessage should equal("requirement failed: Buffer size must be positive")
+      }
       Decoder(Sf8000, 4) match {
         case Success(ok) => fail("Short decoder constructor did not fail on bad construction")
         case Failure(f) => f.getMessage should equal("Failed to create the Opus encoder: invalid argument")

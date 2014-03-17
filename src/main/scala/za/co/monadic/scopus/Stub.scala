@@ -11,7 +11,8 @@ object Stub extends App {
     case Success(e) => e
     case Failure(f) => throw f
   }
-  enc.setUseDtx(1)  // Transmit special short packets if silence is detected
+  enc.setUseDtx(1)
+  // Transmit special short packets if silence is detected
 
   val dec = Decoder(Sf8000, 1) match {
     case Success(e) => e

@@ -15,15 +15,16 @@ object Opus {
   // System dependent load of native libraries
   LibLoader.getOsArch match {
     case "Linux/amd64" =>
-      LibLoader("libopus.so.0",load = false) // Don't load this as it is dynamically found by the linker in Linux
+      LibLoader("libopus.so.0", load = false) // Don't load this as it is dynamically found by the linker in Linux
       LibLoader("libjni_opus.so")
     case "Mac OS X/x86_64" =>
-      LibLoader("libopus.0.dylib",load = false)
+      LibLoader("libopus.0.dylib", load = false)
       LibLoader("libjni_opus.dylib")
     case s: String =>
-        println(s"Unknown OS/platform combination: $s")
-        sys.exit(-1)
+      println(s"Unknown OS/platform combination: $s")
+      sys.exit(-1)
   }
+
   @native
   def decoder_create(Fs: Int, channels: Int, error: Array[Int]): Long
 

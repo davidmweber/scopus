@@ -15,10 +15,11 @@ import scala.util.{Success, Failure, Try}
  * frequency by the frame duration. At 8kHz a 20ms packet is 160 samples long.
  * @param sampleFreq THe required sampling frequency
  * @param channels The number of channels you intend to encode.
- * @param bufferSize The reserved size of the buffer to which compressed data are written
+ * @param bufferSize The reserved size of the buffer to which compressed data are written.
+ *                   The default should be more than sufficient
  */
 class Encoder(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192) {
-
+  require(bufferSize > 0, "Buffer size must be positive")
   val error = Array[Int](0)
   val decodePtr = new Array[Byte](bufferSize)
   val encoder = encoder_create(sampleFreq(), channels, OPUS_APPLICATION_VOIP, error)
