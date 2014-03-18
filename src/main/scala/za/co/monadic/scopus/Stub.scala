@@ -7,7 +7,7 @@ import scala.util.{Try, Failure, Success}
  */
 object Stub extends App {
 
-  val enc = Encoder(Sf8000, 1) getOrElse sys.exit(-1)
+  val enc = Encoder(Sf8000, 1, Audio) getOrElse sys.exit(-1)
   enc.setUseDtx(1)
   // Transmit special short packets if silence is detected
 

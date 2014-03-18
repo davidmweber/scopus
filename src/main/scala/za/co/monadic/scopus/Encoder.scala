@@ -15,14 +15,15 @@ import scala.util.{Success, Failure, Try}
  * frequency by the frame duration. At 8kHz a 20ms packet is 160 samples long.
  * @param sampleFreq The required sampling frequency
  * @param channels The number of channels you intend to encode.
+ * @param app The application (Voip, Audio or LowDelay)
  * @param bufferSize The reserved size of the buffer to which compressed data are written.
  *                   The default should be more than sufficient
  */
-class Encoder(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192) {
+class Encoder(sampleFreq: SampleFrequency, channels: Int, app: Application, bufferSize: Int = 8192) {
   require(bufferSize > 0, "Buffer size must be positive")
   val error = Array[Int](0)
   val decodePtr = new Array[Byte](bufferSize)
-  val encoder = encoder_create(sampleFreq(), channels, OPUS_APPLICATION_VOIP, error)
+  val encoder = encoder_create(sampleFreq(),channels,  app(), error)
   if (error(0) != OPUS_OK) {
     throw new RuntimeException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
   }
@@ -154,9 +155,11 @@ object Encoder {
    * Factory for an encoder instance.
    * @param sampleFreq THe required sampling frequency
    * @param channels The number of channels you intend to encode.
+   * @param app The application (Voip, Audio or LowDelay). It defaults to Voip.
    * @param bufferSize The reserved size of the buffer to which compressed data are written.
    *                   The default should be more than sufficient
    * @return A Try[Array[Byte]) containing a reference to the encoder object
    */
-  def apply(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192) = Try(new Encoder(sampleFreq, channels, bufferSize))
+  def apply(sampleFreq: SampleFrequency, channels: Int, app: Application = Voip, bufferSize: Int = 8192) =
+    Try(new Encoder(sampleFreq,channels, app, bufferSize))
 }

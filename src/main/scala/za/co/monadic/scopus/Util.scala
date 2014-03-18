@@ -4,10 +4,11 @@
  */
 package za.co.monadic.scopus
 
+import za.co.monadic.scopus.Opus._
 /**
  * Base class for supported sample frequencies
  */
-abstract class SampleFrequency {
+sealed trait SampleFrequency {
   def apply(): Int
 }
 
@@ -30,3 +31,21 @@ object Sf24000 extends SampleFrequency {
 object Sf48000 extends SampleFrequency {
   def apply(): Int = 48000
 }
+
+sealed trait Application {
+  def apply(): Int
+}
+
+object Voip extends Application {
+  def apply() = OPUS_APPLICATION_VOIP
+}
+
+object Audio extends Application {
+  def apply() = OPUS_APPLICATION_AUDIO
+}
+
+object LowDelay extends Application {
+  def apply() = OPUS_APPLICATION_RESTRICTED_LOWDELAY
+}
+
+
