@@ -46,6 +46,14 @@ You may have to adjust your classpath for your Scala installation.
 
 Usage
 -----
+Socpus is available from the Sonatype Maven repo. Add the following dependency to your
+sbt build:
+
+```scala
+  resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
+
+  libarydependencies +=  "za.co.monadic" %% "scopus" % "0.1.0-SNAPSHOT"
+```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a Try[_]
 so it is up to you to manage errors reported by the decoder or the encoder.
