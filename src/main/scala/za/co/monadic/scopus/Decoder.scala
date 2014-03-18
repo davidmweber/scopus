@@ -7,6 +7,10 @@ package za.co.monadic.scopus
 import za.co.monadic.scopus.Opus._
 import scala.util.{Failure, Try, Success}
 
+/**
+ * Decoder base class which allows specialisations for the different return types offered by
+ * the Opus system.
+ */
 sealed trait DecoderBase {
 
   val Fs: SampleFrequency
@@ -82,6 +86,11 @@ sealed trait DecoderBase {
   }
 }
 
+/**
+ * Specialisation for Short data return
+ * @param Fs The sampling frequency required
+ * @param channels Number of audio channels required. Must be 1 or 2.
+ */
 class DecoderShort(val Fs: SampleFrequency, val channels: Int) extends DecoderBase {
 
   val decodedBuf = new Array[Short](2880 * channels)
@@ -89,7 +98,7 @@ class DecoderShort(val Fs: SampleFrequency, val channels: Int) extends DecoderBa
   /**
    * Decode an audio packet to an array of Shorts
    * @param compressedAudio The incoming audio packet
-   * @return Decoded audio packet
+   * @return A Try containing decoded audio in Short format
    */
   def apply(compressedAudio: Array[Byte]): Try[Array[Short]] = {
     val len = decode_short(decoder, compressedAudio, compressedAudio.length, decodedBuf, bufferLen, fec)
@@ -103,7 +112,7 @@ class DecoderShort(val Fs: SampleFrequency, val channels: Int) extends DecoderBa
    * Decode an erased (i.e. not received) audio packet. Note you need to specify
    * how many samples you think you have lost so the decoder can attempt to
    * deal with the erasure appropriately.
-   * @return The decompressed audio for this packet
+   * @return A Try containing decompressed audio in short format
    */
   def apply(count: Int): Try[Array[Short]] = {
     val len = decode_short(decoder, null, 0, decodedBuf, count, fec)
@@ -114,10 +123,24 @@ class DecoderShort(val Fs: SampleFrequency, val channels: Int) extends DecoderBa
   }
 }
 
+/**
+ * Factory for an Opus decoder that returns Short data
+ */
 object Decoder {
+  /**
+   * Construct an instance of a decoder that returns audio data as an Array[Short]
+   * @param Fs The sample frequency required
+   * @param channels The number of channels. Must be 1 or 2
+   * @return A Try[] containing a reference to the decoder or an exception if construction fails
+   */
   def apply(Fs: SampleFrequency, channels: Int) = Try(new DecoderShort(Fs, channels))
 }
 
+/**
+ * Specialisation for Float data return
+ * @param Fs The sampling frequency required
+ * @param channels Number of audio channels required. Must be 1 or 2.
+ */
 class DecoderFloat(val Fs: SampleFrequency, val channels: Int) extends DecoderBase {
 
   val decodedBuf = new Array[Float](2880 * channels)
@@ -125,7 +148,7 @@ class DecoderFloat(val Fs: SampleFrequency, val channels: Int) extends DecoderBa
   /**
    * Decode an audio packet to an array of Floats
    * @param compressedAudio The incoming audio packet
-   * @return Decoded audio packet
+   * @return A Try containing the decoded audio packet in Float format
    */
   def apply(compressedAudio: Array[Byte]): Try[Array[Float]] = {
     val len = decode_float(decoder, compressedAudio, compressedAudio.length, decodedBuf, bufferLen, fec)
@@ -139,7 +162,7 @@ class DecoderFloat(val Fs: SampleFrequency, val channels: Int) extends DecoderBa
    * Decode an erased (i.e. not received) audio packet. Note you need to specify
    * how many samples you think you have lost so the decoder can attempt to
    * deal with the erasure appropriately.
-   * @return The decompressed audio for this packet
+   * @return A Try containing decompressed audio in Float format
    */
   def apply(count: Int): Try[Array[Float]] = {
     val len = decode_float(decoder, null, 0, decodedBuf, count, fec)
@@ -151,6 +174,12 @@ class DecoderFloat(val Fs: SampleFrequency, val channels: Int) extends DecoderBa
 }
 
 object DecoderFloat {
+  /**
+   * Construct an instance of a decoder that returns audio data as an Array[Short]
+   * @param Fs The sample frequency required
+   * @param channels The number of channels. Must be 1 or 2
+   * @return A Try[] containing a reference to the decoder or an exception if construction fails
+   */
   def apply(Fs: SampleFrequency, channels: Int) = Try(new DecoderFloat(Fs, channels))
 }
 

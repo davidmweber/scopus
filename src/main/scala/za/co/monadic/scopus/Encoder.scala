@@ -13,7 +13,7 @@ import scala.util.{Success, Failure, Try}
  * be considered definitive. The encoder accepts buffers of duration of
  * 2,5, 5, 10, 20, 40 or 60ms. To calculate the buffer size, multiply your sample
  * frequency by the frame duration. At 8kHz a 20ms packet is 160 samples long.
- * @param sampleFreq THe required sampling frequency
+ * @param sampleFreq The required sampling frequency
  * @param channels The number of channels you intend to encode.
  * @param bufferSize The reserved size of the buffer to which compressed data are written.
  *                   The default should be more than sufficient
@@ -150,5 +150,13 @@ class Encoder(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192
 }
 
 object Encoder {
+  /**
+   * Factory for an encoder instance.
+   * @param sampleFreq THe required sampling frequency
+   * @param channels The number of channels you intend to encode.
+   * @param bufferSize The reserved size of the buffer to which compressed data are written.
+   *                   The default should be more than sufficient
+   * @return A Try[Array[Byte]) containing a reference to the encoder object
+   */
   def apply(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192) = Try(new Encoder(sampleFreq, channels, bufferSize))
 }
