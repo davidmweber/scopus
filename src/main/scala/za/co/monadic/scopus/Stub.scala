@@ -7,17 +7,11 @@ import scala.util.{Try, Failure, Success}
  */
 object Stub extends App {
 
-  val enc = Encoder(Sf8000, 1) match {
-    case Success(e) => e
-    case Failure(f) => throw f
-  }
+  val enc = Encoder(Sf8000, 1) getOrElse sys.exit(-1)
   enc.setUseDtx(1)
   // Transmit special short packets if silence is detected
 
-  val dec = Decoder(Sf8000, 1) match {
-    case Success(e) => e
-    case Failure(f) => throw f
-  }
+  val dec = Decoder(Sf8000, 1) getOrElse sys.exit(-1)
 
   val coded: Try[Array[Byte]] = enc(new Array[Short](160))
   // Transmit

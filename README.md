@@ -48,22 +48,13 @@ Usage
 -----
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a Try[_]
-so it is up to you to manage errors reported by the decoder or the encoder. Getters and
-setters for the codec state do throw exceptions. There is no real way to communicate
-setter errors other than an exception thus they both throw. The construction process can
-also throw an exception
+so it is up to you to manage errors reported by the decoder or the encoder.
 
 ```scala
-   val enc = Encoder(Sf8000, 1) match {
-     case Success(e) => e
-     case Failure(f) => throw f
-   }
+   val enc = Encoder(Sf8000, 1) getOrElse sys.exit(-1)
    enc.setUseDtx(1)  // Transmit special short packets if silence is detected
 
-   val dec = Decoder(Sf8000, 1) match {
-     case Success(e) => e
-     case Failure(f) => throw f
-   }
+   val dec = Decoder(Sf8000, 1) getOrElse sys.exit(-1)
 
    val coded: Try[Array[Byte]] = enc(new Array[Short](160))
    // Transmit
@@ -78,3 +69,8 @@ There are restrictions on the size of the input buffer. Audio frames may be one 
 Smaller values obviously give less delay but at the expense of slightly less efficient compression.
 Note that Java is big endian while most raw audio data are little endian (at least on Intel Architectures). This
 means you may have to do some byte swapping when reading audio streams from external sources.
+
+Scala does not seem to have a [convention for error handling](http://grokbase.com/t/gg/scala-user/1293fwp1je/trying-to-work-with-try).
+I went with [Try](http://www.scala-lang.org/api/2.10.3/index.html#scala.util.Try). If this is
+not how you think it should be done, read the link and make a case. Try can be flatmapped
+which is important in my application.
