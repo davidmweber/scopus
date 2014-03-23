@@ -28,10 +28,12 @@ import java.nio.channels.Channels
  */
 object LibLoader {
 
-  val tempPath = "scopus_"+UUID.randomUUID.toString.split("-").last
+  val tempPath = "scopus_" + UUID.randomUUID.toString.split("-").last
   val path = "native/" + getOsArch
   val destDir = System.getProperty("java.io.tmpdir") + "/" + tempPath + "/"
-  new File(destDir).mkdirs() // Create the temporary directory
+  new File(destDir).mkdirs()
+
+  // Create the temporary directory
 
   def getOsArch = System.getProperty("os.name") + "/" + System.getProperty("os.arch")
 
@@ -44,10 +46,10 @@ object LibLoader {
    */
   def apply(libName: String, load: Boolean = true): Unit = {
     try {
-      val source = Channels.newChannel(Opus.getClass.getClassLoader.getResourceAsStream(path + "/" + libName ))
-      val fileOut = new File(destDir, libName )
+      val source = Channels.newChannel(Opus.getClass.getClassLoader.getResourceAsStream(path + "/" + libName))
+      val fileOut = new File(destDir, libName)
       val dest = new FileOutputStream(fileOut)
-      dest.getChannel.transferFrom(source,0,Long.MaxValue)
+      dest.getChannel.transferFrom(source, 0, Long.MaxValue)
       source.close()
       dest.close()
 
@@ -59,9 +61,10 @@ object LibLoader {
       }
       // Finally, load the dynamic library if required
       if (load) System.load(fileOut.getAbsolutePath)
-    } catch { // This is pretty catastrophic so bail.
+    } catch {
+      // This is pretty catastrophic so bail.
       case e: Exception =>
-        println("Fatal error in LibLoader: " + e.getMessage +" from class " + e.getClass.getCanonicalName)
+        println("Fatal error in LibLoader: " + e.getMessage + " from class " + e.getClass.getCanonicalName)
         sys.exit(-1)
     }
   }

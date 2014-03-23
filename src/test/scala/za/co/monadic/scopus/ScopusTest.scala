@@ -4,6 +4,7 @@
  */
 import java.io._
 import org.scalatest._
+import scala.util.{Failure, Success}
 import za.co.monadic.scopus._
 import Numeric.Implicits._
 
@@ -68,12 +69,23 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
   val chunks = audio.slice(0, nSamples).grouped(chunkSize).toList
   val chunksFloat = audioFloat.slice(0, nSamples).grouped(chunkSize).toList
 
-  val enc = Encoder(Sf8000, 1)
-  val dec = Decoder(Sf8000, 1)
+  val enc = Encoder(Sf8000, 1) match {
+    case Success(ok) => ok
+    case Failure(f) => fail(s"Encoder construction failed: ${f.getMessage}")
+  }
+  val dec = Decoder(Sf8000, 1) match {
+    case Success(ok) => ok
+    case Failure(f) => fail(s"Decoder construction failed: ${f.getMessage}")
+  }
+  val decFloat = DecoderFloat(Sf8000,1) match {
+    case Success(ok) => ok
+    case Failure(f) => fail(s"Float decoder construction failed: ${f.getMessage}")
+  }
 
   override def afterAll() = {
     enc.cleanup()
     dec.cleanup()
+    decFloat.cleanup()
   }
 
   describe("Opus codec can") {
@@ -85,8 +97,8 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       enc.getSampleRate should equal(8000)
       dec.getSampleRate should equal(8000)
       When("the audio is encoded and then decoded")
-      val coded = for (c <- chunks) yield enc.encode(c)
-      val decoded = for (c <- coded) yield dec.decode(c)
+      val coded = for (c <- chunks) yield enc(c).get
+      val decoded = for (c <- coded) yield dec(c).get
 
       Then("the number of packets in the original, coded and decoded streams should be the same")
       coded.length should equal(chunks.length)
@@ -106,13 +118,33 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       //writeAudioFile("test-short.raw",decoded.toArray.flatten)
     }
 
+    it("Fails if the encoder and decoder constructors throw") {
+      // cannot build 4 channel decoders like this
+      Encoder(Sf8000, 4) match {
+        case Success(ok) => fail("Encoder constructor did not fail on bad construction")
+        case Failure(f) => f.getMessage should equal("Failed to create the Opus encoder: invalid argument")
+      }
+      Encoder(Sf8000, 1, Voip, -1 ) match {
+        case Success(ok) => fail("Encoder constructor did not fail on bad construction")
+        case Failure(f) => f.getMessage should equal("requirement failed: Buffer size must be positive")
+      }
+      Decoder(Sf8000, 4) match {
+        case Success(ok) => fail("Short decoder constructor did not fail on bad construction")
+        case Failure(f) => f.getMessage should equal("Failed to create the Opus encoder: invalid argument")
+      }
+      DecoderFloat(Sf8000,4) match {
+        case Success(ok) => fail("Float decoder constructor did not fail on bad construction")
+        case Failure(f) => f.getMessage should equal("Failed to create the Opus encoder: invalid argument")
+      }
+    }
+
     it("encode and decode audio segments as Float types") {
       Given("a PCM file coded as an array of short integers and a codec pair")
       enc.reset
       dec.reset
       When("the audio is encoded and then decoded")
-      val coded = for (c <- chunksFloat) yield enc.encode(c)
-      val decoded = for (c <- coded) yield dec.decodeFloat(c)
+      val coded = for (c <- chunksFloat) yield enc(c).get
+      val decoded = for (c <- coded) yield decFloat(c).get
 
       Then("the number of packets in the original, coded and decoded streams should be the same")
       coded.length should equal(chunksFloat.length)
@@ -139,14 +171,14 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         val d = List(Decoder(Sf8000, 1), Decoder(Sf12000, 1), Decoder(Sf16000, 1), Decoder(Sf24000, 1), Decoder(Sf48000, 1))
         Then("the encoder structures return the correct sample frequency it was configured for")
         for ((f, t) <- freqs zip e) {
-          t.getSampleRate should equal(f)
+          t.get.getSampleRate should equal(f)
         }
-        e.map(_.cleanup())
+        e.map(_.get.cleanup())
         And("the decoder structures return the correct frequencies")
         for ((f, t) <- freqs zip d) {
-          t.getSampleRate should equal(f)
+          t.get.getSampleRate should equal(f)
         }
-        d.map(_.cleanup())
+        d.map(_.get.cleanup())
       } catch {
         case e: Exception => fail(s"Received exception ${e.getMessage}")
       }
@@ -172,19 +204,19 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
     it("decodes erased packets to the specified number of samples") {
       dec.reset
       enc.reset
-      dec.decode(enc.encode(chunks.head)) // Prime the decoder so it get the decoder state
-      dec.decode(chunkSize).length should equal(chunkSize)
+      dec(enc(chunks.head).get) // Prime the decoder so it get the decoder state
+      dec(chunkSize).get.length should equal(chunkSize)
     }
 
     it("decode erased packets for Short data") {
       enc.reset
       dec.reset
-      val coded = for (c <- chunks) yield enc.encode(c)
+      val coded = for (c <- chunks) yield enc(c).get
       val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 15 == 1) dec.decode(chunkSize) else dec.decode(c)
-        } yield p
+          p = if (i % 15 == 1) dec(chunkSize) else dec(c)
+        } yield p.get
       val in = chunks.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
@@ -197,12 +229,12 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
     it("decode erased packets for Float data") {
       enc.reset
       dec.reset
-      val coded = for (c <- chunksFloat) yield enc.encode(c)
+      val coded = for (c <- chunksFloat) yield enc(c).get
       val decoded = // Decode, dropping every 10th packet
         for {
           (c, i) <- coded zip (0 until coded.length)
-          p = if (i % 15 == 1) dec.decodeFloat(chunkSize) else dec.decodeFloat(c)
-        } yield p
+          p = if (i % 15 == 1) decFloat(chunkSize) else decFloat(c)
+        } yield p.get
       val in = chunksFloat.toArray.flatten.grouped(40).toList
       val out = decoded.toArray.flatten.grouped(40).toList
       val eIn = for (a <- in) yield energy(a)
@@ -221,7 +253,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       enc.setComplexity(2)
       val tStart = System.currentTimeMillis()
       for (i <- 0 until repeats) {
-        for (c <- chunks) enc.encode(c)
+        for (c <- chunks) enc(c)
       }
       val duration = (System.currentTimeMillis() - tStart) / 1000.0 // Seconds
       val speed = repeats * nSamples / duration / 8000.0 // multiple of real time
@@ -233,9 +265,9 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       enc.reset
       dec.reset
       val tStart = System.currentTimeMillis()
-      val coded = for (c <- chunks) yield enc.encode(c)
+      val coded = for (c <- chunks) yield enc(c).get
       for (i <- 0 until repeats) {
-        for (c <- coded) dec.decode(c)
+        for (c <- coded) dec(c)
       }
       val duration = (System.currentTimeMillis() - tStart) / 1000.0 // Seconds
       val speed = repeats * nSamples / duration / 8000.0 // multiple of real time

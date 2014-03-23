@@ -1,7 +1,11 @@
+# -*-makefile-*-
 
 CC=gcc
+JAVA = java-7-oracle
 NATIVE = ../../resources/native/Linux/amd64/
-INCLUDES = -I/usr/lib/jvm/java-7-openjdk-amd64/include/ -I/usr/local/include
+INCLUDES = -I/usr/lib/jvm/$(JAVA)/include\
+	   -I/usr/lib/jvm/$(JAVA)/include/linux\
+	   -I/usr/local/include
 CFLAGS = -Ofast -Wall -fPIC $(INCLUDES)
 LDFLAGS = -Wl,-soname,libjni_opus.so,-rpath='$$ORIGIN' -shared
 LDPATH = -L$(NATIVE)

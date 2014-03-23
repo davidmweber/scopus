@@ -4,9 +4,9 @@ Scopus
 Scopus is a Scala interface to the [Opus codec](http://www.opus-codec.org). It is light and thin by design and gives
 programmers access to the bulk of the functionality in Opus.
 It uses JNI to handle the native code and works for Linux and OSX.
-Benchmarks performed on the encoder show that it is 9% slower than a native C implementation. On a 3.5Ghz i5, it runs
-at 380 times real time (complexity factor set to 2). The decoder runs at around 1600 times real time. A native
-benchmark shows the encoder to run at 412 times real time.
+Benchmarks performed on the encoder show that it is 10% slower than a native C implementation. On a 3.5Ghz i5, it runs
+at 360 times real time (complexity factor set to 2). The decoder runs at around 1600 times real time. A native
+benchmark shows the encoder to run at 400 times real time. The LLVM C compiler (clang v3.4) pips GCC by about 5%.
 
 The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/).
 
@@ -46,33 +46,39 @@ You may have to adjust your classpath for your Scala installation.
 
 Usage
 -----
-
-Encoding a stream is pretty simple.
+Scopus is available from the Sonatype Maven repo. Add the following dependency to your
+sbt build:
 
 ```scala
-  val enc = Encoder(Sf8000,1)
-  enc.setUseDtx(1) // Enable discontinuous transmission
+  resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
 
-  //...
-
-  val audio : Array[Short] = getAudioFromSomewhere()
-  val encoded = enc.encode(audio)
-
-  // Send compressed audio to wherever
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.1.1-SNAPSHOT"
 ```
 
-Decoding is just as simple:
+Encoding a stream is pretty simple. Return types are Scala are wrapped in a Try[_]
+so it is up to you to manage errors reported by the decoder or the encoder.
+
 ```scala
-  val dec = Decoder(Sf8000,1)
+   val enc = Encoder(Sf8000, 1, Audio) getOrElse sys.exit(-1)
+   enc.setUseDtx(1)  // Transmit special short packets if silence is detected
 
-  //...
-  val packet: Array[Byte] = getCompressedPacket()
-  val audio = dec.decode(codedPacket)
+   val dec = Decoder(Sf8000, 1) getOrElse sys.exit(-1)
 
-  // Play audio....
+   val coded: Try[Array[Byte]] = enc(new Array[Short](160))
+   // Transmit
+
+   // On receive end
+   val decoded: Try[Array[Short]] = dec(coded.get)
+
+   // Send decoded packet off
 ```
 
 There are restrictions on the size of the input buffer. Audio frames may be one of the following durations: 2.5, 5, 10, 20, 40 or 60 ms.
 Smaller values obviously give less delay but at the expense of slightly less efficient compression.
 Note that Java is big endian while most raw audio data are little endian (at least on Intel Architectures). This
 means you may have to do some byte swapping when reading audio streams from external sources.
+
+Scala does not seem to have a [convention for error handling](http://grokbase.com/t/gg/scala-user/1293fwp1je/trying-to-work-with-try).
+I went with [Try](http://www.scala-lang.org/api/2.10.3/index.html#scala.util.Try). If this is
+not how you think it should be done, read the link and make a case. Try can be flatmapped
+which is important in my application.

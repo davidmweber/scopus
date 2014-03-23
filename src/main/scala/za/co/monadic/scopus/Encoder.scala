@@ -5,6 +5,7 @@
 package za.co.monadic.scopus
 
 import za.co.monadic.scopus.Opus._
+import scala.util.{Success, Failure, Try}
 
 /**
  * Wrapper around the Opus codec's encoder subsystem.
@@ -12,15 +13,17 @@ import za.co.monadic.scopus.Opus._
  * be considered definitive. The encoder accepts buffers of duration of
  * 2,5, 5, 10, 20, 40 or 60ms. To calculate the buffer size, multiply your sample
  * frequency by the frame duration. At 8kHz a 20ms packet is 160 samples long.
- * @param sampleFreq THe required sampling frequency
+ * @param sampleFreq The required sampling frequency
  * @param channels The number of channels you intend to encode.
- * @param bufferSize The reserved size of the buffer to which compressed data are written
+ * @param app The application (Voip, Audio or LowDelay)
+ * @param bufferSize The reserved size of the buffer to which compressed data are written.
+ *                   The default should be more than sufficient
  */
-class Encoder(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192) {
-
+class Encoder(sampleFreq: SampleFrequency, channels: Int, app: Application, bufferSize: Int = 8192) {
+  require(bufferSize > 0, "Buffer size must be positive")
   val error = Array[Int](0)
   val decodePtr = new Array[Byte](bufferSize)
-  val encoder = encoder_create(sampleFreq(), channels, OPUS_APPLICATION_VOIP, error)
+  val encoder = encoder_create(sampleFreq(),channels,  app(), error)
   if (error(0) != OPUS_OK) {
     throw new RuntimeException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
   }
@@ -29,23 +32,27 @@ class Encoder(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192
   /**
    * Encode a block of raw audio  in integer format using the configured encoder
    * @param audio Audio data arranged as a contiguous block interleaved array of short integers
-   * @return An array containing the compressed audio
+   * @return An array containing the compressed audio or the exception in case of a failure
    */
-  def encode(audio: Array[Short]): Array[Byte] = {
+  def apply(audio: Array[Short]): Try[Array[Byte]] = {
     val len: Int = encode_short(encoder, audio, audio.length, decodePtr, bufferSize)
-    if (len < 0) throw new RuntimeException(s"opus_encode() failed: ${error_string(len)}")
-    decodePtr.slice(0, len)
+    if (len < 0)
+      Failure(new IllegalArgumentException(s"opus_encode() failed: ${error_string(len)}"))
+    else
+      Success(decodePtr.slice(0, len))
   }
 
   /**
    * Encode a block of raw audio  in float format using the configured encoder
    * @param audio Audio data arranged as a contiguous block interleaved array of floats
-   * @return An array containing the compressed audio
+   * @return An array containing the compressed audio or the exception in case of a failure
    */
-  def encode(audio: Array[Float]): Array[Byte] = {
+  def apply(audio: Array[Float]): Try[Array[Byte]] = {
     val len = encode_float(encoder, audio, audio.length, decodePtr, bufferSize)
-    if (len < 0) throw new RuntimeException(s"opus_encode_float() failed: ${error_string(len)}")
-    decodePtr.slice(0, len)
+    if (len < 0)
+      Failure(new RuntimeException(s"opus_encode_float() failed: ${error_string(len)}"))
+    else
+      Success(decodePtr.slice(0, len))
   }
 
   /**
@@ -144,5 +151,15 @@ class Encoder(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192
 }
 
 object Encoder {
-  def apply(sampleFreq: SampleFrequency, channels: Int, bufferSize: Int = 8192) = new Encoder(sampleFreq, channels, bufferSize)
+  /**
+   * Factory for an encoder instance.
+   * @param sampleFreq THe required sampling frequency
+   * @param channels The number of channels you intend to encode.
+   * @param app The application (Voip, Audio or LowDelay). It defaults to Voip.
+   * @param bufferSize The reserved size of the buffer to which compressed data are written.
+   *                   The default should be more than sufficient
+   * @return A Try[Array[Byte]) containing a reference to the encoder object
+   */
+  def apply(sampleFreq: SampleFrequency, channels: Int, app: Application = Voip, bufferSize: Int = 8192) =
+    Try(new Encoder(sampleFreq,channels, app, bufferSize))
 }

@@ -5,68 +5,26 @@
 package za.co.monadic.scopus
 
 import za.co.monadic.scopus.Opus._
+import scala.util.{Failure, Try, Success}
 
-class Decoder(Fs: SampleFrequency, channels: Int) {
+/**
+ * Decoder base class which allows specialisations for the different return types offered by
+ * the Opus system.
+ */
+sealed trait DecoderBase {
 
+  val Fs: SampleFrequency
+  val channels: Int
+
+  // 60ms of audio is the longest possible buffer we will need for the decoder
   val bufferLen: Int = math.round(0.120f * Fs() * channels)
   var fec = 0
   val error = Array[Int](0)
   val decoder = decoder_create(Fs(), channels, error)
   if (error(0) != OPUS_OK) {
-    throw new RuntimeException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
+    throw new IllegalArgumentException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
   }
-
-  val decodedShortBuf = new Array[Short](2880 * channels)
-  // 60ms of audio at 48kHz
-  val decodedFloatBuf = new Array[Float](2880 * channels)
-  // 60ms of audio at 48kHz
   var clean = false
-
-  /**
-   * Decode an audio packet to an array of Shorts
-   * @param compressedAudio The incoming audio packet
-   * @return Decoded audio packet
-   */
-  def decode(compressedAudio: Array[Byte]): Array[Short] = {
-    val len = decode_short(decoder, compressedAudio, compressedAudio.length, decodedShortBuf, bufferLen, fec)
-    if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${error_string(len)}")
-    decodedShortBuf.slice(0, len)
-  }
-
-  /**
-   * Decode an erased (i.e. not received) audio packet. Note you need to specify
-   * how many samples you think you have lost so the decoder can attempt to
-   * deal with the erasure appropriately.
-   * @return The decompressed audio for this packet
-   */
-  def decode(count: Int): Array[Short] = {
-    val len = decode_short(decoder, null, 0, decodedShortBuf, count, fec)
-    if (len < 0) throw new RuntimeException(s"opus_decode() failed: ${error_string(len)}")
-    decodedShortBuf.slice(0, len)
-  }
-
-  /**
-   * Decode an audio packet to an array of Floats
-   * @param compressedAudio The incoming audio packet
-   * @return Decoded audio packet
-   */
-  def decodeFloat(compressedAudio: Array[Byte]): Array[Float] = {
-    val len = decode_float(decoder, compressedAudio, compressedAudio.length, decodedFloatBuf, bufferLen, fec)
-    if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${error_string(len)}")
-    decodedFloatBuf.slice(0, len)
-  }
-
-  /**
-   * Decode an erased (i.e. not received) audio packet. Note you need to specify
-   * how many samples you think you have lost so the decoder can attempt to
-   * deal with the erasure appropriately.
-   * @return The decompressed audio for this packet
-   */
-  def decodeFloat(count: Int): Array[Float] = {
-    val len = decode_float(decoder, null, 0, decodedFloatBuf, count, fec)
-    if (len < 0) throw new RuntimeException(s"opus_decode_float() failed: ${error_string(len)}")
-    decodedFloatBuf.slice(0, len)
-  }
 
   /**
    * Release all pointers allocated for the decoder. Make every attempt to call this
@@ -128,6 +86,100 @@ class Decoder(Fs: SampleFrequency, channels: Int) {
   }
 }
 
-object Decoder {
-  def apply(Fs: SampleFrequency, channels: Int) = new Decoder(Fs, channels)
+/**
+ * Specialisation for Short data return
+ * @param Fs The sampling frequency required
+ * @param channels Number of audio channels required. Must be 1 or 2.
+ */
+class DecoderShort(val Fs: SampleFrequency, val channels: Int) extends DecoderBase {
+
+  val decodedBuf = new Array[Short](2880 * channels)
+
+  /**
+   * Decode an audio packet to an array of Shorts
+   * @param compressedAudio The incoming audio packet
+   * @return A Try containing decoded audio in Short format
+   */
+  def apply(compressedAudio: Array[Byte]): Try[Array[Short]] = {
+    val len = decode_short(decoder, compressedAudio, compressedAudio.length, decodedBuf, bufferLen, fec)
+    if (len < 0)
+      Failure(new RuntimeException(s"opus_decode() failed: ${error_string(len)}"))
+    else
+      Success(decodedBuf.slice(0, len))
+  }
+
+  /**
+   * Decode an erased (i.e. not received) audio packet. Note you need to specify
+   * how many samples you think you have lost so the decoder can attempt to
+   * deal with the erasure appropriately.
+   * @return A Try containing decompressed audio in short format
+   */
+  def apply(count: Int): Try[Array[Short]] = {
+    val len = decode_short(decoder, null, 0, decodedBuf, count, fec)
+    if (len < 0)
+      Failure(new RuntimeException(s"opus_decode() failed: ${error_string(len)}"))
+    else
+      Success(decodedBuf.slice(0, len))
+  }
 }
+
+/**
+ * Factory for an Opus decoder that returns Short data
+ */
+object Decoder {
+  /**
+   * Construct an instance of a decoder that returns audio data as an Array[Short]
+   * @param Fs The sample frequency required
+   * @param channels The number of channels. Must be 1 or 2
+   * @return A Try[] containing a reference to the decoder or an exception if construction fails
+   */
+  def apply(Fs: SampleFrequency, channels: Int) = Try(new DecoderShort(Fs, channels))
+}
+
+/**
+ * Specialisation for Float data return
+ * @param Fs The sampling frequency required
+ * @param channels Number of audio channels required. Must be 1 or 2.
+ */
+class DecoderFloat(val Fs: SampleFrequency, val channels: Int) extends DecoderBase {
+
+  val decodedBuf = new Array[Float](2880 * channels)
+
+  /**
+   * Decode an audio packet to an array of Floats
+   * @param compressedAudio The incoming audio packet
+   * @return A Try containing the decoded audio packet in Float format
+   */
+  def apply(compressedAudio: Array[Byte]): Try[Array[Float]] = {
+    val len = decode_float(decoder, compressedAudio, compressedAudio.length, decodedBuf, bufferLen, fec)
+    if (len < 0)
+      Failure(new RuntimeException(s"opus_decode_float() failed: ${error_string(len)}"))
+    else
+      Success(decodedBuf.slice(0, len))
+  }
+
+  /**
+   * Decode an erased (i.e. not received) audio packet. Note you need to specify
+   * how many samples you think you have lost so the decoder can attempt to
+   * deal with the erasure appropriately.
+   * @return A Try containing decompressed audio in Float format
+   */
+  def apply(count: Int): Try[Array[Float]] = {
+    val len = decode_float(decoder, null, 0, decodedBuf, count, fec)
+    if (len < 0)
+      Failure(new RuntimeException(s"opus_decode_float() failed: ${error_string(len)}"))
+    else
+      Success(decodedBuf.slice(0, len))
+  }
+}
+
+object DecoderFloat {
+  /**
+   * Construct an instance of a decoder that returns audio data as an Array[Short]
+   * @param Fs The sample frequency required
+   * @param channels The number of channels. Must be 1 or 2
+   * @return A Try[] containing a reference to the decoder or an exception if construction fails
+   */
+  def apply(Fs: SampleFrequency, channels: Int) = Try(new DecoderFloat(Fs, channels))
+}
+
