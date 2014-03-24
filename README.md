@@ -59,10 +59,10 @@ Encoding a stream is pretty simple. Return types are Scala are wrapped in a Try[
 so it is up to you to manage errors reported by the decoder or the encoder.
 
 ```scala
-   val enc = Encoder(Sf8000, 1, Audio) getOrElse sys.exit(-1)
+   val enc = Encoder(Sf8000, 1, Audio)
    enc.setUseDtx(1)  // Transmit special short packets if silence is detected
 
-   val dec = Decoder(Sf8000, 1) getOrElse sys.exit(-1)
+   val dec = Decoder(Sf8000, 1)
 
    val coded: Try[Array[Byte]] = enc(new Array[Short](160))
    // Transmit

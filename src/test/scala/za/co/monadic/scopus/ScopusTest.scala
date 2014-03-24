@@ -4,7 +4,7 @@
  */
 import java.io._
 import org.scalatest._
-import scala.util.{Failure, Success}
+import scala.util.{Try, Failure, Success}
 import za.co.monadic.scopus._
 import Numeric.Implicits._
 
@@ -69,18 +69,9 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
   val chunks = audio.slice(0, nSamples).grouped(chunkSize).toList
   val chunksFloat = audioFloat.slice(0, nSamples).grouped(chunkSize).toList
 
-  val enc = Encoder(Sf8000, 1) match {
-    case Success(ok) => ok
-    case Failure(f) => fail(s"Encoder construction failed: ${f.getMessage}")
-  }
-  val dec = Decoder(Sf8000, 1) match {
-    case Success(ok) => ok
-    case Failure(f) => fail(s"Decoder construction failed: ${f.getMessage}")
-  }
-  val decFloat = DecoderFloat(Sf8000,1) match {
-    case Success(ok) => ok
-    case Failure(f) => fail(s"Float decoder construction failed: ${f.getMessage}")
-  }
+  val enc = Try(Encoder(Sf8000, 1)) getOrElse fail("Encoder construction failed")
+  val dec = Try(Decoder(Sf8000, 1)) getOrElse fail("Float decoder construction failed")
+  val decFloat = Try(DecoderFloat(Sf8000,1))getOrElse fail("Float decoder construction failed")
 
   override def afterAll() = {
     enc.cleanup()
@@ -120,19 +111,19 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
     it("Fails if the encoder and decoder constructors throw") {
       // cannot build 4 channel decoders like this
-      Encoder(Sf8000, 4) match {
+      Try(Encoder(Sf8000, 4)) match {
         case Success(ok) => fail("Encoder constructor did not fail on bad construction")
         case Failure(f) => f.getMessage should equal("Failed to create the Opus encoder: invalid argument")
       }
-      Encoder(Sf8000, 1, Voip, -1 ) match {
+      Try(Encoder(Sf8000, 1, Voip, -1 )) match {
         case Success(ok) => fail("Encoder constructor did not fail on bad construction")
         case Failure(f) => f.getMessage should equal("requirement failed: Buffer size must be positive")
       }
-      Decoder(Sf8000, 4) match {
+      Try(Decoder(Sf8000, 4)) match {
         case Success(ok) => fail("Short decoder constructor did not fail on bad construction")
         case Failure(f) => f.getMessage should equal("Failed to create the Opus encoder: invalid argument")
       }
-      DecoderFloat(Sf8000,4) match {
+      Try(DecoderFloat(Sf8000,4)) match {
         case Success(ok) => fail("Float decoder constructor did not fail on bad construction")
         case Failure(f) => f.getMessage should equal("Failed to create the Opus encoder: invalid argument")
       }
@@ -171,14 +162,14 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         val d = List(Decoder(Sf8000, 1), Decoder(Sf12000, 1), Decoder(Sf16000, 1), Decoder(Sf24000, 1), Decoder(Sf48000, 1))
         Then("the encoder structures return the correct sample frequency it was configured for")
         for ((f, t) <- freqs zip e) {
-          t.get.getSampleRate should equal(f)
+          t.getSampleRate should equal(f)
         }
-        e.map(_.get.cleanup())
+        e.map(_.cleanup())
         And("the decoder structures return the correct frequencies")
         for ((f, t) <- freqs zip d) {
-          t.get.getSampleRate should equal(f)
+          t.getSampleRate should equal(f)
         }
-        d.map(_.get.cleanup())
+        d.map(_.cleanup())
       } catch {
         case e: Exception => fail(s"Received exception ${e.getMessage}")
       }

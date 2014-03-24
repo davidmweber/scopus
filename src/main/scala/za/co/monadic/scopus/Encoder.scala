@@ -161,5 +161,5 @@ object Encoder {
    * @return A Try[Array[Byte]) containing a reference to the encoder object
    */
   def apply(sampleFreq: SampleFrequency, channels: Int, app: Application = Voip, bufferSize: Int = 8192) =
-    Try(new Encoder(sampleFreq,channels, app, bufferSize))
+    new Encoder(sampleFreq,channels, app, bufferSize)
 }

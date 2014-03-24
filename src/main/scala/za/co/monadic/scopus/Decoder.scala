@@ -133,7 +133,7 @@ object Decoder {
    * @param channels The number of channels. Must be 1 or 2
    * @return A Try[] containing a reference to the decoder or an exception if construction fails
    */
-  def apply(Fs: SampleFrequency, channels: Int) = Try(new DecoderShort(Fs, channels))
+  def apply(Fs: SampleFrequency, channels: Int) = new DecoderShort(Fs, channels)
 }
 
 /**
@@ -180,6 +180,6 @@ object DecoderFloat {
    * @param channels The number of channels. Must be 1 or 2
    * @return A Try[] containing a reference to the decoder or an exception if construction fails
    */
-  def apply(Fs: SampleFrequency, channels: Int) = Try(new DecoderFloat(Fs, channels))
+  def apply(Fs: SampleFrequency, channels: Int) = new DecoderFloat(Fs, channels)
 }
 

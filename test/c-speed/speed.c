@@ -14,9 +14,11 @@ int main() {
   printf("%d\n",sz);
   short *audio = (short *)calloc(sz,sizeof(short));
   unsigned char *decoded = malloc(1000);
-  short *coded = (short *)calloc(1000,sizeof(short));
+  float *audio_fl = (float *)calloc(sz,sizeof(float));
   int n = fread(audio, sizeof(short), sz, fp);
-  printf("%d\n",n);
+  for (int i = 0; i < n; i++) {
+     audio_fl[i] = audio[i]/32768.0;
+  }
 
   int error;
   OpusEncoder *enc;
@@ -36,7 +38,7 @@ int main() {
     int j = 0;
     for (i = 0; i < 100; i++) {
       while ((count + 160) < sz) {
-	int len = opus_encode(enc,audio+count,160,decoded,1000);
+	int len = opus_encode_float(enc,audio_fl+count,160,decoded,1000);
 /*
 	if (j % 20 == 3) {
 	   //opus_decoder_ctl(dec,OPUS_RESET_STATE);
