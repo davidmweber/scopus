@@ -262,7 +262,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       }
       val duration = (System.currentTimeMillis() - tStart) / 1000.0 // Seconds
       val speed = repeats * nSamples / duration / 8000.0 // multiple of real time
-      speed should be > 500.0
+      speed should be > 400.0
       info(f"Decoder runs at $speed%5.1f times real time")
     }
 
