@@ -6,8 +6,14 @@ version := "0.1.2-SNAPSHOT"
 
 scalaVersion := "2.10.4"
 
+crossScalaVersions := Seq("2.10.4", "2.11.0-RC3")
+
+licenses += "CC BY 4.0." -> url("https://creativecommons.org/licenses/by/4.0/")
+
+homepage := Some(url("https://github.com/davidmweber/scopus"))
+
 libraryDependencies ++= List(
-  "org.scalatest" %% "scalatest" % "2.0" % "test"
+  "org.scalatest" %% "scalatest" % "2.1.2" % "test"
 )
 
 publishMavenStyle := true
@@ -19,10 +25,6 @@ publishTo := {
   else
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
-
-licenses := Seq(" Creative Commons Attribution 4.0 International License." -> url("https://creativecommons.org/licenses/by/4.0/"))
-
-homepage := Some(url("https://github.com/davidmweber/scopus"))
 
 pomIncludeRepository := { _ => false }
 
