@@ -38,7 +38,7 @@ If you feel the need to generate header prototypes, build the Scala code then ru
 of the project as follows:
 
 ```bash
-javah  -classpath target/scala-2.10/classes:/usr/local/lib/scala-2.10.3/lib/*\
+javah  -classpath target/scala-2.10/classes:/usr/local/lib/scala-2.10.4/lib/*\
     -d src/main/native/opus/ -stubs  za.co.monadic.scopus.Opus$
 ```
 
@@ -46,16 +46,16 @@ You may have to adjust your classpath for your Scala installation.
 
 Usage
 -----
-Scopus is available from the Sonatype Maven repo. Add the following dependency to your
-sbt build:
+Scopus is available from the Sonatype Maven repo with builds for Scala 2.10 and 2.11. Add the
+following dependency to your sbt build:
 
 ```scala
   resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
 
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.1.2-SNAPSHOT"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.1.3"
 ```
 
-Encoding a stream is pretty simple. Return types are Scala are wrapped in a Try[_]
+Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`
 so it is up to you to manage errors reported by the decoder or the encoder.
 
 ```scala
