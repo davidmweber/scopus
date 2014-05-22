@@ -2,11 +2,11 @@ name := "Scopus"
 
 organization := "za.co.monadic"
 
-version := "0.1.3"
+version := "0.1.4"
 
 scalaVersion := "2.10.4"
 
-crossScalaVersions := Seq("2.10.4", "2.11.0")
+crossScalaVersions := Seq("2.10.4", "2.11.1")
 
 licenses += "CC BY 4.0." -> url("https://creativecommons.org/licenses/by/4.0/")
 
