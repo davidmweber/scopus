@@ -111,6 +111,14 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1set_1ctl
 JNIEXPORT jstring JNICALL Java_za_co_monadic_scopus_Opus_00024_error_1string
   (JNIEnv *, jobject, jint);
 
+/*
+ * Class:     za_co_monadic_scopus_Opus__
+ * Method:    error_string
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_za_co_monadic_scopus_Opus_00024_get_1version_1string
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

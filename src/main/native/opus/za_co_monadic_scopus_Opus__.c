@@ -155,3 +155,8 @@ JNIEXPORT jstring JNICALL Java_za_co_monadic_scopus_Opus_00024_error_1string
     return (*env)->NewStringUTF(env, err_str);
 }
 
+JNIEXPORT jstring JNICALL Java_za_co_monadic_scopus_Opus_00024_get_1version_1string
+    (JNIEnv *env, jobject clazz) {
+    const char *version = opus_get_version_string();
+    return (*env)->NewStringUTF(env, version);
+}

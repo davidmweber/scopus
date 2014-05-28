@@ -4,7 +4,6 @@
  */
 package za.co.monadic.scopus
 
-
 /**
  * Scala interface to the Opus codec API. With the exception of the *_ctl() commands, this
  * is pretty much a 1:1 mapping from Scala to the C API. See the Opus documentation for
@@ -24,6 +23,9 @@ object Opus {
       println(s"Unknown OS/platform combination: $s")
       sys.exit(-1)
   }
+  // Verify we have the correct library loaded. Linux sometimes messes this up.
+  if (get_version_string() != "libopus 1.1")
+    throw new RuntimeException("libopus version must be 1.1")
 
   @native
   def decoder_create(Fs: Int, channels: Int, error: Array[Int]): Long
@@ -63,6 +65,9 @@ object Opus {
 
   @native
   def error_string(error: Int): String
+
+  @native
+  def get_version_string(): String
 
   // Constants from opus.h
   final val OPUS_GET_LSB_DEPTH_REQUEST: Int = 4037
