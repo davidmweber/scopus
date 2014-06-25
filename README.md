@@ -8,6 +8,8 @@ Benchmarks performed on the encoder show that it is 10% slower than a native C i
 at 360 times real time (complexity factor set to 2). The decoder runs at around 1600 times real time. A native
 benchmark shows the encoder to run at 400 times real time. The LLVM C compiler (clang v3.4) pips GCC by about 5%.
 
+It supports Linux (amd64 and i386) and OSX.
+
 The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/).
 
 Licensing
@@ -52,7 +54,7 @@ following dependency to your sbt build:
 ```scala
   resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
 
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.1.4"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.1.6"
 ```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`
