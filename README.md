@@ -3,12 +3,10 @@ Scopus
 ------
 Scopus is a Scala interface to the [Opus codec](http://www.opus-codec.org). It is light and thin by design and gives
 programmers access to the bulk of the functionality in Opus.
-It uses JNI to handle the native code and works for Linux and OSX.
+It uses JNI to handle the native code and works for Linux (amd64 and i386) and OSX.
 Benchmarks performed on the encoder show that it is 10% slower than a native C implementation. On a 3.5Ghz i5, it runs
 at 360 times real time (complexity factor set to 2). The decoder runs at around 1600 times real time. A native
 benchmark shows the encoder to run at 400 times real time. The LLVM C compiler (clang v3.4) pips GCC by about 5%.
-
-It supports Linux (amd64 and i386) and OSX.
 
 The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/).
 
