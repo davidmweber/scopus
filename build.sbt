@@ -1,3 +1,7 @@
+import SonatypeKeys._
+
+sonatypeSettings
+
 name := "Scopus"
 
 organization := "za.co.monadic"
