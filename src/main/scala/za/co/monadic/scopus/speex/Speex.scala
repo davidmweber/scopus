@@ -1,20 +1,64 @@
-package za.co.monadic.scopus
+package za.co.monadic.scopus.speex
+
+import za.co.monadic.scopus._
 
 /**
  *
  */
 object Speex {
 
+  def getMode(sf: SampleFrequency) =sf match {
+      case Sf8000  => SPEEX_MODEID_NB
+      case Sf16000 => SPEEX_MODEID_WB
+      case Sf32000 => SPEEX_MODEID_UWB
+      case s:SampleFrequency => throw new RuntimeException(s"Invalid sampling frequency ($s) for the Speex codec")
+    }
+
   // Ensures that the libraries are loaded as Scala only initialises objects
   // if they are called...
   Libraries()
 
+  // These map closely to the speex C library functions. Consult the speex documentation for more details
   @native
-  def encoder_create(Fs: Int, mode: Int): Long
+  def encoder_create(mode: Int): Long
+
+  // These map closely to the speex C library functions. Consult the speex documentation for more details
+  @native
+  def encoder_destroy(state: Long)
+
+  @native
+  def encode_short(encoder: Long, input: Array[Short], inSize: Int, output: Array[Byte], outSize: Int): Int
+
+  @native
+  def encode_float(encoder: Long, input: Array[Float], inSize: Int, output: Array[Byte], outSize: Int): Int
 
   @native
   def get_version_string(): String
 
+  /**
+   * Create a decoder state. This differs from the C API because we set up both the encoder and
+   * the "Bits" structure.
+   * @param mode Speex mode
+   * @param enhance 1 to enable perceptual enhancement. 0 otherwise.
+   * @return
+   */
+  @native
+  def decoder_create(mode: Int, enhance: Int): Long
+
+  @native
+  def decoder_destroy(state: Long)
+
+  @native
+  def decode_short(decoder: Long, input: Array[Byte], inSize: Int, output: Array[Short], outSize: Int): Int
+
+  @native
+  def decode_float(decoder: Long, input: Array[Byte], inSize: Int, output: Array[Float], outSize: Int): Int
+
+  @native
+  def encoder_ctl(encoder: Long, command: Int, value: Int): Int
+
+  @native
+  def decoder_ctl(decoder: Long, command: Int, value: Int): Int
 
   /** Set enhancement on/off (decoder only) */
   final val SPEEX_SET_ENH = 0

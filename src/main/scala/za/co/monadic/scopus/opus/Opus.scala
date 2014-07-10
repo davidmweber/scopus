@@ -2,7 +2,9 @@
  * Copyright David Weber 2014
  * Released under the Creative Commons License (http://creativecommons.org/licenses/by/4.0/legalcode)
  */
-package za.co.monadic.scopus
+package za.co.monadic.scopus.opus
+
+import za.co.monadic.scopus.Libraries
 
 /**
  * Scala interface to the Opus codec API. With the exception of the *_ctl() commands, this

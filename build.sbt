@@ -6,7 +6,7 @@ name := "Scopus"
 
 organization := "za.co.monadic"
 
-version := "0.1.6"
+version := "0.2.0"
 
 scalaVersion := "2.11.1"
 
@@ -15,6 +15,16 @@ crossScalaVersions := Seq("2.10.4", "2.11.1")
 licenses += "CC BY 4.0." -> url("https://creativecommons.org/licenses/by/4.0/")
 
 homepage := Some(url("https://github.com/davidmweber/scopus"))
+
+// Needed only for IntelliJ (13.1.3) because ScalaTest cannot find the XML library it needs
+libraryDependencies := {
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, scalaMajor)) if scalaMajor >= 11 =>
+      libraryDependencies.value :+ "org.scala-lang.modules" %% "scala-xml" % "1.0.2" % "test"
+    case _ =>
+      libraryDependencies.value
+  }
+}
 
 libraryDependencies ++= List(
   "org.scalatest" %% "scalatest" % "2.1.3" % "test"

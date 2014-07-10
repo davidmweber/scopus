@@ -1,0 +1,29 @@
+# -*-makefile-*-
+
+CC=gcc
+JAVA = java-7-oracle
+NATIVE = ../../resources/native/Linux/amd64/
+INCLUDES = -I/usr/lib/jvm/$(JAVA)/include\
+	   -I/usr/lib/jvm/$(JAVA)/include/linux\
+	   -I/usr/local/include
+CFLAGS = -Ofast -Wall -fPIC $(INCLUDES)
+LDFLAGS = -Wl,-soname,libjni_opus.so,-rpath='$$ORIGIN' -shared
+LDPATH = -L$(NATIVE)
+LIBS = -lopus -lspeex
+SOURCES = za_co_monadic_scopus_opus_Opus__.c za_co_monadic_scopus_speex_Speex__.c
+TARGETLIB = libjni_opus.so
+
+all: libjni_opus.so
+
+clean:
+	rm -f *.o *~ $(TARGETLIB)
+
+$(TARGETLIB) : $(SOURCES:.c=.o)
+	$(CC) $(LDFLAGS) $(LDPATH) -o $@ $^ $(LIBS)
+
+install: $(TARGETLIB)
+	cp $(TARGETLIB) $(NATIVE)
+
+.c.o:
+	$(CC) -c  $(CFLAGS) $< -o $@
+

@@ -9,8 +9,8 @@ INCLUDES = -I/Library/Java/JavaVirtualMachines/$(JAVA)/Contents/Home/include\
 CFLAGS = -Ofast -Wall -fPIC $(INCLUDES)
 LDFLAGS = -dynamiclib
 LDPATH = -L$(NATIVE)
-LIBS = -lopus.0
-SOURCES = za_co_monadic_scopus_Opus__.c
+LIBS = -lspeex -lopus.0 
+SOURCES = za_co_monadic_scopus_opus_Opus__.c za_co_monadic_scopus_speex_Speex__.c
 TARGETLIB = libjni_opus.dylib
 
 all: $(TARGETLIB)
@@ -19,8 +19,9 @@ clean:
 	rm -f *.o *~ $(TARGETLIB)
 
 $(TARGETLIB) : $(SOURCES:.c=.o)
-	$(CC) $(LDFLAGS) $(LDPATH) -o $@ $< $(LIBS)
+	$(CC) $(LDFLAGS) $(LDPATH) -o $@ $^ $(LIBS)
 	install_name_tool -change /usr/local/lib/libopus.0.dylib @loader_path/libopus.0.dylib $(TARGETLIB)
+	install_name_tool -change /usr/local/lib/libspeex.1.dylib @loader_path/libspeex.1.dylib $(TARGETLIB)
 
 install: $(TARGETLIB)
 	cp $(TARGETLIB) $(NATIVE)

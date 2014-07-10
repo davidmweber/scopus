@@ -4,7 +4,8 @@
  */
 package za.co.monadic.scopus
 
-import za.co.monadic.scopus.Opus._
+import za.co.monadic.scopus.opus.Opus
+import Opus._
 /**
  * Base class for supported sample frequencies
  */
@@ -26,6 +27,10 @@ object Sf16000 extends SampleFrequency {
 
 object Sf24000 extends SampleFrequency {
   def apply(): Int = 24000
+}
+
+object Sf32000 extends SampleFrequency {
+  def apply(): Int = 32000
 }
 
 object Sf48000 extends SampleFrequency {

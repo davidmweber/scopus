@@ -2,10 +2,12 @@
  * Copyright David Weber 2014
  * Released under the Creative Commons License (http://creativecommons.org/licenses/by/4.0/legalcode)
  */
-package za.co.monadic.scopus
+package za.co.monadic.scopus.opus
 
-import za.co.monadic.scopus.Opus._
-import scala.util.{Success, Failure, Try}
+import Opus._
+import za.co.monadic.scopus.{Encoder, Application, SampleFrequency, Voip}
+
+import scala.util.{Failure, Success, Try}
 
 /**
  * Wrapper around the Opus codec's encoder subsystem.
@@ -19,7 +21,7 @@ import scala.util.{Success, Failure, Try}
  * @param bufferSize The reserved size of the buffer to which compressed data are written.
  *                   The default should be more than sufficient
  */
-class Encoder(sampleFreq: SampleFrequency, channels: Int, app: Application, bufferSize: Int = 8192) {
+class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, bufferSize: Int = 8192) extends Encoder {
   require(bufferSize > 0, "Buffer size must be positive")
   val error = Array[Int](0)
   val decodePtr = new Array[Byte](bufferSize)
@@ -28,6 +30,8 @@ class Encoder(sampleFreq: SampleFrequency, channels: Int, app: Application, buff
     throw new RuntimeException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
   }
   var clean = false
+
+  def getDetail = s"Opus encoder with sf= ${sampleFreq()}"
 
   /**
    * Encode a block of raw audio  in integer format using the configured encoder
@@ -66,8 +70,6 @@ class Encoder(sampleFreq: SampleFrequency, channels: Int, app: Application, buff
     }
   }
 
-  override def finalize() = cleanup()
-
   def reset = encoder_set_ctl(encoder, OPUS_RESET_STATE, 0)
 
   private def setter(command: Integer, parameter: Integer): Unit = {
@@ -82,6 +84,17 @@ class Encoder(sampleFreq: SampleFrequency, channels: Int, app: Application, buff
     val err: Int = encoder_get_ctl(encoder, command, result)
     if (err != OPUS_OK) throw new RuntimeException(s"opus_encoder_ctl getter failed for command $command: ${error_string(err)}")
     result(0)
+  }
+  /**
+   * Set the complexity of the encoder. This has no effect if the encoder does not support
+   * complexity settings
+   * @param c A value between 0 and 10 indicating the encoder complexity.
+   * @return A reference to the updated encoder
+   */
+  override def complexity(c: Int): Encoder = {
+    require((c >= 0) && (c <= 10))
+    setComplexity(c)
+    this
   }
 
   def setComplexity(complexity: Integer) = setter(OPUS_SET_COMPLEXITY_REQUEST, complexity)
@@ -150,7 +163,7 @@ class Encoder(sampleFreq: SampleFrequency, channels: Int, app: Application, buff
 
 }
 
-object Encoder {
+object OpusEncoder {
   /**
    * Factory for an encoder instance.
    * @param sampleFreq THe required sampling frequency
@@ -161,5 +174,5 @@ object Encoder {
    * @return A Try[Array[Byte]) containing a reference to the encoder object
    */
   def apply(sampleFreq: SampleFrequency, channels: Int, app: Application = Voip, bufferSize: Int = 8192) =
-    new Encoder(sampleFreq,channels, app, bufferSize)
+    new OpusEncoder(sampleFreq,channels, app, bufferSize)
 }

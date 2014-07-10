@@ -2,10 +2,10 @@
  * Copyright David Weber 2014
  * Released under the Creative Commons License (http://creativecommons.org/licenses/by/4.0/legalcode)
  */
-#include "za_co_monadic_scopus_Opus__.h"
+#include "za_co_monadic_scopus_opus_Opus__.h"
 #include <opus/opus.h>
 
-JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1create
+JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decoder_1create
     (JNIEnv *env, jobject clazz, jint Fs, jint channels, jintArray err){
     int error;
     OpusDecoder *decoder = opus_decoder_create(Fs, channels, &error);
@@ -16,7 +16,7 @@ JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1create
 }
 
 
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decode_1short
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decode_1short
     (JNIEnv *env, jobject clazz, jlong decoder, jbyteArray input, jint len_in, jshortArray decoded, jint len_out, jint fec) {
 
     jbyte *in_ptr = 0;
@@ -37,7 +37,7 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decode_1short
     return ret;
 }
 
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decode_1float
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decode_1float
     (JNIEnv *env, jobject clazz, jlong decoder, jbyteArray input, jint len_in, jfloatArray decoded, jint len_out, jint fec) {
     jbyte *in_ptr = 0;
     jbyte *dec_ptr = 0;
@@ -57,12 +57,12 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decode_1float
     return ret;
 }
 
-JNIEXPORT void JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1destroy
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decoder_1destroy
     (JNIEnv *env, jobject clazz, jlong decoder) {
     opus_decoder_destroy((OpusDecoder *) decoder);
 }
 
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1get_1ctl
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decoder_1get_1ctl
     (JNIEnv *env, jobject clazz, jlong decoder, jint command, jintArray result) {
     int *ret = (*env)->GetPrimitiveArrayCritical(env, result, 0);
     int error;
@@ -73,14 +73,14 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1get_1ctl
     return error;
 }
 
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_decoder_1set_1ctl
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decoder_1set_1ctl
     (JNIEnv *env, jobject clazz, jlong decoder, jint command, jint value) {
     int error;
     error = opus_decoder_ctl((OpusDecoder *) decoder, command, value);
     return error;
 }
 
-JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1create
+JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_encoder_1create
     (JNIEnv *env, jobject clazz, jint Fs, jint channels, jint application, jintArray err) {
     int error;
     OpusEncoder *enc = opus_encoder_create(Fs, channels, application, &error);
@@ -90,7 +90,7 @@ JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1create
     return (jlong) enc;
 }
 
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encode_1short
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_encode_1short
     (JNIEnv *env, jobject clazz, jlong encoder, jshortArray input, jint len_in, jbyteArray coded, jint len_out) {
     jshort *in_ptr;
     jbyte *cod_ptr;
@@ -108,7 +108,7 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encode_1short
     return ret;
 }
 
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encode_1float
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_encode_1float
     (JNIEnv *env, jobject clazz, jlong encoder, jfloatArray input, jint len_in, jbyteArray coded, jint len_out) {
     jshort *in_ptr;
     jbyte *cod_ptr;
@@ -126,12 +126,12 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encode_1float
     return ret;
 }
 
-JNIEXPORT void JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1destroy
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_encoder_1destroy
     (JNIEnv *env, jobject clazz, jlong enc) {
     opus_encoder_destroy((OpusEncoder *) enc);
 }
 
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1get_1ctl
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_encoder_1get_1ctl
     (JNIEnv *env, jobject clazz, jlong encoder, jint command, jintArray result) {
     int *ret = (*env)->GetPrimitiveArrayCritical(env, result, 0);
     int error;
@@ -142,20 +142,20 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1get_1ctl
     return error;
 }
 
-JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_Opus_00024_encoder_1set_1ctl
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_encoder_1set_1ctl
     (JNIEnv *env, jobject clazz, jlong encoder, jint command, jint value) {
     int error;
     error = opus_encoder_ctl((OpusEncoder *) encoder, command, value);
     return error;
 }
 
-JNIEXPORT jstring JNICALL Java_za_co_monadic_scopus_Opus_00024_error_1string
+JNIEXPORT jstring JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_error_1string
     (JNIEnv *env, jobject clazz, jint errno) {
     const char *err_str = opus_strerror(errno);
     return (*env)->NewStringUTF(env, err_str);
 }
 
-JNIEXPORT jstring JNICALL Java_za_co_monadic_scopus_Opus_00024_get_1version_1string
+JNIEXPORT jstring JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_get_1version_1string
     (JNIEnv *env, jobject clazz) {
     const char *version = opus_get_version_string();
     return (*env)->NewStringUTF(env, version);

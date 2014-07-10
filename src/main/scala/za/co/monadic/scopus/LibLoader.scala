@@ -8,6 +8,8 @@ import java.util.UUID
 import java.io.{FileOutputStream, File}
 import java.nio.channels.Channels
 
+import za.co.monadic.scopus.opus.Opus
+
 /**
  * General loader for dynamic libraries from the resources directory in the jar file.
  * It copies the required library from the jar to the target temporary directory and then
@@ -31,16 +33,16 @@ object LibLoader {
   val tempPath = "scopus_" + UUID.randomUUID.toString.split("-").last
   val path = "native/" + getOsArch
   val destDir = System.getProperty("java.io.tmpdir") + "/" + tempPath + "/"
-  new File(destDir).mkdirs()
 
   // Create the temporary directory
+  new File(destDir).mkdirs()
 
   def getOsArch = System.getProperty("os.name") + "/" + System.getProperty("os.arch")
 
   /**
    * Copy the OS dependent library from the resources dir in a JAR to a temporary location
    * and optionally ask the JVM to load the library. The library is deleted on exit from the
-   * JVM.
+   * JVM. If load is false, it just copies the library to the temporary location without loading it.
    * @param libName The name of the library to copy and optionally load
    * @param load If true, ask the JVM to dynamically load the library using System.load()
    */
