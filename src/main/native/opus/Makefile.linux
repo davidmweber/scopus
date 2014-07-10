@@ -9,8 +9,8 @@ INCLUDES = -I/usr/lib/jvm/$(JAVA)/include\
 CFLAGS = -Ofast -Wall -fPIC $(INCLUDES)
 LDFLAGS = -Wl,-soname,libjni_opus.so,-rpath='$$ORIGIN' -shared
 LDPATH = -L$(NATIVE)
-LIBS = -lopus
-SOURCES = za_co_monadic_scopus_Opus__.c
+LIBS = -lopus -lspeex
+SOURCES = za_co_monadic_scopus_Opus__.c za_co_monadic_scopus_Speex__.c
 TARGETLIB = libjni_opus.so
 
 all: libjni_opus.so
@@ -19,7 +19,7 @@ clean:
 	rm -f *.o *~ $(TARGETLIB)
 
 $(TARGETLIB) : $(SOURCES:.c=.o)
-	$(CC) $(LDFLAGS) $(LDPATH) -o $@ $< $(LIBS)
+	$(CC) $(LDFLAGS) $(LDPATH) -o $@ $^ $(LIBS)
 
 install: $(TARGETLIB)
 	cp $(TARGETLIB) $(NATIVE)

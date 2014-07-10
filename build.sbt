@@ -8,7 +8,7 @@ organization := "za.co.monadic"
 
 version := "0.1.6"
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.11.1"
 
 crossScalaVersions := Seq("2.10.4", "2.11.1")
 
