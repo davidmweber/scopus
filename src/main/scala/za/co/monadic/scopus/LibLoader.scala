@@ -66,7 +66,7 @@ object LibLoader {
     } catch {
       // This is pretty catastrophic so bail.
       case e: Exception =>
-        println("Fatal error in LibLoader: " + e.getMessage + " from class " + e.getClass.getCanonicalName)
+        println(s"Fatal error in LibLoader while loading $path/$libName: ${e.getMessage}")
         sys.exit(-1)
     }
   }

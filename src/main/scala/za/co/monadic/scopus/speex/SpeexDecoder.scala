@@ -10,7 +10,7 @@ sealed trait SpeexBase {
   val sampleFreq: SampleFrequency
   val enhance: Boolean
 
-  val en = if(enhance) 1 else 0
+  val en = if (enhance) 1 else 0
   val decoder = decoder_create(getMode(sampleFreq), en)
   if (decoder <= 0) throw new RuntimeException("Failed to create Speex decoder state")
   var clean = false
@@ -18,17 +18,23 @@ sealed trait SpeexBase {
   def reset() = decoder_ctl(decoder,SPEEX_RESET_STATE,0)
 
   def getSampleRate = decoder_ctl(decoder,SPEEX_GET_SAMPLING_RATE,0)
+
+  /**
+   * Something odd occurs in the JVM so we get occasional requests to delete
+   * state with a zero pointer. This implies finalize is called on this object
+   * after the "decoder" attribute has been set to zero. Ugly.
+   */
   def cleanup() = {
-    if (!clean) {
+    if (decoder == 0) System.err.println("Zero pointer encountered when cleaning SpeexDecoder state")
+    if (!clean && (decoder != 0)) {
       decoder_destroy(decoder)
+      clean = true
     }
   }
 }
 
-/**
- *
- */
 class SpeexDecoderShort(val sampleFreq: SampleFrequency, val enhance: Boolean) extends SpeexBase with DecoderShort {
+
 
   val decodedBuf = new Array[Short](1024)
   /**
@@ -63,6 +69,12 @@ class SpeexDecoderShort(val sampleFreq: SampleFrequency, val enhance: Boolean) e
 }
 
 object SpeexDecoderShort {
+  /**
+   * Decode to short
+   * @param sampleFreq The required sampling frequency for the decoder
+   * @param enhance If true, apply some audio enhancement to the decoded signal
+   * @return An instance of a Speex decoder
+   */
   def apply(sampleFreq: SampleFrequency, enhance: Boolean = false) = new SpeexDecoderShort(sampleFreq,enhance)
 }
 
@@ -101,5 +113,11 @@ class SpeexDecoderFloat(val sampleFreq: SampleFrequency, val enhance: Boolean) e
 }
 
 object SpeexDecoderFloat {
+  /**
+   * Decode to float
+   * @param sampleFreq The required sampling frequency for the decoder
+   * @param enhance If true, apply some audio enhancement to the decoded signal
+   * @return An instance of a Speex decoder
+   */
   def apply(sampleFreq: SampleFrequency, enhance: Boolean = false) = new SpeexDecoderFloat(sampleFreq,enhance)
 }

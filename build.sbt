@@ -10,6 +10,8 @@ version := "0.2.0"
 
 scalaVersion := "2.11.1"
 
+fork in Test := true
+
 crossScalaVersions := Seq("2.10.4", "2.11.1")
 
 licenses += "CC BY 4.0." -> url("https://creativecommons.org/licenses/by/4.0/")

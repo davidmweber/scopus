@@ -15,7 +15,7 @@ real time. The LLVM C compiler (clang v3.4) pips GCC by about 5%.
 
 The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/) and those for Speex are [here](http://www.speex.org/downloads/)
 
-Note that the Opus codec is better in most aspects than the Speex codec. THe
+Note that the Opus codec is better in most aspects than the Speex codec. The
 latter demonstrates that the framework can manage multiple codecs without
 running into patent issues.
 
@@ -91,9 +91,9 @@ so it is up to you to manage errors reported by the decoder or the encoder.
 Using the Speex codec is very similar. 
 
 ```scala
-   val enc = SpeexEncoder(Sf8000, 1, Audio)
+   val enc = SpeexEncoder(Sf8000)
 
-   val dec = SpeexDecoder(Sf8000, 1)
+   val dec = SpeexDecoder(Sf8000)
 
    val coded: Try[Array[Byte]] = enc(new Array[Short](160))
    // Transmit
@@ -112,6 +112,8 @@ less efficient compression. Note that Java is big endian while most raw audio
 data are little endian (at least on Intel Architectures). This means you may
 have to do some byte swapping when reading audio streams from external
 sources.
+
+Opus can handle two channels while the Speex codec is restricted to 1 channel.
 
 Scala does not seem to have a [convention for error
 handling](http://grokbase.com/t/gg/scala-user/1293fwp1je/trying-to-work-with-

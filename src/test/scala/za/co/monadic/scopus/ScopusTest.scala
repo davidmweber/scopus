@@ -80,7 +80,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
   for ((desc, enc, dec, decFloat, corrMin) <- codecs)  {
 
-    describe(s"$desc codec can") {
+    describe(s"$desc audio api can") {
 
       it("encode and decode audio segments as Short types") {
         Given("a PCM file coded as an array of short integers and a codec pair")
@@ -253,6 +253,18 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       a [RuntimeException] should be thrownBy SpeexDecoderFloat(Sf24000)
       a [RuntimeException] should be thrownBy SpeexDecoderFloat(Sf48000)
     }
+
+    it ("cleans up after itself") {
+      val e = SpeexEncoder(Sf8000)
+      e.cleanup()
+      e.cleanup() // Must not segfault
+      val d = SpeexDecoderShort(Sf8000)
+      d.cleanup()
+      d.cleanup()
+      val df = SpeexDecoderFloat(Sf8000)
+      df.cleanup()
+      df.cleanup()
+    }
   }
 
   describe("The Opus codec") {
@@ -317,5 +329,18 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         case e: Exception => fail(s"Received exception ${e.getMessage}")
       }
     }
+
+    it ("cleans up after itself") {
+      val e = OpusEncoder(Sf8000,1)
+      e.cleanup()
+      e.cleanup() // Must not segfault
+      val d = OpusDecoderShort(Sf8000,1)
+      d.cleanup()
+      d.cleanup()
+      val df = OpusDecoderFloat(Sf8000,1)
+      df.cleanup()
+      df.cleanup()
+    }
+
   }
 }

@@ -11,7 +11,9 @@ trait Codec {
    */
   def cleanup(): Unit
 
-  final override def finalize() = cleanup()
+  final override def finalize() = {
+    cleanup()
+  }
 
   /**
    * @return A discription of this instance of an encoder or decoder
@@ -102,5 +104,4 @@ trait Encoder extends Codec {
    */
   def complexity(c:Int): Encoder
 
-  def finalize()
 }

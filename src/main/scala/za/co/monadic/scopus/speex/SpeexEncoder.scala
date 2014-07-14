@@ -53,10 +53,15 @@ class SpeexEncoder(sampleFreq: SampleFrequency) extends Encoder {
 
   /**
    * Release all pointers allocated for the encoder. Make every attempt to call this
-   * when you are done with the encoder as finalise() is what it is in the JVM
+   * when you are done with the encoder as finalise() is what it is in the JVM.
+   *
+   * Something odd occurs in the JVM so we get occasional requests to delete
+   * state with a zero pointer. This implies finalize is called on this object
+   * after the "state" attribute has been set to zero. Ugly.
    */
   override def cleanup(): Unit = {
-    if (!clean) {
+    if (state == 0) System.err.println("Zero pointer encountered when cleaning SpeexEncoder state")
+    if (!clean && (state != 0)) {
       encoder_destroy(state)
       clean = true
     }
