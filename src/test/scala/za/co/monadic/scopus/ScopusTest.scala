@@ -74,6 +74,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
   val codecs = List(
     ("Speex", SpeexEncoder(Sf8000).complexity(1), SpeexDecoderShort(Sf8000), SpeexDecoderFloat(Sf8000), 0.81),
+    ("Speex with enhancement", SpeexEncoder(Sf8000).complexity(1), SpeexDecoderShort(Sf8000,true), SpeexDecoderFloat(Sf8000,true), 0.81),
     ("Opus", OpusEncoder(Sf8000, 1).complexity(2), OpusDecoderShort(Sf8000, 1), OpusDecoderFloat(Sf8000, 1), 0.90))
 
 
