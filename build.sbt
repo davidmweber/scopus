@@ -10,7 +10,7 @@ version := "0.2.1"
 
 scalaVersion := "2.11.1"
 
-//fork in Test := true
+fork in Test := true
 
 crossScalaVersions := Seq("2.10.4", "2.11.1")
 

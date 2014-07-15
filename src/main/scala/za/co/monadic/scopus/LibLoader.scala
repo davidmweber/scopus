@@ -48,7 +48,6 @@ object LibLoader {
    */
   def apply(libName: String, load: Boolean = true): Unit = {
     try {
-      println(s"******Loading $path/$libName to $destDir")
       val source = Channels.newChannel(Opus.getClass.getClassLoader.getResourceAsStream(path + "/" + libName))
       val fileOut = new File(destDir, libName)
       val dest = new FileOutputStream(fileOut)
@@ -61,7 +60,6 @@ object LibLoader {
         new File(destDir, libName).delete
         // Attempt to delete the directory also. It goes if the directory is empty
         new File(destDir).delete
-        println(s"******Unloaded $path/$libName")
       }
       // Finally, load the dynamic library if required
       if (load) System.load(fileOut.getAbsolutePath)

@@ -7,7 +7,6 @@ import za.co.monadic.scopus.speex.Speex
  * Load all the native libraries
  */
 object Libraries {
-  println(s"***** Loading libraries")
   // System dependent load of native libraries
   LibLoader.getOsArch match {
     case "Linux/amd64" =>
@@ -16,6 +15,7 @@ object Libraries {
       LibLoader("libjni_opus.so")
     case "Linux/i386" =>
       LibLoader("libopus.so.0", load = false)
+      LibLoader("libspeex.so.1", load = false)
       LibLoader("libjni_opus.so")
     case "Mac OS X/x86_64" =>
       LibLoader("libopus.0.dylib", load = false)
