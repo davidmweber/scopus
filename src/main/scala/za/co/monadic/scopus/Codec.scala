@@ -31,11 +31,15 @@ trait Codec {
   def getSampleRate: Int
 }
 
+trait Decoder {
+  val fs: SampleFrequency
+  val channels: Int
+}
+
 /**
  *  Decoder for float data types
  */
-trait DecoderFloat extends Codec {
-
+trait DecoderFloat extends Codec with Decoder {
   /**
    * Decode an audio packet to an array of Floats
    * @param compressedAudio The incoming audio packet
@@ -54,7 +58,7 @@ trait DecoderFloat extends Codec {
 /**
  * Decoder for float data types
  */
-trait DecoderShort extends Codec {
+trait DecoderShort extends Codec with Decoder {
 
   /**
    * Decode an audio packet to an array of Shorts

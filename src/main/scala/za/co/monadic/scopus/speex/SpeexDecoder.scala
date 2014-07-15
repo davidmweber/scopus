@@ -7,11 +7,12 @@ import scala.util.{Success, Failure, Try}
 
 sealed trait SpeexBase {
 
-  val sampleFreq: SampleFrequency
+  val fs: SampleFrequency
   val enhance: Boolean
+  val channels = 1
 
   val en = if (enhance) 1 else 0
-  val decoder = decoder_create(getMode(sampleFreq), en)
+  val decoder = decoder_create(getMode(fs), en)
   if (decoder <= 0) throw new RuntimeException("Failed to create Speex decoder state")
   var clean = false
 
@@ -33,7 +34,7 @@ sealed trait SpeexBase {
   }
 }
 
-class SpeexDecoderShort(val sampleFreq: SampleFrequency, val enhance: Boolean) extends SpeexBase with DecoderShort {
+class SpeexDecoderShort(val fs: SampleFrequency, val enhance: Boolean) extends SpeexBase with DecoderShort {
 
 
   val decodedBuf = new Array[Short](1024)
@@ -64,7 +65,7 @@ class SpeexDecoderShort(val sampleFreq: SampleFrequency, val enhance: Boolean) e
       Success(decodedBuf.slice(0, len))
   }
 
-  def getDetail = s"Speex decoder to `short' with sf= ${sampleFreq()}"
+  def getDetail = s"Speex decoder to `short' with sf= ${fs()}"
 
 }
 
@@ -78,7 +79,7 @@ object SpeexDecoderShort {
   def apply(sampleFreq: SampleFrequency, enhance: Boolean = false) = new SpeexDecoderShort(sampleFreq,enhance)
 }
 
-class SpeexDecoderFloat(val sampleFreq: SampleFrequency, val enhance: Boolean) extends SpeexBase with DecoderFloat {
+class SpeexDecoderFloat(val fs: SampleFrequency, val enhance: Boolean) extends SpeexBase with DecoderFloat {
 
   val decodedBuf = new Array[Float](1024)
   /**
@@ -108,7 +109,7 @@ class SpeexDecoderFloat(val sampleFreq: SampleFrequency, val enhance: Boolean) e
       Success(decodedBuf.slice(0, len))
   }
 
-  def getDetail = s"Speex decoder to `float' with sf= ${sampleFreq()}"
+  def getDetail = s"Speex decoder to `float' with sf= ${fs()}"
 
 }
 

@@ -14,14 +14,14 @@ import scala.util.{Failure, Success, Try}
  */
 sealed trait OpusBase {
 
-  val Fs: SampleFrequency
+  val fs: SampleFrequency
   val channels: Int
 
   // 60ms of audio is the longest possible buffer we will need for the decoder
-  val bufferLen: Int = math.round(0.120f * Fs() * channels)
+  val bufferLen: Int = math.round(0.120f * fs() * channels)
   var fec = 0
   val error = Array[Int](0)
-  val decoder = decoder_create(Fs(), channels, error)
+  val decoder = decoder_create(fs(), channels, error)
   if (error(0) != OPUS_OK) {
     throw new IllegalArgumentException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
   }
@@ -87,10 +87,10 @@ sealed trait OpusBase {
 
 /**
  * Specialisation for Short data return
- * @param Fs The sampling frequency required
+ * @param fs The sampling frequency required
  * @param channels Number of audio channels required. Must be 1 or 2.
  */
-class OpusDecoderShort(val Fs: SampleFrequency, val channels: Int) extends DecoderShort with OpusBase {
+class OpusDecoderShort(val fs: SampleFrequency, val channels: Int) extends DecoderShort with OpusBase {
 
   val decodedBuf = new Array[Short](2880 * channels)
   /**
@@ -120,7 +120,7 @@ class OpusDecoderShort(val Fs: SampleFrequency, val channels: Int) extends Decod
       Success(decodedBuf.slice(0, len))
   }
 
-  def getDetail = s"Opus decoder to `short' with sf= ${Fs()}"
+  def getDetail = s"Opus decoder to `short' with sf= ${fs()}"
 
 }
 
@@ -139,10 +139,10 @@ object OpusDecoderShort {
 
 /**
  * Specialisation for Float data return
- * @param Fs The sampling frequency required
+ * @param fs The sampling frequency required
  * @param channels Number of audio channels required. Must be 1 or 2.
  */
-class OpusDecoderFloat(val Fs: SampleFrequency, val channels: Int) extends DecoderFloat with OpusBase {
+class OpusDecoderFloat(val fs: SampleFrequency, val channels: Int) extends DecoderFloat with OpusBase {
 
   val decodedBuf = new Array[Float](2880 * channels)
 
@@ -168,7 +168,7 @@ class OpusDecoderFloat(val Fs: SampleFrequency, val channels: Int) extends Decod
       Success(decodedBuf.slice(0, len))
   }
 
-  def getDetail = s"Opus decoder to `float' with sf= ${Fs()}"
+  def getDetail = s"Opus decoder to `float' with sf= ${fs()}"
 
 }
 
