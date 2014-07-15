@@ -32,6 +32,7 @@ sealed trait OpusBase {
    * when you are done with the encoder as finalise() is what it is in the JVM
    */
   def cleanup(): Unit = {
+    println(s"***** Cleaning Opus decoder $decoder")
     if (!clean) {
       decoder_destroy(decoder)
       clean = true

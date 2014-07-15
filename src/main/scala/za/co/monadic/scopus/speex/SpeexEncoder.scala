@@ -60,6 +60,7 @@ class SpeexEncoder(sampleFreq: SampleFrequency) extends Encoder {
    * after the "state" attribute has been set to zero. Ugly.
    */
   override def cleanup(): Unit = {
+    println(s"***** Cleaning speex encoder $state")
     if (state == 0) System.err.println("Zero pointer encountered when cleaning SpeexEncoder state")
     if (!clean && (state != 0)) {
       encoder_destroy(state)

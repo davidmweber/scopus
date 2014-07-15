@@ -7,7 +7,7 @@ import za.co.monadic.scopus.speex.Speex
  * Load all the native libraries
  */
 object Libraries {
-
+  println(s"***** Loading libraries")
   // System dependent load of native libraries
   LibLoader.getOsArch match {
     case "Linux/amd64" =>

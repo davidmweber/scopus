@@ -64,6 +64,7 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
    * when you are done with the encoder as finalise() is what it is in the JVM
    */
   def cleanup() = {
+    println(s"***** Cleaning opus encoder $encoder")
     if (!clean) {
       encoder_destroy(encoder)
       clean = true

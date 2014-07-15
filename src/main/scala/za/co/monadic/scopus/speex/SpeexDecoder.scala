@@ -26,6 +26,7 @@ sealed trait SpeexBase {
    * after the "decoder" attribute has been set to zero. Ugly.
    */
   def cleanup() = {
+    println(s"***** Cleaning speex decoder $decoder")
     if (decoder == 0) System.err.println("Zero pointer encountered when cleaning SpeexDecoder state")
     if (!clean && (decoder != 0)) {
       decoder_destroy(decoder)
