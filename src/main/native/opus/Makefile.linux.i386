@@ -6,7 +6,7 @@ NATIVE = ../../resources/native/Linux/i386/
 INCLUDES = -I/usr/lib/jvm/$(JAVA)/include\
 	   -I/usr/lib/jvm/$(JAVA)/include/linux\
 	   -I/usr/local/include
-CFLAGS = -Ofast -Wall -fPIC $(INCLUDES)
+CFLAGS = -Ofast -Wall -fPIC $(INCLUDES) -Wno-int-to-pointer-cast 
 LDFLAGS = -Wl,-soname,libjni_opus.so,-rpath='$$ORIGIN' -shared
 LDPATH = -L$(NATIVE)
 LIBS = -lopus -lspeex

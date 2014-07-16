@@ -12,7 +12,7 @@ JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decoder_1creat
     int *err_ret = (*env)->GetPrimitiveArrayCritical(env, err, 0);
     err_ret[0] = error;
     (*env)->ReleasePrimitiveArrayCritical(env, err, err_ret, 0);
-    return (jlong) decoder;
+    return (unsigned long) decoder;
 }
 
 
@@ -87,7 +87,7 @@ JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_encoder_1creat
     int *err_ret = (*env)->GetPrimitiveArrayCritical(env, err, 0);
     err_ret[0] = error;
     (*env)->ReleasePrimitiveArrayCritical(env, err, err_ret, 0);
-    return (jlong) enc;
+    return (unsigned long) enc;
 }
 
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_encode_1short

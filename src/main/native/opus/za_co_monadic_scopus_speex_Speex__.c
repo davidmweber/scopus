@@ -44,11 +44,11 @@ JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_encoder_1cre
             break;
         default:
             free(state);
-            return (jlong) -1;
+            return (jlong) 0;
     }
 
     speex_bits_init(&(state->bits));
-    return (jlong) state;
+    return  (unsigned long)state;
 }
 
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_encode_1short
@@ -148,7 +148,7 @@ JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_decoder_1cre
     }
     speex_bits_init(&(state->bits));
     speex_decoder_ctl(state->st, SPEEX_SET_ENH, &enhance);
-    return (jlong) state;
+    return (unsigned long) state;
 }
 
 
