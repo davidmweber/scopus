@@ -2,7 +2,9 @@ package za.co.monadic.scopus.echo
 
 import za.co.monadic.scopus.speex.Speex._
 /**
- * Wrapper for the Speex echo canceller function
+ * Wrapper for the Speex echo canceller function. Note that the playback and capture
+ * methods are designed to run in separate threads, hence the synchronization on
+ * this. If you use playback/capture with cancel, you deserve what you get.
  */
 class EchoCanceller(frameSize: Int, filterLength: Int) {
 
@@ -64,7 +66,7 @@ class EchoCanceller(frameSize: Int, filterLength: Int) {
    */
   def cancel(rec: Array[Short], play: Array[Short] ): Array[Short] = {
     val out = new Array[Short](rec.length)
-    this.synchronized(echo_cancellation(state,rec,play,out))
+    echo_cancellation(state,rec,play,out)
     out
   }
 
