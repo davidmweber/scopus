@@ -1,17 +1,21 @@
 package za.co.monadic.scopus.echo
 
+import za.co.monadic.scopus.speex.Speex._
 /**
  * Wrapper for the Speex echo canceller function
  */
-trait EchoCanceller {
+class EchoCanceller(frameSize: Int, filterLength: Int) {
 
+  val state = echo_state_init(frameSize,filterLength)
   /**
    * Call this every time a voice packet is played to the speakers. Use
    * this call in conjunction with the @see capture call if the
    * sound card read and writes (record and playback) are in different threads.
    * @param audio Audio that has just been or about to be played
    */
-  def playback(audio: Array[Short])
+  def playback(audio: Array[Short]): Unit = {
+    echo_playback(state, audio)
+  }
 
   /**
    * Captured audio should be passed to this function after it has been
@@ -21,15 +25,23 @@ trait EchoCanceller {
    * @param recorded The recorded audio buffer
    * @return The audio with cancelled echo.
    */
-  def capture(recorded: Array[Short]): Array[Short]
+  def capture(recorded: Array[Short]): Array[Short] = {
+    val out = new Array[Short](recorded.length)
+    echo_capture(state,recorded,out)
+    out
+  }
 
   /**
    * If recording and playback are synchronised, use this call to cancel the
    * echos.
-   * @param input Recorded audio frame
-   * @param output Audio destined for play back
+   * @param rec Recorded audio frame
+   * @param play Audio destined for play back
    * @return Echo cancelled recorded audio packet
    */
-  def cancel(input: Array[Short], output: Array[Short] ): Array[Short]
+  def cancel(rec: Array[Short], play: Array[Short] ): Array[Short] = {
+    val out = new Array[Short](rec.length)
+    echo_cancellation(state,rec,play,out)
+    out
+  }
 
 }

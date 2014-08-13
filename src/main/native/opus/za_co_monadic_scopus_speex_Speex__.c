@@ -213,43 +213,49 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_decode_1short
 
 JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1state_1init
     (JNIEnv *env, jobject clazz, jint frame_size, jint filter_length ) {
-
     SpeexEchoState *state = speex_echo_state_init(frame_size,filter_length);
-
-
+    return (unsigned long) state;
 }
 
 JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1state_1destroy
-    (JNIEnv *env, jobject clazz, jlong SpeexEchoState) {
-
+    (JNIEnv *env, jobject clazz, jlong state) {
+    speex_echo_state_destroy((SpeexEchoState *)state);
 }
 
 JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1cancellation
-    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jshortArray rec, jshortArray play, jshortArray out){
-
-
-
+    (JNIEnv *env, jobject clazz, jlong state, jshortArray rec, jshortArray play, jshortArray out){
+    jshort *rec_ptr = 0;
+    jshort *play_ptr = 0;
+    jshort *out_ptr = 0;
+    rec_ptr = (*env)->GetPrimitiveArrayCritical(env, rec, 0);
+    play_ptr = (*env)->GetPrimitiveArrayCritical(env, play, 0);
+    out_ptr = (*env)->GetPrimitiveArrayCritical(env, out, 0);
+    speex_echo_cancellation((SpeexEchoState *)state, rec_ptr, play_ptr, out_ptr);
 }
 
 JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1capture
-    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jshortArray rec, jshortArray out) {
-
-
+    (JNIEnv *env, jobject clazz, jlong state, jshortArray rec, jshortArray out) {
+    jshort *rec_ptr = 0;
+    jshort *out_ptr = 0;
+    rec_ptr = (*env)->GetPrimitiveArrayCritical(env, rec, 0);
+    out_ptr = (*env)->GetPrimitiveArrayCritical(env, out, 0);
+    speex_echo_capture((SpeexEchoState *)state, rec_ptr, out_ptr);
 }
 
 JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1playback
-    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jshortArray play) {
-
-
+    (JNIEnv *env, jobject clazz, jlong state, jshortArray play) {
+    jshort *play_ptr = 0;
+    play_ptr = (*env)->GetPrimitiveArrayCritical(env, play, 0);
+    speex_echo_playback((SpeexEchoState *)state, play_ptr);
 }
 
 JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1state_1reset
-    (JNIEnv *env, jobject clazz, jlong SpeexEchoState){
-
+    (JNIEnv *env, jobject clazz, jlong state){
+    speex_echo_state_reset((SpeexEchoState *)state);
 }
 
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1ctl
-    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jint request, jlong ptr){
-
+    (JNIEnv *env, jobject clazz, jlong state, jint request, jlong ptr) {
+    return speex_echo_ctl((SpeexEchoState *)state, request, (void *) ptr);
 }
 
