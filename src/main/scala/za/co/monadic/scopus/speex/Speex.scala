@@ -223,4 +223,22 @@ object Speex {
 
   /** modeID for the defined ultra-wideband mode */
   final val SPEEX_MODEID_UWB = 2
+
+  /** Obtain frame size used by the AEC */
+  final val SPEEX_ECHO_GET_FRAME_SIZE = 3
+
+  /** Set sampling rate */
+  final val SPEEX_ECHO_SET_SAMPLING_RATE = 24
+  /** Get sampling rate */
+  final val SPEEX_ECHO_GET_SAMPLING_RATE = 25
+
+  /* Can't set window sizes */
+  /** Get size of impulse response (int32) */
+  final val SPEEX_ECHO_GET_IMPULSE_RESPONSE_SIZE = 27
+
+  /* Can't set window content */
+  /** Get impulse response (int32[]) */
+  final val SPEEX_ECHO_GET_IMPULSE_RESPONSE = 29
+
+
 }

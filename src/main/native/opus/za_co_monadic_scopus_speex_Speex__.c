@@ -4,6 +4,7 @@
  */
 #include "za_co_monadic_scopus_speex_Speex__.h"
 #include <speex/speex.h>
+#include <speex/speex_echo.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -205,5 +206,50 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_decode_1short
     (*env)->ReleasePrimitiveArrayCritical(env, decoded, dec_ptr, 0);
     (*env)->ReleasePrimitiveArrayCritical(env, input, in_ptr, 0);
     return ret;
+}
+
+
+/* Echo canceller API */
+
+JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1state_1init
+    (JNIEnv *env, jobject clazz, jint frame_size, jint filter_length ) {
+
+    SpeexEchoState *state = speex_echo_state_init(frame_size,filter_length);
+
+
+}
+
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1state_1destroy
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState) {
+
+}
+
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1cancellation
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jshortArray rec, jshortArray play, jshortArray out){
+
+
+
+}
+
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1capture
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jshortArray rec, jshortArray out) {
+
+
+}
+
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1playback
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jshortArray play) {
+
+
+}
+
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1state_1reset
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState){
+
+}
+
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1ctl
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jint request, jlong ptr){
+
 }
 
