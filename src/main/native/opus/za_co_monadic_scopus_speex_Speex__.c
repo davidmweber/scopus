@@ -231,6 +231,9 @@ JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1cancell
     play_ptr = (*env)->GetPrimitiveArrayCritical(env, play, 0);
     out_ptr = (*env)->GetPrimitiveArrayCritical(env, out, 0);
     speex_echo_cancellation((SpeexEchoState *)state, rec_ptr, play_ptr, out_ptr);
+    (*env)->ReleasePrimitiveArrayCritical(env, rec, rec_ptr, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, play, play_ptr, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, out, out_ptr, 0);
 }
 
 JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1capture
@@ -240,6 +243,8 @@ JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1capture
     rec_ptr = (*env)->GetPrimitiveArrayCritical(env, rec, 0);
     out_ptr = (*env)->GetPrimitiveArrayCritical(env, out, 0);
     speex_echo_capture((SpeexEchoState *)state, rec_ptr, out_ptr);
+    (*env)->ReleasePrimitiveArrayCritical(env, rec, rec_ptr, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, out, out_ptr, 0);
 }
 
 JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1playback
@@ -247,6 +252,7 @@ JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1playbac
     jshort *play_ptr = 0;
     play_ptr = (*env)->GetPrimitiveArrayCritical(env, play, 0);
     speex_echo_playback((SpeexEchoState *)state, play_ptr);
+    (*env)->ReleasePrimitiveArrayCritical(env, play, play_ptr, 0);
 }
 
 JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1state_1reset
