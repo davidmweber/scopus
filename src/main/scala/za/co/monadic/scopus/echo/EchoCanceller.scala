@@ -29,10 +29,13 @@ class EchoCanceller(frameSize: Int, filterLength: Int) {
    * Call this every time a voice packet is played to the speakers. Use
    * this call in conjunction with the @see capture call if the
    * sound card read and writes (record and playback) are in different threads.
+   *
+   * Note that @see capture and @see playback are not thread safe.
+   *
    * @param audio Audio that has just been or about to be played
    */
   def playback(audio: Array[Short]): Unit = {
-    echo_playback(state, audio)
+    this.synchronized(echo_playback(state, audio))
   }
 
   /**
@@ -40,12 +43,15 @@ class EchoCanceller(frameSize: Int, filterLength: Int) {
    * recorded from the sound card. Use this call in conjunction with
    * the @see playback call if the sound card read and writes (record
    * and playback) are in different threads.
+   *
+   * Note that @see capture and @see playback are not thread safe.
+   *
    * @param recorded The recorded audio buffer
    * @return The audio with cancelled echo.
    */
   def capture(recorded: Array[Short]): Array[Short] = {
     val out = new Array[Short](recorded.length)
-    echo_capture(state,recorded,out)
+    this.synchronized(echo_capture(state,recorded,out))
     out
   }
 
@@ -58,7 +64,7 @@ class EchoCanceller(frameSize: Int, filterLength: Int) {
    */
   def cancel(rec: Array[Short], play: Array[Short] ): Array[Short] = {
     val out = new Array[Short](rec.length)
-    echo_cancellation(state,rec,play,out)
+    this.synchronized(echo_cancellation(state,rec,play,out))
     out
   }
 
