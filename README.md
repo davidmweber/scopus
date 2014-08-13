@@ -13,6 +13,10 @@ native C implementation. For example, on a 3.5Ghz i5, the Opus codder runs at
 1600 times real time. A native benchmark shows the encoder to run at 400 times
 real time. The LLVM C compiler (clang v3.4) pips GCC by about 5%.
 
+There is support for the Speex [echo cancellation API](http://www.speex.org/docs/manual/speex-manual/node7.html#SECTION00740000000000000000).
+Like the rest of the library, this is a thin layer over the underlying C libraries. See the tests for an example of 
+how to use this.
+
 The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/) and those for Speex are [here](http://www.speex.org/downloads/).
 
 Note that the Opus codec is better in most aspects than the Speex codec. The
@@ -67,7 +71,7 @@ following dependency to your sbt build:
 ```scala
   resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
 
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.2.2"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.0"
 ```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`

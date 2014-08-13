@@ -6,6 +6,24 @@ import za.co.monadic.scopus.speex.Speex._
  */
 class EchoCanceller(frameSize: Int, filterLength: Int) {
 
+  var clean = false
+
+  /**
+   * Release all pointers allocated for the decoder. Make every attempt to call this
+   * when you are done with the encoder as finalise() is what it is in the JVM
+   */
+  def cleanup(): Unit = {
+    if (!clean) {
+      echo_state_destroy(state)
+      clean = true
+    }
+  }
+
+  final override def finalize() = {
+    cleanup()
+  }
+
+
   val state = echo_state_init(frameSize,filterLength)
   /**
    * Call this every time a voice packet is played to the speakers. Use
