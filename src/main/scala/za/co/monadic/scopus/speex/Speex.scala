@@ -7,12 +7,12 @@ import za.co.monadic.scopus._
  */
 object Speex {
 
-  def getMode(sf: SampleFrequency) =sf match {
-      case Sf8000  => SPEEX_MODEID_NB
-      case Sf16000 => SPEEX_MODEID_WB
-      case Sf32000 => SPEEX_MODEID_UWB
-      case s:SampleFrequency => throw new RuntimeException(s"Invalid sampling frequency ($s) for the Speex codec")
-    }
+  def getMode(sf: SampleFrequency) = sf match {
+    case Sf8000 => SPEEX_MODEID_NB
+    case Sf16000 => SPEEX_MODEID_WB
+    case Sf32000 => SPEEX_MODEID_UWB
+    case s: SampleFrequency => throw new RuntimeException(s"Invalid sampling frequency ($s) for the Speex codec")
+  }
 
   // Ensures that the libraries are loaded as Scala only initialises objects
   // if they are called...
@@ -60,6 +60,28 @@ object Speex {
   @native
   def decoder_ctl(decoder: Long, command: Int, value: Int): Int
 
+  // Echo canceller API:
+  @native
+  def echo_state_init(frame_size: Int, filter_length: Int): Long
+
+  @native
+  def echo_state_destroy(SpeexEchoState: Long)
+
+  @native
+  def echo_cancellation(SpeexEchoState: Long, rec: Array[Short], play: Array[Short], out: Array[Short])
+
+  @native
+  def echo_capture(SpeexEchoState: Long, rec: Array[Short], out: Array[Short])
+
+  @native
+  def echo_playback(SpeexEchoState: Long, play: Array[Short])
+
+  @native
+  def echo_state_reset(SpeexEchoState: Long)
+
+  @native
+  def echo_ctl(SpeexEchoState: Long, request: Int, ptr: Long): Int
+
   /** Set enhancement on/off (decoder only) */
   final val SPEEX_SET_ENH = 0
   /** Get enhancement state (decoder only) */
@@ -77,14 +99,14 @@ object Speex {
   /** Get current sub-mode in use */
   final val SPEEX_GET_MODE = 7
 
-  /** Set low-band sub-mode to use (wideband only)*/
+  /** Set low-band sub-mode to use (wideband only) */
   final val SPEEX_SET_LOW_MODE = 8
-  /** Get current low-band mode in use (wideband only)*/
+  /** Get current low-band mode in use (wideband only) */
   final val SPEEX_GET_LOW_MODE = 9
 
-  /** Set high-band sub-mode to use (wideband only)*/
+  /** Set high-band sub-mode to use (wideband only) */
   final val SPEEX_SET_HIGH_MODE = 10
-  /** Get current high-band mode in use (wideband only)*/
+  /** Get current high-band mode in use (wideband only) */
   final val SPEEX_GET_HIGH_MODE = 11
 
   /** Set VBR on (1) or off (0) */
@@ -107,10 +129,10 @@ object Speex {
   /** Get current bit-rate used by the encoder or decoder */
   final val SPEEX_GET_BITRATE = 19
 
-  /** Define a handler function for in-band Speex request*/
+  /** Define a handler function for in-band Speex request */
   final val SPEEX_SET_HANDLER = 20
 
-  /** Define a handler function for in-band user-defined request*/
+  /** Define a handler function for in-band user-defined request */
   final val SPEEX_SET_USER_HANDLER = 22
 
   /** Set sampling rate used in bit-rate computation */
@@ -118,7 +140,7 @@ object Speex {
   /** Get sampling rate used in bit-rate computation */
   final val SPEEX_GET_SAMPLING_RATE = 25
 
-  /** Reset the encoder/decoder memories to zero*/
+  /** Reset the encoder/decoder memories to zero */
   final val SPEEX_RESET_STATE = 26
 
   /** Get VBR info (mostly used internally) */
@@ -201,5 +223,4 @@ object Speex {
 
   /** modeID for the defined ultra-wideband mode */
   final val SPEEX_MODEID_UWB = 2
-
 }

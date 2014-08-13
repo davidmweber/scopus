@@ -34,6 +34,29 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_decode_1float
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_decode_1short
     (JNIEnv *env, jobject clazz, jlong decoder, jbyteArray input, jint len_in, jshortArray decoded, jint len_out);
 
+// Echo cancellerJNIEnv *env, jobject clazz, jlong
+
+JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1state_1init
+    (JNIEnv *env, jobject clazz, jint frame_size, jint filter_length );
+
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1state_1destroy
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState);
+
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1cancellation
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jshortArray rec, jshortArray play, jshortArray out);
+
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1capture
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jshortArray rec, jshortArray out);
+
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1playback
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jshortArray play);
+
+JNIEXPORT void JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1state_1reset
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState);
+
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_speex_Speex_00024_echo_1ctl
+    (JNIEnv *env, jobject clazz, jlong SpeexEchoState, jint request, jlong ptr);
+
 #ifdef __cplusplus
 }
 #endif
