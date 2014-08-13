@@ -3,65 +3,16 @@
  * Released under the Creative Commons License (http://creativecommons.org/licenses/by/4.0/legalcode)
  */
 
-import java.io._
 import org.scalatest._
-import za.co.monadic.scopus.opus.{OpusDecoderShort, OpusDecoderFloat, OpusEncoder}
-import za.co.monadic.scopus.speex.{SpeexEncoder, SpeexDecoderFloat, SpeexDecoderShort}
-import scala.util.{Try, Failure, Success}
+import za.co.monadic.scopus.TestUtils._
 import za.co.monadic.scopus._
-import Numeric.Implicits._
+import za.co.monadic.scopus.echo.EchoCanceller
+import za.co.monadic.scopus.opus.{OpusDecoderFloat, OpusDecoderShort, OpusEncoder}
+import za.co.monadic.scopus.speex.{SpeexDecoderFloat, SpeexDecoderShort, SpeexEncoder}
+
+import scala.util.{Failure, Success, Try}
 
 class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAndAfterAll {
-
-  // Byteswap. Needed for testing on Intel architectures
-  def swap(in: Short): Short = ((in >> 8) + ((in & 0xff) << 8)).asInstanceOf[Short]
-
-  def readAudioFile(file: String): Array[Short] = {
-    val stream = new FileInputStream(file)
-    val infile = new DataInputStream(new BufferedInputStream(stream))
-    val len = stream.getChannel.size().asInstanceOf[Int]
-    val audio = new Array[Short](len / 2)
-    for (i <- 0 to len / 2 - 1) audio(i) = swap(infile.readShort())
-    infile.close()
-    audio
-  }
-
-  /**
-   * Writes a raw audio file that can be played back using sox as
-   * "play -r 8000 -b 16 -e signed <filename.raw> "
-   * @param file Name of the file to write to
-   * @param data Array containing the data formatted as Short
-   */
-  def writeAudioFile(file: String, data: Array[Short]): Unit = {
-    val stream = new FileOutputStream(file)
-    val outfile = new DataOutputStream(new BufferedOutputStream(stream))
-    for (i <- 0 until data.length) outfile.writeShort(swap(data(i)))
-    outfile.close()
-  }
-
-  def sqr[A: Numeric](a: A): A = a * a
-
-  def energy(audio: Array[Short]): Double = {
-    audio.map(a => sqr(a.toDouble / (1 << 15))).sum / audio.length.toDouble
-  }
-
-  def energy(audio: Array[Float]): Double = {
-    audio.map(a => sqr(a)).sum / audio.length.toDouble
-  }
-
-  /**
-   * Calculates the correlation coefficient using Pearson's formula.
-   * @param a List for first sequence
-   * @param b List for second sequence
-   * @return Computed correlation coefficient.
-   */
-  def correlate(a: List[Double], b: List[Double]): Double = {
-    val aAve = a.sum / a.length
-    val bAve = b.sum / b.length
-    val top = (for ((x, y) <- a zip b) yield (x - aAve) * (y - bAve)).sum
-    val bottom = math.sqrt(a.map((t: Double) => sqr(t - aAve)).sum) * math.sqrt(b.map((t: Double) => sqr(t - bAve)).sum)
-    top / bottom
-  }
 
   val audio = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
   val audioFloat = audio.map(_.toFloat / (1 << 15))
@@ -342,5 +293,40 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       df.cleanup()
     }
 
+  }
+
+  describe("Echo canceller") {
+
+    it("should remove all output sound from the input (synchronous call") {
+      val N = 320
+      val ec = new EchoCanceller(N,256)
+      val error = for {
+        i ← 0 to 100
+        play = Seq.fill(N)(shortGauss()).toArray[Short]
+        rec  = play.map((s: Short) ⇒ (s/2).toShort)
+      } yield energy(ec.cancel(play,rec))
+      error.head should be > 0.01
+      error.last should be < 1e-8
+      ec.cleanup()
+      ec.cleanup()
+    }
+
+    it("should remove all output sound from the input (separate calls)") {
+      val N = 320
+      val ec = new EchoCanceller(N,256)
+      // There is a packet delay of 2 * frame_size in the playback queue
+      val sound = for (i ← 0 to 100) yield Seq.fill(N)(shortGauss()).toArray[Short]
+      ec.capture(sound(0))
+      val error = for {
+        i ← 1 until 100
+        none = ec.playback(sound(i+1))
+        rec  = sound(i).map((s: Short) ⇒ (s/2).toShort)
+        e = energy(ec.capture(rec))
+      } yield e
+      error.head should be > 0.01
+      error.last should be < 1e-8
+      ec.cleanup()
+      ec.cleanup() // Test for no bomb on second cleanup
+    }
   }
 }
