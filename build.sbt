@@ -6,13 +6,13 @@ name := "Scopus"
 
 organization := "za.co.monadic"
 
-version := "0.3.1"
+version := "0.3.2"
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.2"
 
 fork in Test := true
 
-crossScalaVersions := Seq("2.10.4", "2.11.1")
+crossScalaVersions := Seq("2.10.4", "2.11.2")
 
 licenses += "CC BY 4.0." -> url("https://creativecommons.org/licenses/by/4.0/")
 
