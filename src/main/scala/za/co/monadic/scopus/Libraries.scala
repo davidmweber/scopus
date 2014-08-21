@@ -17,6 +17,7 @@ object Libraries {
     case "Mac OS X/x86_64" =>
       LibLoader("libopus.0.dylib", load = false)
       LibLoader("libspeex.1.dylib", load = false)
+      LibLoader("libspeexdsp.1.dylib", load = false)
       LibLoader("libjni_opus.dylib")
     case s: String =>
       println(s"Unknown OS/platform combination: $s")
