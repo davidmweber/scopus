@@ -6,13 +6,13 @@ name := "Scopus"
 
 organization := "za.co.monadic"
 
-version := "0.3.2"
+version := "0.3.3"
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.5"
 
 fork in Test := true
 
-crossScalaVersions := Seq("2.10.4", "2.11.2")
+crossScalaVersions := Seq("2.10.4", "2.11.5")
 
 licenses += "CC BY 4.0." -> url("https://creativecommons.org/licenses/by/4.0/")
 
@@ -29,7 +29,7 @@ libraryDependencies := {
 }
 
 libraryDependencies ++= List(
-  "org.scalatest" %% "scalatest" % "2.1.3" % "test"
+  "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 )
 
 publishMavenStyle := true

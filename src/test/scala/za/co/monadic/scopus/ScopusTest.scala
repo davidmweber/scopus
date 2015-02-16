@@ -7,8 +7,9 @@ import org.scalatest._
 import za.co.monadic.scopus.TestUtils._
 import za.co.monadic.scopus._
 import za.co.monadic.scopus.echo.EchoCanceller
-import za.co.monadic.scopus.opus.{OpusDecoderFloat, OpusDecoderShort, OpusEncoder}
-import za.co.monadic.scopus.speex.{SpeexDecoderFloat, SpeexDecoderShort, SpeexEncoder}
+import za.co.monadic.scopus.opus._
+import za.co.monadic.scopus.speex._
+import za.co.monadic.scopus.pcm._
 
 import scala.util.{Failure, Success, Try}
 
@@ -26,7 +27,8 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
   val codecs = List(
     ("Speex", SpeexEncoder(Sf8000).complexity(1), SpeexDecoderShort(Sf8000), SpeexDecoderFloat(Sf8000), 0.81),
     ("Speex with enhancement", SpeexEncoder(Sf8000).complexity(1), SpeexDecoderShort(Sf8000,true), SpeexDecoderFloat(Sf8000,true), 0.81),
-    ("Opus", OpusEncoder(Sf8000, 1).complexity(2), OpusDecoderShort(Sf8000, 1), OpusDecoderFloat(Sf8000, 1), 0.90))
+    ("Opus", OpusEncoder(Sf8000, 1).complexity(2), OpusDecoderShort(Sf8000, 1), OpusDecoderFloat(Sf8000, 1), 0.90),
+    ("PCM", PcmEncoder(Sf8000,1), PcmDecoderShort(Sf8000,1), PcmDecoderFloat(Sf8000, 1), 0.95))
 
 
   for ((desc, enc, dec, decFloat, corrMin) <- codecs)  {
@@ -326,6 +328,31 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       error.last should be < 1e-8
       ec.cleanup()
       ec.cleanup() // Test for no bomb on second cleanup */
+    }
+  }
+
+
+  describe("Array conversion utilities") {
+
+    import za.co.monadic.scopus.ArrayConversion._
+
+    it("convert between Short and Byte arrays") {
+      val bytes0 = Array[Byte](0, 1, 2, 3, 200.toByte, 129.toByte)
+      val out = byteArrayToShortArray(bytes0)
+      val swapped0 = shortArrayToByteArray(out)
+      bytes0 should equal(swapped0)
+
+      val bytes1 = Array[Short](0, -1, -2, -3, -4, -5, -6, -7, -8, -9, 12000, -15000)
+      val swapped1 = byteArrayToShortArray(shortArrayToByteArray(bytes1))
+
+      bytes1 should equal(swapped1)
+    }
+
+    it("convert between Float and Byte arrays") {
+      val f =  Array[Float](0.0f,1.0f,-1.0f, 3.1415e11f, -3.1415e15f)
+      val b = floatArrayToByteArray(f)
+      val fOut = byteArrayToFloatArray(b)
+      fOut should be (f)
     }
   }
 }

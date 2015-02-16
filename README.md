@@ -4,11 +4,14 @@ Scopus
 ------
 
 Scopus is a Scala interface to the [Opus](http://www.opus-codec.org) and
-[Speex](http://www.speex.org/) codecs. It is light and thin by design and
-gives programmers access to the bulk of the functionality to the codecs. It
+[Speex](http://www.speex.org/) codecs. There is also a PCM "codec" which
+is effectively a NULL codec and is useful in testing.
+
+It is light and thin by design and gives programmers access to the bulk
+of thefunctionality to the codecs. It
 uses JNI to handle the native code and works for Linux (amd64 and i386) and
 OSX. Benchmarks performed on the encoder show that it is 10% slower than a
-native C implementation. For example, on a 3.5Ghz i5, the Opus codder runs at
+native C implementation. For example, on a 3.5Ghz i5, the Opus coder runs at
 360 times real time (complexity factor set to 2). The Opus decoder runs at around
 1600 times real time. A native benchmark shows the encoder to run at 400 times
 real time. The LLVM C compiler (clang v3.4) pips GCC by about 5%.
@@ -61,7 +64,7 @@ javah  -classpath target/scala-2.10/classes:/usr/local/lib/scala-2.10.4/lib/*\
     -d src/main/native/opus/ -stubs  za.co.monadic.scopus.Opus$
 ```
 
-You may have to adjust your classpath for your Scala installation.
+You may have to adjust your classpath for your Scala installation and version.
 
 Usage
 -----
@@ -71,7 +74,7 @@ following dependency to your sbt build:
 ```scala
   resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
 
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.2"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.3"
 ```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`
