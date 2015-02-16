@@ -295,6 +295,29 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
     }
   }
 
+  describe("The PCM codec") {
+    it("handles Shorts and Floats interchangeably ") {
+
+      def check(a: Array[Float], b: Array[Float]): Unit = {
+        a.length should be (b.length)
+        for (i ← 0 until a.length) {
+          Math.abs(a(i)-b(i)) should be <= 0.5f
+        }
+      }
+      val freq = 1000f
+      val e = PcmEncoder(Sf8000, 1)
+      val ds = PcmDecoderShort(Sf8000,1)
+      val df = PcmDecoderFloat(Sf8000,1)
+      val a0 = (0 until 10).map((idx: Int) ⇒ (30000.0 * math.sin(2.0 * math.Pi * idx * freq / 8000.0)).toShort).toArray
+      val a1 = (0 until 10).map((idx: Int) ⇒ 0.9155273f * math.sin(2.0f * math.Pi * idx * freq / 8000.0f).toFloat).toArray
+
+      ds(e(a0).get).get should equal (a0)
+      ds(e(a1).get).get should equal (a0)
+      check(df(e(a0).get).get, a1)
+      check(df(e(a1).get).get, a1)
+    }
+  }
+
   describe("Echo canceller") {
 
     it("should remove all output sound from the input (synchronous call") {
