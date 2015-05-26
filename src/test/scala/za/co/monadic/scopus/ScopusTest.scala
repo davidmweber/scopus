@@ -1,3 +1,5 @@
+package za.co.monadic.scopus
+
 /*
  * Copyright David Weber 2014
  * Released under the Creative Commons License (http://creativecommons.org/licenses/by/4.0/legalcode)
@@ -5,7 +7,6 @@
 
 import org.scalatest._
 import za.co.monadic.scopus.TestUtils._
-import za.co.monadic.scopus._
 import za.co.monadic.scopus.echo.EchoCanceller
 import za.co.monadic.scopus.opus._
 import za.co.monadic.scopus.speex._
@@ -171,24 +172,24 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         Given("a set of sampling frequencies for the encoders and decoders")
         val freqs = List(8000, 16000, 32000)
         When("they are constructed for different sample frequencies")
-        val e = List(SpeexEncoder(Sf8000), SpeexEncoder(Sf16000),SpeexEncoder(Sf32000))
-        val d = List(SpeexDecoderShort(Sf8000), SpeexDecoderShort(Sf16000),SpeexDecoderShort(Sf32000))
-        val df = List(SpeexDecoderFloat(Sf8000), SpeexDecoderFloat(Sf16000),SpeexDecoderFloat(Sf32000))
+        val e = List(SpeexEncoder(Sf8000), SpeexEncoder(Sf16000), SpeexEncoder(Sf32000))
+        val d = List(SpeexDecoderShort(Sf8000), SpeexDecoderShort(Sf16000), SpeexDecoderShort(Sf32000))
+        val df = List(SpeexDecoderFloat(Sf8000), SpeexDecoderFloat(Sf16000), SpeexDecoderFloat(Sf32000))
         Then("the encoder structures return the correct sample frequency it was configured for")
         for ((f, t) <- freqs zip e) {
           t.getSampleRate should equal(f)
         }
-        e.map(_.cleanup())
+        e.foreach(_.cleanup())
         And("the short decoder structures return the correct frequencies")
         for ((f, t) <- freqs zip d) {
           t.getSampleRate should equal(f)
         }
-        d.map(_.cleanup())
+        d.foreach(_.cleanup())
         And("the float decoder structures return the correct frequencies")
         for ((f, t) <- freqs zip df) {
           t.getSampleRate should equal(f)
         }
-        df.map(_.cleanup())
+        df.foreach(_.cleanup())
       } catch {
         case e: Exception => fail(s"Received exception ${e.getMessage}")
       }
@@ -271,12 +272,12 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         for ((f, t) <- freqs zip e) {
           t.getSampleRate should equal(f)
         }
-        e.map(_.cleanup())
+        e.foreach(_.cleanup())
         And("the decoder structures return the correct frequencies")
         for ((f, t) <- freqs zip d) {
           t.getSampleRate should equal(f)
         }
-        d.map(_.cleanup())
+        d.foreach(_.cleanup())
       } catch {
         case e: Exception => fail(s"Received exception ${e.getMessage}")
       }
@@ -339,7 +340,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val ec = new EchoCanceller(N,256)
       // There is a packet delay of 2 * frame_size in the playback queue
       val sound = for (i ← 0 to 101) yield Seq.fill(N)(shortGauss()).toArray[Short]
-      ec.capture(sound(0))
+      ec.capture(sound.head)
       val error = for {
         i ← 1 to 100
         none = ec.playback(sound(i+1))

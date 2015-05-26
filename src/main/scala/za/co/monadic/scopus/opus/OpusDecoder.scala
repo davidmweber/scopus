@@ -4,8 +4,9 @@
  */
 package za.co.monadic.scopus.opus
 
-import Opus._
-import za.co.monadic.scopus.{Codec, DecoderShort, DecoderFloat, SampleFrequency}
+import za.co.monadic.scopus.opus.Opus._
+import za.co.monadic.scopus.{DecoderFloat, DecoderShort, SampleFrequency}
+
 import scala.util.{Failure, Success, Try}
 
 /**
