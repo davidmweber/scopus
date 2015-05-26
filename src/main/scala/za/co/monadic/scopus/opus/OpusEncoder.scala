@@ -175,4 +175,12 @@ object OpusEncoder {
    */
   def apply(sampleFreq: SampleFrequency, channels: Int, app: Application = Voip, bufferSize: Int = 8192) =
     new OpusEncoder(sampleFreq,channels, app, bufferSize)
+
+  /**
+   * Test if the packet is an Opus DTX (silent) packet
+   * @param audio Opus compressed packet
+   * @return True if it is a DTX packet
+   */
+  def isDTX(audio: Array[Byte]) = audio.length == 1
+
 }
