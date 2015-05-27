@@ -11,21 +11,9 @@ scalaVersion := "2.11.6"
 
 fork in Test := true
 
-crossScalaVersions := Seq("2.10.5", "2.11.6")
-
 licenses += "CC BY 4.0." -> url("https://creativecommons.org/licenses/by/4.0/")
 
 homepage := Some(url("https://github.com/davidmweber/scopus"))
-
-// Needed only for IntelliJ (13.1.3) because ScalaTest cannot find the XML library it needs
-libraryDependencies := {
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, scalaMajor)) if scalaMajor >= 11 =>
-      libraryDependencies.value :+ "org.scala-lang.modules" %% "scala-xml" % "1.0.2" % "test"
-    case _ =>
-      libraryDependencies.value
-  }
-}
 
 libraryDependencies ++= List(
   "org.scalatest" %% "scalatest" % "2.2.4" % "test"
@@ -35,7 +23,6 @@ publishMavenStyle := true
 
 // sbt publishSigned
 // sbt sonatypeRelease
-
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
   if (isSnapshot.value)
