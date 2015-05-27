@@ -1,4 +1,3 @@
-import SonatypeKeys._
 
 sonatypeSettings
 
@@ -33,6 +32,9 @@ libraryDependencies ++= List(
 )
 
 publishMavenStyle := true
+
+// sbt publishSigned
+// sbt sonatypeRelease
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
