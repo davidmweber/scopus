@@ -104,7 +104,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         val coded = for (c <- chunks) yield enc(c).get
         val decoded = // Decode, dropping every 10th packet
           for {
-            (c, i) <- coded zip (0 until coded.length)
+            (c, i) <- coded.zipWithIndex
             p = if (i % 15 == 1) dec(chunkSize) else dec(c)
           } yield p.get
         val in = chunks.toArray.flatten.grouped(40).toList
@@ -122,7 +122,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         val coded = for (c <- chunksFloat) yield enc(c).get
         val decoded = // Decode, dropping every 10th packet
           for {
-            (c, i) <- coded zip (0 until coded.length)
+            (c, i) <- coded.zipWithIndex
             p = if (i % 15 == 1) decFloat(chunkSize) else decFloat(c)
           } yield p.get
         val in = chunksFloat.toArray.flatten.grouped(40).toList
@@ -309,7 +309,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
       def check(a: Array[Float], b: Array[Float]): Unit = {
         a.length should be (b.length)
-        for (i ← 0 until a.length) {
+        for (i ← a.indices) {
           Math.abs(a(i)-b(i)) should be <= 0.5f
         }
       }
