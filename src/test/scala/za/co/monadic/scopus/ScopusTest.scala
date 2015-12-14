@@ -245,6 +245,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
 
     it("detects silence packets in DTX mode") {
       val enc = OpusEncoder(Sf8000, 1)
+      val dec = OpusDecoderFloat(Sf8000, 1)
       enc.setUseDtx(1)
       val coded = for (c <- chunksFloat) yield enc(c).get
       coded.count(isDTX) shouldBe 7
