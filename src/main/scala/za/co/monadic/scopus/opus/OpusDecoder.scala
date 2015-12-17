@@ -84,6 +84,7 @@ sealed trait OpusBase {
   def getFec(useFec: Boolean) = {
     fec == 1
   }
+
 }
 
 /**
@@ -122,6 +123,14 @@ class OpusDecoderShort(val fs: SampleFrequency, val channels: Int) extends Decod
   }
 
   def getDetail = s"Opus decoder to `short' with sf= ${fs()}"
+
+  /**
+   * Test if the packet is an Opus DTX (silent) packet
+   * @param audio Opus compressed packet
+   * @return True if it is a DTX packet
+   */
+  override def isDTX(audio: Array[Byte]) = audio.length == 1
+
 
 }
 
@@ -171,6 +180,12 @@ class OpusDecoderFloat(val fs: SampleFrequency, val channels: Int) extends Decod
 
   def getDetail = s"Opus decoder to `float' with sf= ${fs()}"
 
+  /**
+   * Test if the packet is an Opus DTX (silent) packet
+   * @param audio Opus compressed packet
+   * @return True if it is a DTX packet
+   */
+  override def isDTX(audio: Array[Byte]) = audio.length == 1
 }
 
 object OpusDecoderFloat {

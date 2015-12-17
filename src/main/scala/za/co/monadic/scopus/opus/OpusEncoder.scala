@@ -85,6 +85,7 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
     if (err != OPUS_OK) throw new RuntimeException(s"opus_encoder_ctl getter failed for command $command: ${error_string(err)}")
     result(0)
   }
+
   /**
    * Set the complexity of the encoder. This has no effect if the encoder does not support
    * complexity settings
@@ -161,6 +162,14 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
 
   def getPredictionDisable = getter(OPUS_GET_PREDICTION_DISABLED_REQUEST)
 
+
+  /**
+   * Test if the packet is an Opus DTX (silent) packet
+   * @param audio Opus compressed packet
+   * @return True if it is a DTX packet
+   */
+  override def isDTX(audio: Array[Byte]) = audio.length == 1
+
 }
 
 object OpusEncoder {
@@ -175,12 +184,5 @@ object OpusEncoder {
    */
   def apply(sampleFreq: SampleFrequency, channels: Int, app: Application = Voip, bufferSize: Int = 8192) =
     new OpusEncoder(sampleFreq,channels, app, bufferSize)
-
-  /**
-   * Test if the packet is an Opus DTX (silent) packet
-   * @param audio Opus compressed packet
-   * @return True if it is a DTX packet
-   */
-  def isDTX(audio: Array[Byte]) = audio.length == 1
 
 }

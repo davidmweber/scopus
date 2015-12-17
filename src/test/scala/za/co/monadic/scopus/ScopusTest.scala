@@ -8,7 +8,6 @@ package za.co.monadic.scopus
 import org.scalatest._
 import za.co.monadic.scopus.TestUtils._
 import za.co.monadic.scopus.echo.EchoCanceller
-import za.co.monadic.scopus.opus.OpusEncoder.isDTX
 import za.co.monadic.scopus.opus._
 import za.co.monadic.scopus.speex._
 import za.co.monadic.scopus.pcm._
@@ -248,7 +247,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val dec = OpusDecoderFloat(Sf8000, 1)
       enc.setUseDtx(1)
       val coded = for (c <- chunksFloat) yield enc(c).get
-      coded.count(isDTX) shouldBe 7
+      coded.count(enc.isDTX) shouldBe 7
     }
 
     it("get and set the encoder parameters (tests opus_encoder_set/get_ctl call only)") {

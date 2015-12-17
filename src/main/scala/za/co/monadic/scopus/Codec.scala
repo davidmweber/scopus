@@ -29,6 +29,13 @@ trait Codec {
    * @return The sample rate for this codec's instance
    */
   def getSampleRate: Int
+
+  /**
+    * Returns true if the compressed audio packet is DTX.
+    * @param compressedAudio A compressed audio packet for this codec
+    * @return True if the packet is DTX and should not be transmitted
+    */
+  def isDTX(compressedAudio: Array[Byte]): Boolean = false
 }
 
 trait Decoder {
@@ -53,7 +60,8 @@ trait DecoderFloat extends Codec with Decoder {
    * deal with the erasure appropriately.
    * @return A Try containing decompressed audio in Float format
    */
-  def apply(count: Int): Try[Array[Float]]}
+  def apply(count: Int): Try[Array[Float]]
+}
 
 /**
  * Decoder for float data types

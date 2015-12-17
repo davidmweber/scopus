@@ -1,11 +1,11 @@
 
-sonatypeSettings
+//sonatypeSettings
 
 name := "Scopus"
 
 organization := "za.co.monadic"
 
-version := "0.3.6"
+version := "0.3.7"
 
 scalaVersion := "2.11.7"
 
