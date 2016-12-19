@@ -8,7 +8,7 @@ Scopus is a Scala interface to the [Opus](http://www.opus-codec.org) and
 is effectively a NULL codec and is useful in testing.
 
 It is light and thin by design and gives programmers access to the bulk
-of thefunctionality to the codecs. It
+of the functionality to the codecs. It
 uses JNI to handle the native code and works for Linux (amd64 and i386) and
 OSX. Benchmarks performed on the encoder show that it is 10% slower than a
 native C implementation. For example, on a 3.5Ghz i5, the Opus coder runs at
@@ -56,6 +56,15 @@ installations of Opus, the linker will likely find that library rather than
 the bundled one (demonstrated for Linux). This may cause the test cases to
 fail.
 
+The Opus codec performance improves if compiled with `clang`. Configure, build
+and test it as follows:
+
+```bash
+CC=clang CFLAGS=-O3 ./configure
+make
+make check
+```
+
 If you feel the need to generate header prototypes, build the Scala code then
 run `javah` from the root directory of the project as follows:
 
@@ -74,7 +83,7 @@ following dependency to your sbt build:
 ```scala
   resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
 
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.6"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.8"
 ```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`

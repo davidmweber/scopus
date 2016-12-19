@@ -1,13 +1,13 @@
 
-//sonatypeSettings
-
 name := "Scopus"
 
 organization := "za.co.monadic"
 
-version := "0.3.7"
+version := "0.3.8"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.12.1"
+
+crossScalaVersions := Seq("2.11.8", "2.12.1")
 
 fork in Test := true
 
@@ -16,7 +16,7 @@ licenses += "CC BY 4.0." -> url("https://creativecommons.org/licenses/by/4.0/")
 homepage := Some(url("https://github.com/davidmweber/scopus"))
 
 libraryDependencies ++= List(
-  "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 )
 
 publishMavenStyle := true
