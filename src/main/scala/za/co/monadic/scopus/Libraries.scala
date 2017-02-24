@@ -4,12 +4,12 @@ import za.co.monadic.scopus.opus.Opus
 import za.co.monadic.scopus.speex.Speex
 
 /**
- * Load all the native libraries
- */
+  * Load all the native libraries
+  */
 object Libraries {
   // System dependent load of native libraries
   LibLoader.getOsArch match {
-    case "Linux/amd64" | "Linux/i386"=>
+    case "Linux/amd64" | "Linux/i386" =>
       LibLoader("libopus.so.0", load = false) // Don't load this as it is dynamically found by the linker in Linux
       LibLoader("libspeex.so.1", load = false)
       LibLoader("libspeexdsp.so.1", load = false)

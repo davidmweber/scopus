@@ -1,9 +1,8 @@
-
 name := "Scopus"
 
 organization := "za.co.monadic"
 
-version := "0.3.8"
+version := "0.3.9"
 
 scalaVersion := "2.12.1"
 
@@ -28,13 +27,15 @@ publishTo := {
   if (isSnapshot.value)
     Some("snapshots" at nexus + "content/repositories/snapshots")
   else
-    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 
-pomIncludeRepository := { _ => false }
+pomIncludeRepository := { _ =>
+  false
+}
 
 pomExtra :=
-    <scm>
+  <scm>
       <url>git@github.com:davidmweber/scopus.git</url>
       <connection>scm:git:git@github.com:davidmweber/scopus.git</connection>
     </scm>
@@ -45,4 +46,3 @@ pomExtra :=
         <url>https://github.com/davidmweber</url>
       </developer>
     </developers>
-

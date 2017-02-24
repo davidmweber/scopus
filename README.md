@@ -83,16 +83,17 @@ following dependency to your sbt build:
 ```scala
   resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
 
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.8"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.9"
 ```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`
 so it is up to you to manage errors reported by the decoder or the encoder.
 
 ```scala
-   val enc = OpusEncoder(Sf8000, 1, Audio)
-   enc.setUseDtx(1)  // Transmit special short packets if silence is detected
+   // Variable bit rate Opus encoder with discontinuous transmission
+   val enc = OpusEncoder(Sf8000, 1, Audio).setUseDtx(1).setVbr(1)  
 
+   // Corresponding decoder
    val dec = OpusDecoder(Sf8000, 1)
 
    val coded: Try[Array[Byte]] = enc(new Array[Short](160))

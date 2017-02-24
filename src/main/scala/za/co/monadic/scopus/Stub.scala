@@ -6,8 +6,8 @@ import za.co.monadic.scopus.speex.{SpeexDecoderShort, SpeexEncoder, Speex}
 import scala.util.Try
 
 /**
- *
- */
+  *
+  */
 object Stub extends App {
 
   val enc = OpusEncoder(Sf8000, 1, Audio)
@@ -27,7 +27,7 @@ object Stub extends App {
   val senc = SpeexEncoder(Sf8000)
   senc.cleanup()
 
-  val sdec = SpeexDecoderShort(Sf8000,true)
+  val sdec = SpeexDecoderShort(Sf8000, true)
   sdec.cleanup()
 
   // Send decoded packet off
