@@ -65,19 +65,9 @@ make
 make check
 ```
 
-If you feel the need to generate header prototypes, build the Scala code then
-run `javah` from the root directory of the project as follows:
-
-```bash
-javah  -classpath target/scala-2.10/classes:/usr/local/lib/scala-2.10.4/lib/*\
-    -d src/main/native/opus/ -stubs  za.co.monadic.scopus.Opus$
-```
-
-You may have to adjust your classpath for your Scala installation and version.
-
 Usage
 -----
-Scopus is available from the Sonatype Maven repo with builds for Scala 2.10 and 2.11. Add the
+Scopus is available from the Sonatype Maven repo with builds for Scala 2.11 and 2.12. Add the
 following dependency to your sbt build:
 
 ```scala
