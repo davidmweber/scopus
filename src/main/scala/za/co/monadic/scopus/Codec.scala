@@ -30,7 +30,8 @@ trait Codec {
   def getSampleRate: Int
 
   /**
-    * Returns true if the compressed audio packet is DTX.
+    * Returns true if the compressed audio packet is DTX. In practice, if
+    * this is true then don't transmit this packet.
     * @param compressedAudio A compressed audio packet for this codec
     * @return True if the packet is DTX and should not be transmitted
     */

@@ -245,11 +245,12 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
   def getPredictionDisable = getter(OPUS_GET_PREDICTION_DISABLED_REQUEST)
 
   /**
-    * Test if the packet is an Opus DTX (silent) packet
+    * Test if the packet is an Opus DTX (silent) packet. In practice, if
+    * this is true then don't transmit this packet.
     * @param audio Opus compressed packet
     * @return True if it is a DTX packet
     */
-  override def isDTX(audio: Array[Byte]) = audio.length == 1
+  override def isDTX(audio: Array[Byte]) = audio.length <= 2
 
 }
 
