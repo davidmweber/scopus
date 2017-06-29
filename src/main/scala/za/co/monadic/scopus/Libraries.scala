@@ -24,8 +24,8 @@ object Libraries {
       sys.exit(-1)
   }
   // Verify we have the correct library loaded. Linux sometimes messes this up.
-  if (Opus.get_version_string() != "libopus 1.1")
-    throw new RuntimeException("libopus version must be 1.1")
+  if (Opus.get_version_string() != "libopus 1.2.1")
+    throw new RuntimeException("libopus version must be 1.2.1")
 
   if (Speex.get_version_string() != "1.2rc1")
     throw new RuntimeException("libspeex version must be 1.2rc1")
