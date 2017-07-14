@@ -258,6 +258,26 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       b.count(_.length <= 6) should be > 95
     }
 
+    it("detects silence packets in DTX mode at 48kHz") {
+      val enc = OpusEncoder(Sf48000, 1)
+      enc.setUseDtx(1)
+      val blank = Array.fill[Float](chunkSize*6*2)(0.0f)
+      // With DTS, packets are either 1 or 6 bytes long. The 6 byte one gets transmitted, the
+      // 1 byte long packets should not be transmitted.
+      val b = (0 to 100).map(_ ⇒ enc(blank).get)
+      b.count(_.length <= 6) should be > 85
+    }
+
+    it("returns the correct number of samples in the packet") {
+      val enc = OpusEncoder(Sf8000, 1)
+      enc.setVbr(1)
+      chunks.foreach{ c⇒
+        val d = enc(c)
+        val l = Opus.decoder_get_nb_samples(d.get, d.get.length, Sf8000())
+        l shouldBe c.length
+      }
+    }
+
     it("encodes and decodes DTX packets") {
       // This is not really a test. I just used it to experiment with VBR and DTX packet streams
       val enc = OpusEncoder(Sf8000, 1)

@@ -1,7 +1,7 @@
 # -*-makefile-*-
 
 CC=gcc
-JAVA = java-7-oracle
+JAVA = java-8-openjdk-amd64
 NATIVE = ../../resources/native/Linux/amd64/
 INCLUDES = -I/usr/lib/jvm/$(JAVA)/include\
 	   -I/usr/lib/jvm/$(JAVA)/include/linux\
