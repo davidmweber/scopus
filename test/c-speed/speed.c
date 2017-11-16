@@ -27,7 +27,7 @@ int main() {
  enc = opus_encoder_create(8000, 1, OPUS_APPLICATION_VOIP, &error);
  dec = opus_decoder_create(8000, 1, &error);
  if (error == 0) {
-  error = opus_encoder_ctl(enc,OPUS_SET_COMPLEXITY(1));
+  error = opus_encoder_ctl(enc,OPUS_SET_COMPLEXITY(3));
   error = opus_encoder_ctl(enc,OPUS_SET_SIGNAL(OPUS_SIGNAL_VOICE));
   int count = 0;
   struct timeval t1,t2;
