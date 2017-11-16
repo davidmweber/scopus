@@ -123,11 +123,10 @@ sources.
 Opus can handle two channels while the Speex codec is restricted to 1 channel.
 
 Scala does not seem to have a [convention for error
-handling](http://grokbase.com/t/gg/scala-user/1293fwp1je/trying-to-work-with-
-try). I went with [Try](http://www.scala-
-lang.org/api/2.10.3/index.html#scala.util.Try). If this is not how you think
-it should be done, read the link and make a case. Try can be flatmapped which
-is important in my application.
+handling](http://grokbase.com/t/gg/scala-user/1293fwp1je/trying-to-work-with-try). 
+I went with [Try](http://www.scala-lang.org/api/2.10.3/index.html#scala.util.Try). 
+If this is not how you think it should be done, read the link and make a case. 
+Try can be flatmapped which is important in my application.
 
 Future plans include adding codecs and abstracting the codec layer so they are
 more pluggable. Pull requests welcome.
