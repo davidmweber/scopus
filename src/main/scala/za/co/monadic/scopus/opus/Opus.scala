@@ -37,6 +37,15 @@ object Opus {
                    decodeFEC: Int): Int
 
   @native
+  def decoder_get_nb_samples(data: Array[Byte], length: Int, fs: Int): Int
+
+  @native
+  def decoder_samples_per_frame(data: Array[Byte], fs: Int): Int
+
+  @native
+  def decoder_get_nb_frames(data: Array[Byte], length: Int): Int
+
+  @native
   def decoder_destroy(decoder: Long)
 
   @native

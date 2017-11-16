@@ -16,6 +16,45 @@ JNIEXPORT jlong JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decoder_1creat
 }
 
 
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decoder_1get_1nb_1samples
+    (JNIEnv *env, jobject clazz, jbyteArray data, jint length, jint Fs) {
+    int n = 0;
+    jbyte *d_ptr = 0;
+    if ((long) data != 0) {
+      d_ptr = (*env)->GetPrimitiveArrayCritical(env, data, 0);
+      if (d_ptr == 0) return OPUS_ALLOC_FAIL;
+    }
+    n = opus_packet_get_nb_samples( (unsigned char *)d_ptr, length, Fs);
+    (*env)->ReleasePrimitiveArrayCritical(env,data, d_ptr, 0);
+    return n;
+}
+
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decoder_1nb_1samples_1per_1frame
+    (JNIEnv *env, jobject clazz, jbyteArray data, jint Fs) {
+    int n = 0;
+    jbyte *d_ptr = 0;
+    if ((long) data != 0) {
+      d_ptr = (*env)->GetPrimitiveArrayCritical(env, data, 0);
+      if (d_ptr == 0) return OPUS_ALLOC_FAIL;
+    }
+    n = opus_packet_get_samples_per_frame( (unsigned char *)d_ptr, Fs);
+    (*env)->ReleasePrimitiveArrayCritical(env,data, d_ptr, 0);
+    return n;
+}
+
+JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decoder_1get_1nb_1frames
+    (JNIEnv *env, jobject clazz, jbyteArray data, jint length) {
+    int n = 0;
+    jbyte *d_ptr = 0;
+    if ((long) data != 0) {
+      d_ptr = (*env)->GetPrimitiveArrayCritical(env, data, 0);
+      if (d_ptr == 0) return OPUS_ALLOC_FAIL;
+    }
+    n = opus_packet_get_nb_frames((unsigned char *)d_ptr, length);
+    (*env)->ReleasePrimitiveArrayCritical(env,data, d_ptr, 0);
+    return n;
+}
+
 JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_decode_1short
     (JNIEnv *env, jobject clazz, jlong decoder, jbyteArray input, jint len_in, jshortArray decoded, jint len_out, jint fec) {
 

@@ -7,7 +7,7 @@ import za.co.monadic.scopus._
   */
 object Speex {
 
-  def getMode(sf: SampleFrequency) = sf match {
+  def getMode(sf: SampleFrequency): Int = sf match {
     case Sf8000             => SPEEX_MODEID_NB
     case Sf16000            => SPEEX_MODEID_WB
     case Sf32000            => SPEEX_MODEID_UWB

@@ -28,14 +28,14 @@ import java.nio.channels.Channels
   */
 object LibLoader {
 
-  val tempPath = "scopus_" + UUID.randomUUID.toString.split("-").last
-  val path     = "native/" + getOsArch
-  val destDir  = System.getProperty("java.io.tmpdir") + "/" + tempPath + "/"
+  private val tempPath = "scopus_" + UUID.randomUUID.toString.split("-").last
+  private val path     = "native/" + getOsArch
+  private val destDir  = System.getProperty("java.io.tmpdir") + "/" + tempPath + "/"
 
   // Create the temporary directory
   new File(destDir).mkdirs()
 
-  def getOsArch = System.getProperty("os.name") + "/" + System.getProperty("os.arch")
+  def getOsArch: String = System.getProperty("os.name") + "/" + System.getProperty("os.arch")
 
   /**
     * Copy the OS dependent library from the resources dir in a JAR to a temporary location

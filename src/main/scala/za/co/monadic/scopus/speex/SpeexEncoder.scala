@@ -18,7 +18,7 @@ class SpeexEncoder(sampleFreq: SampleFrequency) extends Encoder {
 
   def getDetail = s"Speex encoder with sf= ${sampleFreq()}"
 
-  def reset = encoder_ctl(state, SPEEX_RESET_STATE, 0)
+  def reset: Int = encoder_ctl(state, SPEEX_RESET_STATE, 0)
 
   /**
     * @return The sample rate for this codec's instance

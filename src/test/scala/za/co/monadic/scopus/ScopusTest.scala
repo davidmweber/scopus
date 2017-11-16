@@ -8,6 +8,7 @@ package za.co.monadic.scopus
 import org.scalatest._
 import za.co.monadic.scopus.TestUtils._
 import za.co.monadic.scopus.echo.EchoCanceller
+import za.co.monadic.scopus.g711μ.{G711μDecoderFloat, G711μDecoderShort, G711μEncoder}
 import za.co.monadic.scopus.opus._
 import za.co.monadic.scopus.speex._
 import za.co.monadic.scopus.pcm._
@@ -16,14 +17,14 @@ import scala.util.{Failure, Success, Try}
 
 class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAndAfterAll {
 
-  val audio      = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
-  val audioFloat = audio.map(_.toFloat / (1 << 15))
+  val audio: Array[Short] = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
+  val audioFloat: Array[Float] = audio.map(_.toFloat / (1 << 15))
   // Normalise to +-1.0
   val chunkSize = 160
-  val nSamples  = (audio.length / chunkSize) * chunkSize
+  val nSamples: Int = (audio.length / chunkSize) * chunkSize
   // A list of 20ms chunks of audio rounded up to a whole number of blocks. Gotta love Scala :)
-  val chunks      = audio.slice(0, nSamples).grouped(chunkSize).toList
-  val chunksFloat = audioFloat.slice(0, nSamples).grouped(chunkSize).toList
+  val chunks: List[Array[Short]] = audio.slice(0, nSamples).grouped(chunkSize).toList
+  val chunksFloat: List[Array[Float]] = audioFloat.slice(0, nSamples).grouped(chunkSize).toList
 
   val codecs = List(
     ("Speex", SpeexEncoder(Sf8000).complexity(1), SpeexDecoderShort(Sf8000), SpeexDecoderFloat(Sf8000), 0.81),
@@ -33,7 +34,8 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
      SpeexDecoderFloat(Sf8000, true),
      0.81),
     ("Opus", OpusEncoder(Sf8000, 1).complexity(2), OpusDecoderShort(Sf8000, 1), OpusDecoderFloat(Sf8000, 1), 0.90),
-    ("PCM", PcmEncoder(Sf8000, 1), PcmDecoderShort(Sf8000, 1), PcmDecoderFloat(Sf8000, 1), 0.95)
+    ("PCM", PcmEncoder(Sf8000, 1), PcmDecoderShort(Sf8000, 1), PcmDecoderFloat(Sf8000, 1), 0.95),
+    ("g.711μ", G711μEncoder(Sf8000, 1), G711μDecoderShort(Sf8000, 1),G711μDecoderFloat(Sf8000, 1), 0.90)
   )
 
   for ((desc, enc, dec, decFloat, corrMin) <- codecs) {
@@ -258,22 +260,41 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       b.count(_.length <= 6) should be > 95
     }
 
+    it("detects silence packets in DTX mode at 48kHz") {
+      val enc = OpusEncoder(Sf48000, 1)
+      enc.setUseDtx(1)
+      val blank = Array.fill[Float](chunkSize*6*2)(0.0f)
+      // With DTS, packets are either 1 or 6 bytes long. The 6 byte one gets transmitted, the
+      // 1 byte long packets should not be transmitted.
+      val b = (0 to 100).map(_ ⇒ enc(blank).get)
+      b.count(_.length <= 6) should be > 85
+    }
+
+    it("returns the correct number of samples in the packet") {
+      val enc = OpusEncoder(Sf8000, 1)
+      enc.setVbr(1)
+      chunks.foreach{ c⇒
+        val d = enc(c)
+        val l = Opus.decoder_get_nb_samples(d.get, d.get.length, Sf8000())
+        l shouldBe c.length
+      }
+    }
+
     it("encodes and decodes DTX packets") {
       // This is not really a test. I just used it to experiment with VBR and DTX packet streams
       val enc = OpusEncoder(Sf8000, 1)
       val dec = OpusDecoderFloat(Sf8000, 1)
-      enc.setUseDtx(1)
       enc.setVbr(1)
       val blank = Array.fill[Float](chunkSize)(0.0f)
       // With DTS, packets are either 1 or 6 bytes long. The 6 byte one gets transmitted, the
       // 1 byte long packets should not be transmitted.
-      val b = (0 to 100).map(c ⇒ (c, enc(blank).get)).drop(1)
+      val b = (0 to 100).map(c ⇒ (c, enc(blank).get))
       // We decode all the packets and ensure the ones we transmit reconstruct to a silent frame
       b.foreach {
-        case (c, p) ⇒
+        case (_, p) ⇒
         if (!enc.isDTX(p)) {
           val r = dec(p).get.toList
-          r.count(Math.abs(_) > 1e-8) shouldBe 0 // Apart from the first packet, all packets should be zero
+          r.count(Math.abs(_) > 1e-4) shouldBe 0 // Apart from the first packet, all packets should be zero
         }
       }
     }

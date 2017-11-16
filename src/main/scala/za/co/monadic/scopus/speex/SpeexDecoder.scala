@@ -11,21 +11,21 @@ sealed trait SpeexBase {
   val enhance: Boolean
   val channels = 1
 
-  val en      = if (enhance) 1 else 0
-  val decoder = decoder_create(getMode(fs), en)
+  val en: Int = if (enhance) 1 else 0
+  val decoder: Long = decoder_create(getMode(fs), en)
   if (decoder <= 0) throw new RuntimeException("Failed to create Speex decoder state")
   var clean = false
 
-  def reset() = decoder_ctl(decoder, SPEEX_RESET_STATE, 0)
+  def reset(): Int = decoder_ctl(decoder, SPEEX_RESET_STATE, 0)
 
-  def getSampleRate = decoder_ctl(decoder, SPEEX_GET_SAMPLING_RATE, 0)
+  def getSampleRate: Int = decoder_ctl(decoder, SPEEX_GET_SAMPLING_RATE, 0)
 
   /**
     * Something odd occurs in the JVM so we get occasional requests to delete
     * state with a zero pointer. This implies finalize is called on this object
     * after the "decoder" attribute has been set to zero. Ugly.
     */
-  def cleanup() = {
+  def cleanup(): Unit = {
     if (decoder == 0) System.err.println("Zero pointer encountered when cleaning SpeexDecoder state")
     if (!clean && (decoder != 0)) {
       decoder_destroy(decoder)
