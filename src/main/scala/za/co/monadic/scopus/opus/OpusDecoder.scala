@@ -21,8 +21,8 @@ sealed trait OpusBase {
   // 60ms of audio is the longest possible buffer we will need for the decoder
   val bufferLen: Int = math.round(0.120f * fs() * channels)
   var fec            = 0
-  val error          = Array[Int](0)
-  val decoder        = decoder_create(fs(), channels, error)
+  val error: Array[Int] = Array[Int](0)
+  val decoder: Long = decoder_create(fs(), channels, error)
   if (error(0) != OPUS_OK) {
     throw new IllegalArgumentException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
   }
@@ -55,27 +55,27 @@ sealed trait OpusBase {
       throw new RuntimeException(s"opus_decoder_ctl setter failed for command $command: ${error_string(err)}")
   }
 
-  def reset = decoder_set_ctl(decoder, OPUS_RESET_STATE, 0)
+  def reset: Int = decoder_set_ctl(decoder, OPUS_RESET_STATE, 0)
 
-  def getSampleRate = getter(OPUS_GET_SAMPLE_RATE_REQUEST)
+  def getSampleRate: Int = getter(OPUS_GET_SAMPLE_RATE_REQUEST)
 
-  def getLookAhead = getter(OPUS_GET_LOOKAHEAD_REQUEST)
+  def getLookAhead: Int = getter(OPUS_GET_LOOKAHEAD_REQUEST)
 
-  def getBandwidth = getter(OPUS_GET_BANDWIDTH_REQUEST)
+  def getBandwidth: Int = getter(OPUS_GET_BANDWIDTH_REQUEST)
 
-  def getPitch = getter(OPUS_GET_PITCH_REQUEST)
+  def getPitch: Int = getter(OPUS_GET_PITCH_REQUEST)
 
-  def getGain = getter(OPUS_GET_GAIN_REQUEST)
+  def getGain: Int = getter(OPUS_GET_GAIN_REQUEST)
 
-  def getLastPacketDuration = getter(OPUS_GET_LAST_PACKET_DURATION_REQUEST)
+  def getLastPacketDuration: Int = getter(OPUS_GET_LAST_PACKET_DURATION_REQUEST)
 
-  def setGain(gain: Int) = setter(OPUS_SET_GAIN_REQUEST, gain)
+  def setGain(gain: Int): Unit = setter(OPUS_SET_GAIN_REQUEST, gain)
 
   /**
     * Custom setter for the FEC mode in the decoder
     * @param useFec If true, employ error correction if it is available in the packet
     */
-  def setFec(useFec: Boolean) = {
+  def setFec(useFec: Boolean): Unit = {
     fec = if (useFec) 1 else 0
   }
 
@@ -83,7 +83,7 @@ sealed trait OpusBase {
     * Returns the current FEC decoding status.
     * @return  True if FEC is being decoded
     */
-  def getFec(useFec: Boolean) = {
+  def getFec(useFec: Boolean): Boolean = {
     fec == 1
   }
 
@@ -133,7 +133,7 @@ class OpusDecoderShort(val fs: SampleFrequency, val channels: Int) extends Decod
     * @param audio Opus compressed packet
     * @return True if it is a DTX packet
     */
-  override def isDTX(audio: Array[Byte]) = audio.length == 1
+  override def isDTX(audio: Array[Byte]): Boolean = audio.length == 1
 
 }
 
@@ -190,7 +190,7 @@ class OpusDecoderFloat(val fs: SampleFrequency, val channels: Int) extends Decod
     * @param audio Opus compressed packet
     * @return True if it is a DTX packet
     */
-  override def isDTX(audio: Array[Byte]) = audio.length <= 1
+  override def isDTX(audio: Array[Byte]): Boolean = audio.length <= 1
 }
 
 object OpusDecoderFloat {

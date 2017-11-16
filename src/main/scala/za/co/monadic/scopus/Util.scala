@@ -56,13 +56,13 @@ sealed trait Application {
 }
 
 object Voip extends Application {
-  def apply() = OPUS_APPLICATION_VOIP
+  def apply(): Int = OPUS_APPLICATION_VOIP
 }
 
 object Audio extends Application {
-  def apply() = OPUS_APPLICATION_AUDIO
+  def apply(): Int = OPUS_APPLICATION_AUDIO
 }
 
 object LowDelay extends Application {
-  def apply() = OPUS_APPLICATION_RESTRICTED_LOWDELAY
+  def apply(): Int = OPUS_APPLICATION_RESTRICTED_LOWDELAY
 }

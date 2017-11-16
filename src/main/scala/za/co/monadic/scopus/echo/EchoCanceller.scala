@@ -22,11 +22,11 @@ class EchoCanceller(frameSize: Int, filterLength: Int) {
     }
   }
 
-  final override def finalize() = {
+  final override def finalize(): Unit = {
     cleanup()
   }
 
-  val state = echo_state_init(frameSize, filterLength)
+  private val state = echo_state_init(frameSize, filterLength)
 
   /**
     * Call this every time a voice packet is played to the speakers. Use

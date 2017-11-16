@@ -8,6 +8,7 @@ package za.co.monadic.scopus
 import org.scalatest._
 import za.co.monadic.scopus.TestUtils._
 import za.co.monadic.scopus.echo.EchoCanceller
+import za.co.monadic.scopus.g711μ.{G711μDecoderFloat, G711μDecoderShort, G711μEncoder}
 import za.co.monadic.scopus.opus._
 import za.co.monadic.scopus.speex._
 import za.co.monadic.scopus.pcm._
@@ -16,14 +17,14 @@ import scala.util.{Failure, Success, Try}
 
 class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAndAfterAll {
 
-  val audio      = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
-  val audioFloat = audio.map(_.toFloat / (1 << 15))
+  val audio: Array[Short] = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
+  val audioFloat: Array[Float] = audio.map(_.toFloat / (1 << 15))
   // Normalise to +-1.0
   val chunkSize = 160
-  val nSamples  = (audio.length / chunkSize) * chunkSize
+  val nSamples: Int = (audio.length / chunkSize) * chunkSize
   // A list of 20ms chunks of audio rounded up to a whole number of blocks. Gotta love Scala :)
-  val chunks      = audio.slice(0, nSamples).grouped(chunkSize).toList
-  val chunksFloat = audioFloat.slice(0, nSamples).grouped(chunkSize).toList
+  val chunks: List[Array[Short]] = audio.slice(0, nSamples).grouped(chunkSize).toList
+  val chunksFloat: List[Array[Float]] = audioFloat.slice(0, nSamples).grouped(chunkSize).toList
 
   val codecs = List(
     ("Speex", SpeexEncoder(Sf8000).complexity(1), SpeexDecoderShort(Sf8000), SpeexDecoderFloat(Sf8000), 0.81),
@@ -33,7 +34,8 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
      SpeexDecoderFloat(Sf8000, true),
      0.81),
     ("Opus", OpusEncoder(Sf8000, 1).complexity(2), OpusDecoderShort(Sf8000, 1), OpusDecoderFloat(Sf8000, 1), 0.90),
-    ("PCM", PcmEncoder(Sf8000, 1), PcmDecoderShort(Sf8000, 1), PcmDecoderFloat(Sf8000, 1), 0.95)
+    ("PCM", PcmEncoder(Sf8000, 1), PcmDecoderShort(Sf8000, 1), PcmDecoderFloat(Sf8000, 1), 0.95),
+    ("g.711μ", G711μEncoder(Sf8000, 1), G711μDecoderShort(Sf8000, 1),G711μDecoderFloat(Sf8000, 1), 0.90),
   )
 
   for ((desc, enc, dec, decFloat, corrMin) <- codecs) {

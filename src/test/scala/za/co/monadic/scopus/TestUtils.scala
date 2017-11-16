@@ -9,7 +9,7 @@ import scala.util.Random
   */
 object TestUtils {
 
-  def shortGauss() = {
+  def shortGauss(): Short = {
     Math.round(Random.nextGaussian() * 10000.0).toShort
   }
 

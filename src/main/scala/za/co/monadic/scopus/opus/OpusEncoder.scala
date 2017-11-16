@@ -24,9 +24,9 @@ import scala.util.{Failure, Success, Try}
 class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, bufferSize: Int = 8192)
     extends Encoder {
   require(bufferSize > 0, "Buffer size must be positive")
-  val error     = Array[Int](0)
-  val decodePtr = new Array[Byte](bufferSize)
-  val encoder   = encoder_create(sampleFreq(), channels, app(), error)
+  val error: Array[Int] = Array[Int](0)
+  val decodePtr         = new Array[Byte](bufferSize)
+  val encoder: Long     = encoder_create(sampleFreq(), channels, app(), error)
   if (error(0) != OPUS_OK) {
     throw new RuntimeException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
   }
@@ -65,14 +65,14 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
     * Release all pointers allocated for the encoder. Make every attempt to call this
     * when you are done with the encoder as finalise() is what it is in the JVM
     */
-  def cleanup() = {
+  def cleanup(): Unit = {
     if (!clean) {
       encoder_destroy(encoder)
       clean = true
     }
   }
 
-  def reset = encoder_set_ctl(encoder, OPUS_RESET_STATE, 0)
+  def reset: Int = encoder_set_ctl(encoder, OPUS_RESET_STATE, 0)
 
   private def setter(command: Integer, parameter: Integer): Unit = {
     assert(command % 2 == 0) // Setter commands are even
@@ -102,37 +102,37 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
     this
   }
 
-  def setComplexity(complexity: Integer) = {
+  def setComplexity(complexity: Integer): OpusEncoder = {
     require((complexity >= 0) && (complexity <= 10))
     setter(OPUS_SET_COMPLEXITY_REQUEST, complexity)
     this
   }
 
-  def setBitRate(bitRate: Integer) = {
+  def setBitRate(bitRate: Integer): OpusEncoder = {
     require(bitRate > 500 && bitRate <= 512000)
     setter(OPUS_SET_BITRATE_REQUEST, bitRate)
     this
   }
 
-  def setVbr(useVbr: Integer) = {
+  def setVbr(useVbr: Integer): OpusEncoder = {
     require(useVbr == 0 || useVbr == 1)
     setter(OPUS_SET_VBR_REQUEST, useVbr)
     this
   }
 
-  def setVbrConstraint(cvbr: Integer) = {
+  def setVbrConstraint(cvbr: Integer): OpusEncoder = {
     require(cvbr == 0 || cvbr == 1)
     setter(OPUS_SET_VBR_CONSTRAINT_REQUEST, cvbr)
     this
   }
 
-  def setForceChannels(forceChannels: Integer) = {
+  def setForceChannels(forceChannels: Integer): OpusEncoder = {
     require(forceChannels == 0 || forceChannels == 1 || forceChannels == OPUS_AUTO)
     setter(OPUS_SET_FORCE_CHANNELS_REQUEST, forceChannels)
     this
   }
 
-  def setMaxBandwidth(bandwidth: Integer) = {
+  def setMaxBandwidth(bandwidth: Integer): OpusEncoder = {
     require(
       Set(OPUS_BANDWIDTH_FULLBAND,
           OPUS_BANDWIDTH_SUPERWIDEBAND,
@@ -143,7 +143,7 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
     this
   }
 
-  def setBandWidth(bandwidth: Integer) = {
+  def setBandWidth(bandwidth: Integer): OpusEncoder = {
     require(
       Set(OPUS_AUTO,
           OPUS_BANDWIDTH_NARROWBAND,
@@ -155,43 +155,43 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
     this
   }
 
-  def setSignal(signal: Integer) = {
+  def setSignal(signal: Integer): OpusEncoder = {
     require(Set(OPUS_AUTO, OPUS_SIGNAL_VOICE, OPUS_SIGNAL_MUSIC).contains(signal))
     setter(OPUS_SET_SIGNAL_REQUEST, signal)
     this
   }
 
-  def setApplication(appl: Integer) = {
+  def setApplication(appl: Integer): OpusEncoder = {
     require(Set(OPUS_APPLICATION_VOIP, OPUS_APPLICATION_AUDIO, OPUS_APPLICATION_RESTRICTED_LOWDELAY).contains(appl))
     setter(OPUS_SET_APPLICATION_REQUEST, appl)
     this
   }
 
-  def setInbandFec(useInbandFec: Integer) = {
+  def setInbandFec(useInbandFec: Integer): OpusEncoder = {
     require(useInbandFec == 0 || useInbandFec == 1)
     setter(OPUS_SET_INBAND_FEC_REQUEST, useInbandFec)
     this
   }
 
-  def setPacketLossPerc(packetLossPerc: Integer) = {
+  def setPacketLossPerc(packetLossPerc: Integer): OpusEncoder = {
     require(packetLossPerc >= 0 && packetLossPerc <= 100)
     setter(OPUS_SET_PACKET_LOSS_PERC_REQUEST, packetLossPerc)
     this
   }
 
-  def setUseDtx(useDtx: Integer) = {
+  def setUseDtx(useDtx: Integer): OpusEncoder = {
     require(useDtx == 0 || useDtx == 1)
     setter(OPUS_SET_DTX_REQUEST, useDtx)
     this
   }
 
-  def setLsbDepth(depth: Integer = 24) = {
+  def setLsbDepth(depth: Integer = 24): OpusEncoder = {
     require(depth >= 8 && depth <= 24)
     setter(OPUS_SET_LSB_DEPTH_REQUEST, depth)
     this
   }
 
-  def setExpertFrameDuration(duration: Integer) = {
+  def setExpertFrameDuration(duration: Integer): OpusEncoder = {
     require(
       Set(OPUS_FRAMESIZE_ARG,
           OPUS_FRAMESIZE_2_5_MS,
@@ -204,45 +204,45 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
     this
   }
 
-  def setPredictionDisable(disable: Integer) = {
+  def setPredictionDisable(disable: Integer): OpusEncoder = {
     require(disable == 0 || disable == 1)
     setter(OPUS_SET_PREDICTION_DISABLED_REQUEST, disable)
     this
   }
 
-  def getComplexity = getter(OPUS_GET_COMPLEXITY_REQUEST)
+  def getComplexity: Int = getter(OPUS_GET_COMPLEXITY_REQUEST)
 
-  def getBitRate = getter(OPUS_GET_BITRATE_REQUEST)
+  def getBitRate: Int = getter(OPUS_GET_BITRATE_REQUEST)
 
-  def getVbr = getter(OPUS_GET_VBR_REQUEST)
+  def getVbr: Int = getter(OPUS_GET_VBR_REQUEST)
 
-  def getVbrConstraint = getter(OPUS_GET_VBR_CONSTRAINT_REQUEST)
+  def getVbrConstraint: Int = getter(OPUS_GET_VBR_CONSTRAINT_REQUEST)
 
-  def getForceChannels = getter(OPUS_GET_FORCE_CHANNELS_REQUEST)
+  def getForceChannels: Int = getter(OPUS_GET_FORCE_CHANNELS_REQUEST)
 
-  def getMaxBandwidth = getter(OPUS_GET_MAX_BANDWIDTH_REQUEST)
+  def getMaxBandwidth: Int = getter(OPUS_GET_MAX_BANDWIDTH_REQUEST)
 
-  def getBandwidth = getter(OPUS_GET_BANDWIDTH_REQUEST)
+  def getBandwidth: Int = getter(OPUS_GET_BANDWIDTH_REQUEST)
 
-  def getSignal = getter(OPUS_GET_SIGNAL_REQUEST)
+  def getSignal: Int = getter(OPUS_GET_SIGNAL_REQUEST)
 
-  def getApplication = getter(OPUS_GET_APPLICATION_REQUEST)
+  def getApplication: Int = getter(OPUS_GET_APPLICATION_REQUEST)
 
-  def getSampleRate = getter(OPUS_GET_SAMPLE_RATE_REQUEST)
+  def getSampleRate: Int = getter(OPUS_GET_SAMPLE_RATE_REQUEST)
 
-  def getLookahead = getter(OPUS_GET_LOOKAHEAD_REQUEST)
+  def getLookahead: Int = getter(OPUS_GET_LOOKAHEAD_REQUEST)
 
-  def getInbandFec = getter(OPUS_GET_INBAND_FEC_REQUEST)
+  def getInbandFec: Int = getter(OPUS_GET_INBAND_FEC_REQUEST)
 
-  def getPacketLossPerc = getter(OPUS_GET_PACKET_LOSS_PERC_REQUEST)
+  def getPacketLossPerc: Int = getter(OPUS_GET_PACKET_LOSS_PERC_REQUEST)
 
-  def getUseDtx = getter(OPUS_GET_DTX_REQUEST)
+  def getUseDtx: Int = getter(OPUS_GET_DTX_REQUEST)
 
-  def getLsbDepth = getter(OPUS_GET_LSB_DEPTH_REQUEST)
+  def getLsbDepth: Int = getter(OPUS_GET_LSB_DEPTH_REQUEST)
 
-  def getExpertFrameDuration = getter(OPUS_GET_EXPERT_FRAME_DURATION_REQUEST)
+  def getExpertFrameDuration: Int = getter(OPUS_GET_EXPERT_FRAME_DURATION_REQUEST)
 
-  def getPredictionDisable = getter(OPUS_GET_PREDICTION_DISABLED_REQUEST)
+  def getPredictionDisable: Int = getter(OPUS_GET_PREDICTION_DISABLED_REQUEST)
 
   /**
     * Test if the packet is an Opus DTX (silent) packet. In practice, if
@@ -250,7 +250,7 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
     * @param audio Opus compressed packet
     * @return True if it is a DTX packet
     */
-  override def isDTX(audio: Array[Byte]) = audio.length <= 2
+  override def isDTX(audio: Array[Byte]): Boolean = audio.length <= 2
 
 }
 

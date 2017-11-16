@@ -30,5 +30,5 @@ object Libraries {
   if (Speex.get_version_string() != "1.2rc1")
     throw new RuntimeException("libspeex version must be 1.2rc1")
 
-  def apply() = Unit
+  def apply(): Unit = Unit
 }

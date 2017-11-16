@@ -10,12 +10,12 @@ trait Codec {
     */
   def cleanup(): Unit
 
-  final override def finalize() = {
+  final override def finalize(): Unit = {
     cleanup()
   }
 
   /**
-    * @return A discription of this instance of an encoder or decoder
+    * @return A description of this instance of an encoder or decoder
     */
   def getDetail: String
 
