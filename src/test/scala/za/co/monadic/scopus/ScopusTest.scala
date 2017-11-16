@@ -35,7 +35,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
      0.81),
     ("Opus", OpusEncoder(Sf8000, 1).complexity(2), OpusDecoderShort(Sf8000, 1), OpusDecoderFloat(Sf8000, 1), 0.90),
     ("PCM", PcmEncoder(Sf8000, 1), PcmDecoderShort(Sf8000, 1), PcmDecoderFloat(Sf8000, 1), 0.95),
-    ("g.711μ", G711μEncoder(Sf8000, 1), G711μDecoderShort(Sf8000, 1),G711μDecoderFloat(Sf8000, 1), 0.90),
+    ("g.711μ", G711μEncoder(Sf8000, 1), G711μDecoderShort(Sf8000, 1),G711μDecoderFloat(Sf8000, 1), 0.90)
   )
 
   for ((desc, enc, dec, decFloat, corrMin) <- codecs) {
