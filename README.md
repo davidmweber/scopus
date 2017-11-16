@@ -3,8 +3,8 @@
 Scopus
 ------
 
-Scopus is a Scala interface to the [Opus](http://www.opus-codec.org) and
-[Speex](http://www.speex.org/) codecs. There is also a PCM "codec" which
+Scopus is a Scala interface to the [Opus 1.2.1](http://www.opus-codec.org),
+[Speex 1.2.0](http://www.speex.org/) and g.711u codecs. There is also a PCM "codec" which
 is effectively a NULL codec and is useful in testing.
 
 It is light and thin by design and gives programmers access to the bulk
@@ -46,7 +46,7 @@ are:
 
 * [Benson Margulies' JNI test bed](https://github.com/bimargulies/jni-origin-testbed) shows how to avoid `LD_LIBRARY_PATH` hell.
 * Read the `ld` man page, especially the bit about -rpath=$ORIGIN (Linux) and @loader_path (OSX). It makes the magic work.
-* For OSX, `otool` and `install_name_tool` are your friends. See [here](http://www.tribler.org/trac/wiki/MacBinaries) for more details.
+* For OSX, `otool` and `install_name_tool` are your friends. 
 
 This library explicitly copies the dynamic libraries out of the resources
 directory in the jar file to a unique location (something like
@@ -73,7 +73,7 @@ following dependency to your sbt build:
 ```scala
   resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
 
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.9"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.11"
 ```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`
