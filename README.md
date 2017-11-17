@@ -29,7 +29,7 @@ running into patent issues.
 
 Licensing
 ---------
-Scopus by David Weber is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
+Scopus by David Weber is released under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)) license.
 
 Building
 --------
