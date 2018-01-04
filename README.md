@@ -73,7 +73,7 @@ following dependency to your sbt build:
 ```scala
   resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
 
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.11"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.12"
 ```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`
