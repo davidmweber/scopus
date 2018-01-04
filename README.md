@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/davidmweber/scopus.png?branch=master)](https://travis-ci.org/davidmweber/scopus)
+[![Maven Central](https://img.shields.io/maven-central/v/za.co.monadic/scopus_2.12.svg)](http://search.maven.org/#search%7Cga%7C1%7Cscopus)
 
 Scopus
 ------
