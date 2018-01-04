@@ -72,8 +72,6 @@ Scopus is available from the Sonatype Maven repo with builds for Scala 2.11 and 
 following dependency to your sbt build:
 
 ```scala
-  resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
-
   libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.12"
 ```
 
