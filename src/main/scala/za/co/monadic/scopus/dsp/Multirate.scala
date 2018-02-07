@@ -9,7 +9,9 @@ package za.co.monadic.scopus.dsp
   * @param a The coefficients of the polynomial defining the poles in the Z-domain
   * @param b The coefficients of the polynomial defining the xeros in the Z-domain
   */
-case class Filter(order: Int, a: Array[Float], b: Array[Float])
+case class Filter(order: Int, a: Array[Float], b: Array[Float]) {
+  require(order == a.length && order == b.length, "Order and coefficient array sizes must be equal")
+}
 
 /**
   * Supplies Elliptical filters that are suitable as interpolation and decimation filters
@@ -69,23 +71,24 @@ object MultirateFilterFactory {
   }
 }
 
-
 /**
-  * Common state for the interpolator and decimator traits.
+  * Retain every n'th sample in the sequence. The input array length must be an
+  * integer multiple of the decimation factor else the decimate method will throw
+  * an exception.
   */
-trait AtorState {
-  var idx: Int = 0 // The current position of the interpolation/decimation
-  val factor: Int // By how many samples to we interpolate or decimate
-}
-
-/**
-  * Retain every n'th sample in the sequence, taking care to account for array boundaries.
-  */
-trait Decimator extends AtorState {
-
+trait Decimator {
+  val factor: Int
   def decimate(x: Array[Float]): Array[Float] = {
-
-    Array[Float](0.0f)
+    require(x.length % factor == 0, "Input array length must be a multiple of the decimation rate")
+    var n = 0
+    var m = 0
+    val y = new Array[Float](x.length / factor)
+    while (m < x.length) {
+      y(n) = x(m)
+      n += 1
+      m += factor
+    }
+    y
   }
 }
 
@@ -93,11 +96,17 @@ trait Decimator extends AtorState {
   * Inserts N-1 zeros between samples provided, taking care to account for array boundaries. If the
   * interpolation factor is 3, then the sequence [1,2,3] is mapped to [1,0,0,2,0,0,3,0,0]
   */
-trait Interpolator  extends AtorState {
-
+trait Interpolator {
+  val factor: Int
   def interpolate(x: Array[Float]): Array[Float] = {
-
-    Array[Float](0.0f)
+    val l = x.length
+    val y = new Array[Float](l * factor)
+    var n = 0
+    while (n < l) {
+      y(factor * n) = x(n)
+      n += 1
+    }
+    y
   }
 }
 
@@ -109,14 +118,34 @@ class FilterIIR(f: Filter) {
 
   val state = new Array[Float](f.a.length)
 
+  @inline
+  def filterOne(x: Float): Float = {
+    var sumA = x
+    var sumB = 0.0f
+    var i    = f.order - 1
+    while (i > 0) {
+      sumA -= state(i) * f.a(i)
+      sumB += state(i) * f.b(i)
+      state(i) = state(i - 1)
+      i -= 1
+    }
+    state(1) = sumA
+    sumA * f.b(0) + sumB
+  }
+
   /**
     * IIR filter
     * @param x Input sequence
     * @return Filtered sequence using the configured filter parameters
     */
   def filter(x: Array[Float]): Array[Float] = {
-
-    Array[Float](0.0f)
+    val y = new Array[Float](x.length)
+    var n = 0
+    while (n < x.length) {
+      y(n) = filterOne(x(n))
+      n += 1
+    }
+    y
   }
 }
 
