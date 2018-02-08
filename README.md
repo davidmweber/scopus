@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/davidmweber/scopus.png?branch=master)](https://travis-ci.org/davidmweber/scopus)
+[![Build Status](https://img.shields.io/travis/davidmweber/scopus.svg)](https://travis-ci.org/davidmweber/scopus)
+[![Maven Central](https://img.shields.io/maven-central/v/za.co.monadic/scopus_2.12.svg)](http://search.maven.org/#search%7Cga%7C1%7Cscopus)
 
 Scopus
 ------
@@ -71,9 +72,7 @@ Scopus is available from the Sonatype Maven repo with builds for Scala 2.11 and 
 following dependency to your sbt build:
 
 ```scala
-  resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
-
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.13"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.12"
 ```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`
