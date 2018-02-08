@@ -10,7 +10,7 @@ package za.co.monadic.scopus.dsp
   * @param b The coefficients of the polynomial defining the xeros in the Z-domain
   */
 case class Filter(order: Int, a: Array[Float], b: Array[Float]) {
-  require(order == a.length && order == b.length, "Order and coefficient array sizes must be equal")
+  require(order == a.length -1  && order == b.length - 1, "Order and coefficient array sizes must be equal")
 }
 
 /**
@@ -116,13 +116,13 @@ trait Interpolator {
   */
 class FilterIIR(f: Filter) {
 
-  val state = new Array[Float](f.a.length)
+  val state = new Array[Float](f.order + 1)
 
   @inline
   def filterOne(x: Float): Float = {
     var sumA = x
     var sumB = 0.0f
-    var i    = f.order - 1
+    var i    = f.order
     while (i > 0) {
       sumA -= state(i) * f.a(i)
       sumB += state(i) * f.b(i)
@@ -134,15 +134,17 @@ class FilterIIR(f: Filter) {
   }
 
   /**
-    * IIR filter
+    * IIR filter. The multiplication factor is present to compensate for the loss in energy
+    * caused by interpolation.
     * @param x Input sequence
+    * @param mult A multiplication factor by which the output is multiplied.
     * @return Filtered sequence using the configured filter parameters
     */
-  def filter(x: Array[Float]): Array[Float] = {
+  def filter(x: Array[Float], mult: Float = 1.0f): Array[Float] = {
     val y = new Array[Float](x.length)
     var n = 0
     while (n < x.length) {
-      y(n) = filterOne(x(n))
+      y(n) = filterOne(x(n)) * mult
       n += 1
     }
     y
@@ -165,7 +167,7 @@ case class Upsampler(factor: Int) extends FilterIIR(MultirateFilterFactory(facto
     * @param x Signal to be upsampled
     * @return Processed resilt.
     */
-  def process(x: Array[Float]): Array[Float] = filter(interpolate(x))
+  def process(x: Array[Float]): Array[Float] = filter(interpolate(x), factor)
 }
 
 /**
