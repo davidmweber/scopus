@@ -24,10 +24,10 @@ import scala.util.{Success, Try}
 case class G711μEncoder(sampleFreq: SampleFrequency, channels: Int) extends Encoder {
 
   require(channels == 1, s"The $getDetail supports only mono audio")
+  import ArrayConversion._
 
   private val BIAS     = 0x84 /* Bias for linear code. */
   private val CLIP     = 8159
-  private val PCM_NORM = 32124.0f /* Normalization factor for Float to PCM */
   private val uEnd     = Array[Int](0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0x1FFF)
 
   private val factor = sampleFreq match {
@@ -76,34 +76,14 @@ case class G711μEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enc
 
   private def toMu(xIn: Float): Byte = toMu((xIn * PCM_NORM).toShort)
 
-  private def shortToFloat(x: Array[Short]): Array[Float] = {
-    val y = new Array[Float](x.length)
-    var i = 0
-    while (i < x.length) {
-      y(i) = x(i) / PCM_NORM
-      i += 1
-    }
-    y
-  }
-
-  private def floatToShort(x: Array[Float]): Array[Short] = {
-    val y = new Array[Short](x.length)
-    var i = 0
-    while (i < x.length) {
-      y(i) = (x(i) * PCM_NORM).toShort
-      i += 1
-    }
-    y
-  }
-
   /**
-    * Encode a block of raw audio  in integer format using the configured encoder
+    * Encode a block of raw audio in integer format using the configured encoder
     *
     * @param audio Audio data arranged as a contiguous block interleaved array of short integers
     * @return An array containing the compressed audio or the exception in case of a failure
     */
   override def apply(audio: Array[Short]): Try[Array[Byte]] = {
-    val out = new Array[Byte](audio.length)
+    val out = new Array[Byte](audio.length / factor)
     val dAudio = down match {
       case Some(d) ⇒ floatToShort(d.process(shortToFloat(audio)))
       case None    ⇒ audio
@@ -123,7 +103,7 @@ case class G711μEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enc
     * @return An array containing the compressed audio or the exception in case of a failure
     */
   override def apply(audio: Array[Float]): Try[Array[Byte]] = {
-    val out = new Array[Byte](audio.length)
+    val out = new Array[Byte](audio.length / factor)
     val dAudio = down match {
       case Some(d) ⇒ d.process(audio)
       case None    ⇒ audio

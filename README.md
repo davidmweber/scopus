@@ -73,7 +73,7 @@ following dependency to your sbt build:
 ```scala
   resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
 
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.11"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.13"
 ```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`
@@ -110,6 +110,13 @@ Using the Speex codec is very similar.
 
    // Send decoded packet off
 ```
+
+There is now support for a G711 u-law encoder. The standard applies to 8kHz signals
+but this codec will upsample and downsample the signal to achieve particular sampling
+rate goals. If the encoder is set to decode to a 48kHz sampling rate, it expects an
+8kHz u-Law codec signal which it first decodes to a linear signal then upsamples it
+to reach 48kHz. Similarly, a decoder configured for 48kHz will first downsample the
+signal to 8kHz then u-Law encode it. Stereo is not supported for this mode.
 
 There are restrictions on the size of the input buffer. For Speex, all audio
 frames must be 20ms long. For 8kHz sampling rate, this is 20ms. For Opus,

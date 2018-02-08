@@ -17,13 +17,13 @@ import scala.util.{Failure, Success, Try}
 
 class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAndAfterAll {
 
-  val audio: Array[Short] = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
+  val audio: Array[Short]      = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
   val audioFloat: Array[Float] = audio.map(_.toFloat / (1 << 15))
   // Normalise to +-1.0
-  val chunkSize = 160
+  val chunkSize     = 160
   val nSamples: Int = (audio.length / chunkSize) * chunkSize
   // A list of 20ms chunks of audio rounded up to a whole number of blocks. Gotta love Scala :)
-  val chunks: List[Array[Short]] = audio.slice(0, nSamples).grouped(chunkSize).toList
+  val chunks: List[Array[Short]]      = audio.slice(0, nSamples).grouped(chunkSize).toList
   val chunksFloat: List[Array[Float]] = audioFloat.slice(0, nSamples).grouped(chunkSize).toList
 
   val codecs = List(
@@ -35,7 +35,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
      0.81),
     ("Opus", OpusEncoder(Sf8000, 1).complexity(2), OpusDecoderShort(Sf8000, 1), OpusDecoderFloat(Sf8000, 1), 0.90),
     ("PCM", PcmEncoder(Sf8000, 1), PcmDecoderShort(Sf8000, 1), PcmDecoderFloat(Sf8000, 1), 0.95),
-    ("g.711μ", G711μEncoder(Sf8000, 1), G711μDecoderShort(Sf8000, 1),G711μDecoderFloat(Sf8000, 1), 0.90)
+    ("g.711μ", G711μEncoder(Sf8000, 1), G711μDecoderShort(Sf8000, 1), G711μDecoderFloat(Sf8000, 1), 0.90)
   )
 
   for ((desc, enc, dec, decFloat, corrMin) <- codecs) {
@@ -46,8 +46,9 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         Given("a PCM file coded as an array of short integers and a codec pair")
         enc.reset
         dec.reset
-        enc.getSampleRate should equal(8000)
-        dec.getSampleRate should equal(8000)
+        enc.getSampleRate should equal(dec.getSampleRate)
+        enc.getSampleRate should equal(decFloat.getSampleRate)
+
         When("the audio is encoded and then decoded")
         val coded   = for (c <- chunks) yield enc(c).get
         val decoded = for (c <- coded) yield dec(c).get
@@ -108,10 +109,10 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         dec.reset
         val coded = for (c <- chunks) yield enc(c).get
         val decoded = // Decode, dropping every 10th packet
-        for {
-          (c, i) <- coded.zipWithIndex
-          p = if (i % 15 == 1) dec(chunkSize) else dec(c)
-        } yield p.get
+          for {
+            (c, i) <- coded.zipWithIndex
+            p = if (i % 15 == 1) dec(chunkSize) else dec(c)
+          } yield p.get
         val in   = chunks.toArray.flatten.grouped(40).toList
         val out  = decoded.toArray.flatten.grouped(40).toList
         val eIn  = for (a <- in) yield energy(a)
@@ -126,10 +127,10 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         decFloat.reset
         val coded = for (c <- chunksFloat) yield enc(c).get
         val decoded = // Decode, dropping every 10th packet
-        for {
-          (c, i) <- coded.zipWithIndex
-          p = if (i % 15 == 1) decFloat(chunkSize) else decFloat(c)
-        } yield p.get
+          for {
+            (c, i) <- coded.zipWithIndex
+            p = if (i % 15 == 1) decFloat(chunkSize) else decFloat(c)
+          } yield p.get
         val in   = chunksFloat.toArray.flatten.grouped(40).toList
         val out  = decoded.toArray.flatten.grouped(40).toList
         val eIn  = for (a <- in) yield energy(a)
@@ -150,7 +151,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
           for (c <- chunks) enc(c)
         }
         val duration = (System.currentTimeMillis() - tStart) / 1000.0 // Seconds
-        val speed    = repeats * nSamples / duration / 8000.0         // multiple of real time
+        val speed    = repeats * nSamples / duration / enc.getSampleRate // multiple of real time
         speed should be > 100.0
         info(f"Encoder runs at $speed%5.1f times real time")
       }
@@ -164,7 +165,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
           for (c <- coded) dec(c)
         }
         val duration = (System.currentTimeMillis() - tStart) / 1000.0 // Seconds
-        val speed    = repeats * nSamples / duration / 8000.0         // multiple of real time
+        val speed    = repeats * nSamples / duration / enc.getSampleRate // multiple of real time
         speed should be > 400.0
         info(f"Decoder runs at $speed%5.1f times real time")
       }
@@ -226,6 +227,58 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
     }
   }
 
+  describe("The G711u codec") {
+
+    it("fails if an invalid codec construction is requested") {
+      a[IllegalArgumentException] should be thrownBy G711μEncoder(Sf8000, 2)
+      a[IllegalArgumentException] should be thrownBy G711μDecoderFloat(Sf8000, 2)
+      a[IllegalArgumentException] should be thrownBy G711μDecoderShort(Sf8000, 2)
+
+      a[RuntimeException] should be thrownBy G711μEncoder(Sf12000, 1)
+      a[RuntimeException] should be thrownBy G711μDecoderShort(Sf12000, 1)
+      a[RuntimeException] should be thrownBy G711μDecoderFloat(Sf12000, 1)
+    }
+
+    it("encodes and decodes a Float signal, generating the correct output") {
+      import FreqUtils._
+      val freqTable = Map(1 → Sf8000, 2 → Sf16000, 3 → Sf24000, 4 → Sf32000, 6 → Sf48000)
+      freqTable.foreach {
+        case (factor, sf) ⇒
+          val l: Int = (0.04 * sf()).toInt
+          val f      = pickFreq(100, l, sf)
+          val x      = genSine(f, l, sf)
+          val enc    = G711μEncoder(sf, 1)
+          val dec    = G711μDecoderFloat(sf, 1)
+          val e      = enc(x).get
+          e.length shouldBe l / factor
+          dec(enc(x).get) // Work past transient from filter startup
+          val y   = dec(e).get
+          val amp = getAmplitude(y, f, sf) // Check our target frequency
+          amp should be(1.0 +- 0.18) // Must be 1 give or take the passband ripple of the filter.
+      }
+    }
+
+    it("encodes and decodes a Short signal, generating the correct output") {
+      import FreqUtils._
+      import ArrayConversion._
+      val freqTable = Map(1 → Sf8000, 2 → Sf16000, 3 → Sf24000, 4 → Sf32000, 6 → Sf48000)
+      freqTable.foreach {
+        case (factor, sf) ⇒
+          val l: Int = (0.04 * sf()).toInt
+          val f      = pickFreq(100, l, sf)
+          val x      = floatToShort(genSine(f, l, sf))
+          val enc    = G711μEncoder(sf, 1)
+          val dec    = G711μDecoderShort(sf, 1)
+          val e      = enc(x).get
+          e.length shouldBe l / factor
+          dec(enc(x).get) // Work past transient from filter startup
+          val y   = shortToFloat(dec(e).get)
+          val amp = getAmplitude(y, f, sf) // Check our target frequency
+          amp should be(1.0 +- 0.18) // Must be 1 give or take the passband ripple of the filter.
+      }
+    }
+  }
+
   describe("The Opus codec") {
 
     it("Fails if the encoder and decoder constructors throw") {
@@ -263,7 +316,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
     it("detects silence packets in DTX mode at 48kHz") {
       val enc = OpusEncoder(Sf48000, 1)
       enc.setUseDtx(1)
-      val blank = Array.fill[Float](chunkSize*6*2)(0.0f)
+      val blank = Array.fill[Float](chunkSize * 6 * 2)(0.0f)
       // With DTS, packets are either 1 or 6 bytes long. The 6 byte one gets transmitted, the
       // 1 byte long packets should not be transmitted.
       val b = (0 to 100).map(_ ⇒ enc(blank).get)
@@ -273,7 +326,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
     it("returns the correct number of samples in the packet") {
       val enc = OpusEncoder(Sf8000, 1)
       enc.setVbr(1)
-      chunks.foreach{ c⇒
+      chunks.foreach { c ⇒
         val d = enc(c)
         val l = Opus.decoder_get_nb_samples(d.get, d.get.length, Sf8000())
         l shouldBe c.length
@@ -292,10 +345,10 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       // We decode all the packets and ensure the ones we transmit reconstruct to a silent frame
       b.foreach {
         case (_, p) ⇒
-        if (!enc.isDTX(p)) {
-          val r = dec(p).get.toList
-          r.count(Math.abs(_) > 1e-4) shouldBe 0 // Apart from the first packet, all packets should be zero
-        }
+          if (!enc.isDTX(p)) {
+            val r = dec(p).get.toList
+            r.count(Math.abs(_) > 1e-4) shouldBe 0 // Apart from the first packet, all packets should be zero
+          }
       }
     }
 
