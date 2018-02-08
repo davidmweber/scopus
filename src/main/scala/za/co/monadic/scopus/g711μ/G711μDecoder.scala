@@ -16,7 +16,8 @@
 
 package za.co.monadic.scopus.g711μ
 
-import za.co.monadic.scopus.{DecoderFloat, DecoderShort, SampleFrequency, Sf8000}
+import za.co.monadic.scopus._
+import za.co.monadic.scopus.dsp.Upsampler
 
 import scala.util.{Success, Try}
 
@@ -101,8 +102,20 @@ case class G711μDecoderShort(fs: SampleFrequency, channels: Int) extends Decode
 }
 
 case class G711μDecoderFloat(fs: SampleFrequency, channels: Int) extends DecoderFloat {
-
   import G711μDecoder.μToLinF
+
+  require(channels == 1, s"The $getDetail supports only mono audio")
+
+  private val factor = fs match {
+    case Sf8000  ⇒ 1
+    case Sf16000 ⇒ 2
+    case Sf24000 ⇒ 3
+    case Sf32000 ⇒ 4
+    case Sf48000 ⇒ 6
+    case _       ⇒ throw new RuntimeException("Unsupported sample rate conversion")
+  }
+
+  private val up = if (factor == 1) None else Some(Upsampler(factor))
 
   /**
     * Decode an audio packet to an array of Floats
@@ -117,7 +130,10 @@ case class G711μDecoderFloat(fs: SampleFrequency, channels: Int) extends Decode
       out(i) = μToLinF(compressedAudio(i) & 0xff)
       i += 1
     }
-    Success(out)
+    up match {
+      case Some(u) ⇒ Success(u.process(out))
+      case None ⇒ Success(out)
+    }
   }
 
   /**

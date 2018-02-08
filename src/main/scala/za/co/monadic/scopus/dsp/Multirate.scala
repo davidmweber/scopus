@@ -112,6 +112,7 @@ trait Interpolator {
 
 /**
   * Perform an IIR filter operation using the filter configuration provided in the constructor.
+  * This implementation is unoptimised.
   * @param f The input data signal to filter
   */
 class FilterIIR(f: Filter) {
@@ -156,7 +157,7 @@ trait Multirate {
 }
 
 /**
-  * Upsample a signal by the factor specified. If a signal orignially sampled at 8kHz is upsampled by a factor
+  * Upsample a signal by the factor specified. If a signal originally sampled at 8kHz is upsampled by a factor
   * of 6, the returned signal will have a sample frequency of 48kHz and will retain its original bandwidth
   * @param factor The interpolation factor to use
   */
@@ -165,7 +166,6 @@ case class Upsampler(factor: Int) extends FilterIIR(MultirateFilterFactory(facto
   /**
     * Process a signal, increasing its effective sample rate
     * @param x Signal to be upsampled
-    * @return Processed resilt.
     */
   def process(x: Array[Float]): Array[Float] = filter(interpolate(x), factor)
 }
@@ -178,5 +178,9 @@ case class Upsampler(factor: Int) extends FilterIIR(MultirateFilterFactory(facto
   */
 case class Downsampler(factor: Int) extends FilterIIR(MultirateFilterFactory(factor)) with Decimator with Multirate {
 
+  /**
+    * Process the signal, effectively decreasing its sample rate.
+    * @param x Input audio signal
+    */
   def process(x: Array[Float]): Array[Float] = decimate(filter(x))
 }
