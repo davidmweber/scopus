@@ -18,6 +18,9 @@ package za.co.monadic.scopus
 
 object ArrayConversion {
 
+  val PCM_NORM = 32124.0f /* Normalization factor for Float to PCM */
+
+
   /**
     * Re-interpret a byte array as an array of short. This means that two bytes are combined
     * to give a short.
@@ -79,4 +82,31 @@ object ArrayConversion {
     }
     dest
   }
+
+  /**
+    * Converts an array of Short values to an array of Float.
+    */
+  def shortToFloat(x: Array[Short]): Array[Float] = {
+    val y = new Array[Float](x.length)
+    var i = 0
+    while (i < x.length) {
+      y(i) = x(i) / PCM_NORM
+      i += 1
+    }
+    y
+  }
+
+  /**
+    * Converts an array of Float values to an array of Short.
+    */
+  def floatToShort(x: Array[Float]): Array[Short] = {
+    val y = new Array[Short](x.length)
+    var i = 0
+    while (i < x.length) {
+      y(i) = (x(i) * PCM_NORM).toShort
+      i += 1
+    }
+    y
+  }
+
 }

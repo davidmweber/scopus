@@ -78,3 +78,4 @@ object Audio extends Application {
 object LowDelay extends Application {
   def apply(): Int = OPUS_APPLICATION_RESTRICTED_LOWDELAY
 }
+
