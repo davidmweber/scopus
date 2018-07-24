@@ -30,7 +30,7 @@ sealed trait OpusBase {
   val fs: SampleFrequency
   val channels: Int
 
-  // 60ms of audio is the longest possible buffer we will need for the decoder
+  // 120ms of audio is the longest possible buffer we will need for the decoder
   val bufferLen: Int = math.round(0.120f * fs() * channels)
   var fec            = 0
   val error: Array[Int] = Array[Int](0)
@@ -108,7 +108,7 @@ sealed trait OpusBase {
   */
 class OpusDecoderShort(val fs: SampleFrequency, val channels: Int) extends DecoderShort with OpusBase {
 
-  val decodedBuf = new Array[Short](2880 * channels)
+  val decodedBuf = new Array[Short](bufferLen)
 
   /**
     * Decode an audio packet to an array of Shorts
@@ -170,7 +170,7 @@ object OpusDecoderShort {
   */
 class OpusDecoderFloat(val fs: SampleFrequency, val channels: Int) extends DecoderFloat with OpusBase {
 
-  val decodedBuf = new Array[Float](2880 * channels)
+  val decodedBuf = new Array[Float](bufferLen)
 
   def apply(compressedAudio: Array[Byte]): Try[Array[Float]] = {
     val len = decode_float(decoder, compressedAudio, compressedAudio.length, decodedBuf, bufferLen, fec)

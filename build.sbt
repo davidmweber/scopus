@@ -1,8 +1,8 @@
 name := "Scopus"
 organization := "za.co.monadic"
-version := "0.3.13"
-scalaVersion := "2.12.4"
-crossScalaVersions := Seq("2.11.8", "2.12.4")
+version := "0.3.14"
+scalaVersion := "2.12.6"
+crossScalaVersions := Seq("2.11.8", "2.12.6")
 fork in Test := true
 
 organizationName := "David Weber"
