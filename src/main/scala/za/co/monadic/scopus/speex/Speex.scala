@@ -18,6 +18,11 @@ package za.co.monadic.scopus.speex
 
 import za.co.monadic.scopus._
 
+
+trait SpeexCodec {
+  def getCodecName: String = "speex"
+}
+
 /**
   *
   */

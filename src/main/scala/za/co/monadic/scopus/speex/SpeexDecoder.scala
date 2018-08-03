@@ -21,7 +21,7 @@ import za.co.monadic.scopus.{SampleFrequency, DecoderFloat, DecoderShort}
 
 import scala.util.{Success, Failure, Try}
 
-sealed trait SpeexBase {
+sealed trait SpeexBase extends SpeexCodec {
 
   val fs: SampleFrequency
   val enhance: Boolean
@@ -50,7 +50,7 @@ sealed trait SpeexBase {
   }
 }
 
-class SpeexDecoderShort(val fs: SampleFrequency, val enhance: Boolean) extends SpeexBase with DecoderShort {
+class SpeexDecoderShort(val fs: SampleFrequency, val enhance: Boolean) extends SpeexBase with DecoderShort{
 
   val decodedBuf = new Array[Short](1024)
 

@@ -26,7 +26,7 @@ import scala.util.Try
   * byte indicating the data type. A "0" indicates Short types and a "1"
   * indicates a Float type
   */
-case class PcmEncoder(sampleFreq: SampleFrequency, channels: Int) extends Encoder {
+case class PcmEncoder(sampleFreq: SampleFrequency, channels: Int) extends Encoder with PcmCodec {
 
   /**
     * Encode a block of raw audio  in integer format using the configured encoder

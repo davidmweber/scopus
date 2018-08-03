@@ -46,6 +46,11 @@ trait Codec {
   def getSampleRate: Int
 
   /**
+    * Returns the canonical name for this codec
+    */
+  def getCodecName: String
+
+  /**
     * Returns true if the compressed audio packet is DTX. In practice, if
     * this is true then don't transmit this packet.
     * @param compressedAudio A compressed audio packet for this codec

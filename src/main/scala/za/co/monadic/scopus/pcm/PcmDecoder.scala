@@ -26,7 +26,7 @@ import scala.util.Try
   * byte indicating the data type. A "0" indicates Short types and a "1"
   * indicates a Float type
   */
-case class PcmDecoderFloat(fs: SampleFrequency, channels: Int) extends DecoderFloat {
+case class PcmDecoderFloat(fs: SampleFrequency, channels: Int) extends DecoderFloat with PcmCodec {
 
   /**
     * Decode an audio packet to an array of Floats
@@ -80,7 +80,7 @@ case class PcmDecoderFloat(fs: SampleFrequency, channels: Int) extends DecoderFl
   * byte indicating the data type. A "0" indicates Short types and a "1"
   * indicates a Float type
   */
-case class PcmDecoderShort(fs: SampleFrequency, channels: Int) extends DecoderShort {
+case class PcmDecoderShort(fs: SampleFrequency, channels: Int) extends DecoderShort with PcmCodec {
 
   /**
     * Decode an audio packet to an array of Shorts

@@ -18,6 +18,11 @@ package za.co.monadic.scopus.opus
 
 import za.co.monadic.scopus.Libraries
 
+
+trait OpusCodec {
+  def getCodecName: String = "opus"
+}
+
 /**
   * Scala interface to the Opus codec API. With the exception of the *_ctl() commands, this
   * is pretty much a 1:1 mapping from Scala to the C API. See the Opus documentation for

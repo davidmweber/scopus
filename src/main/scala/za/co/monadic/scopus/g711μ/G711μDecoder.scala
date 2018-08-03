@@ -50,7 +50,7 @@ private object G711μDecoder {
 
 }
 
-case class G711μDecoderShort(fs: SampleFrequency, channels: Int) extends DecoderShort {
+case class G711μDecoderShort(fs: SampleFrequency, channels: Int) extends DecoderShort with G711μCodec {
 
   require(channels == 1, s"The $getDetail supports only mono audio")
 
@@ -118,7 +118,7 @@ case class G711μDecoderShort(fs: SampleFrequency, channels: Int) extends Decode
   override def getSampleRate: Int = fs()
 }
 
-case class G711μDecoderFloat(fs: SampleFrequency, channels: Int) extends DecoderFloat {
+case class G711μDecoderFloat(fs: SampleFrequency, channels: Int) extends DecoderFloat with G711μCodec {
   import G711μDecoder.μToLinF
 
   require(channels == 1, s"The $getDetail supports only mono audio")

@@ -23,7 +23,7 @@ import Speex._
 /**
   *
   */
-class SpeexEncoder(sampleFreq: SampleFrequency) extends Encoder {
+class SpeexEncoder(sampleFreq: SampleFrequency) extends Encoder with SpeexCodec {
 
   val bufferSize = 8192
   val decodePtr  = new Array[Byte](bufferSize)

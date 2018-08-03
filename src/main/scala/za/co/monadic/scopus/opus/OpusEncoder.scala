@@ -34,7 +34,7 @@ import scala.util.{Failure, Success, Try}
   *                   The default should be more than sufficient
   */
 class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, bufferSize: Int = 8192)
-    extends Encoder {
+    extends Encoder with OpusCodec {
   require(bufferSize > 0, "Buffer size must be positive")
   val error: Array[Int] = Array[Int](0)
   val decodePtr         = new Array[Byte](bufferSize)

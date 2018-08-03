@@ -25,7 +25,7 @@ import scala.util.{Failure, Success, Try}
   * Decoder base class which allows specialisations for the different return types offered by
   * the Opus system.
   */
-sealed trait OpusBase {
+sealed trait OpusBase extends OpusCodec {
 
   val fs: SampleFrequency
   val channels: Int

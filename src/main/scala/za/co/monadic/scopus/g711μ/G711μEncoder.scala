@@ -21,7 +21,7 @@ import za.co.monadic.scopus._
 
 import scala.util.{Success, Try}
 
-case class G711μEncoder(sampleFreq: SampleFrequency, channels: Int) extends Encoder {
+case class G711μEncoder(sampleFreq: SampleFrequency, channels: Int) extends Encoder with G711μCodec {
 
   require(channels == 1, s"The $getDetail supports only mono audio")
   import ArrayConversion._
