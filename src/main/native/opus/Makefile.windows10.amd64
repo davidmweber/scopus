@@ -5,7 +5,6 @@ JAVA = java-8-openjdk-amd64
 NATIVE = ../../resources/native/WINDOW~1/amd64/
 INCLUDES = -IC:/PROGRA~1/Java/jdk1.8.0_144/include\
 	   -IC:/PROGRA~1/Java/jdk1.8.0_144/include/win32\
-	   -IC:/Users/garre/Downloads/ghetto_include\
 	   -I/usr/local/include
 CFLAGS = -Ofast -Wall -fPIC $(INCLUDES)
 LDFLAGS = -Wl,-soname,libjni_opus.dll,-rpath='$$ORIGIN' -shared
