@@ -189,8 +189,8 @@ JNIEXPORT jint JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_encoder_1set_1c
 }
 
 JNIEXPORT jstring JNICALL Java_za_co_monadic_scopus_opus_Opus_00024_error_1string
-    (JNIEnv *env, jobject clazz, jint errno) {
-    const char *err_str = opus_strerror(errno);
+    (JNIEnv *env, jobject clazz, jint errorno) {
+    const char *err_str = opus_strerror(errorno);
     return (*env)->NewStringUTF(env, err_str);
 }
 
