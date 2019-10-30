@@ -63,7 +63,7 @@ object Opus {
   def decoder_get_nb_frames(data: Array[Byte], length: Int): Int
 
   @native
-  def decoder_destroy(decoder: Long)
+  def decoder_destroy(decoder: Long): Unit
 
   @native
   def decoder_get_ctl(decoder: Long, command: Int, param: Array[Int]): Int
@@ -81,7 +81,7 @@ object Opus {
   def encode_float(encoder: Long, input: Array[Float], inSize: Int, output: Array[Byte], outSize: Int): Int
 
   @native
-  def encoder_destroy(encoder: Long)
+  def encoder_destroy(encoder: Long): Unit
 
   @native
   def encoder_get_ctl(encoder: Long, command: Int, param: Array[Int]): Int

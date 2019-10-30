@@ -31,12 +31,12 @@ case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enco
   private val uEnd     = Array[Int](0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0x1FFF)
 
   private val factor = sampleFreq match {
-    case Sf8000  ⇒ 1
-    case Sf16000 ⇒ 2
-    case Sf24000 ⇒ 3
-    case Sf32000 ⇒ 4
-    case Sf48000 ⇒ 6
-    case _       ⇒ throw new RuntimeException("Unsupported sample rate conversion")
+    case Sf8000  => 1
+    case Sf16000 => 2
+    case Sf24000 => 3
+    case Sf32000 => 4
+    case Sf48000 => 6
+    case _       => throw new RuntimeException("Unsupported sample rate conversion")
   }
 
   private val down = if (factor == 1) None else Some(Downsampler(factor))
@@ -85,8 +85,8 @@ case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enco
   override def apply(audio: Array[Short]): Try[Array[Byte]] = {
     val out = new Array[Byte](audio.length / factor)
     val dAudio = down match {
-      case Some(d) ⇒ floatToShort(d.process(shortToFloat(audio)))
-      case None    ⇒ audio
+      case Some(d) => floatToShort(d.process(shortToFloat(audio)))
+      case None    => audio
     }
     var i = 0
     while (i < dAudio.length) {
@@ -105,8 +105,8 @@ case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enco
   override def apply(audio: Array[Float]): Try[Array[Byte]] = {
     val out = new Array[Byte](audio.length / factor)
     val dAudio = down match {
-      case Some(d) ⇒ d.process(audio)
-      case None    ⇒ audio
+      case Some(d) => d.process(audio)
+      case None    => audio
     }
     var i = 0
     while (i < dAudio.length) {

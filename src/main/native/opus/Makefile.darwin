@@ -9,8 +9,8 @@ INCLUDES = -I/Library/Java/JavaVirtualMachines/$(JAVA)/Contents/Home/include\
 CFLAGS = -Ofast -Wall -fPIC $(INCLUDES)
 LDFLAGS = -dynamiclib
 LDPATH = -L$(NATIVE)
-LIBS = -lspeex -lspeexdsp -lopus.0
-SOURCES = za_co_monadic_scopus_opus_Opus__.c za_co_monadic_scopus_speex_Speex__.c
+LIBS = -lopus.0
+SOURCES = za_co_monadic_scopus_opus_Opus__.c
 TARGETLIB = libjni_opus.dylib
 
 all: $(TARGETLIB)
