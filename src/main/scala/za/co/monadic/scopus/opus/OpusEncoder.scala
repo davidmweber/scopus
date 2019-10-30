@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ import scala.util.{Failure, Success, Try}
   *                   The default should be more than sufficient
   */
 class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, bufferSize: Int = 8192)
-    extends Encoder with OpusCodec {
+    extends Encoder
+    with OpusCodec {
   require(bufferSize > 0, "Buffer size must be positive")
   val error: Array[Int] = Array[Int](0)
   val decodePtr         = new Array[Byte](bufferSize)
@@ -146,23 +147,29 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
 
   def setMaxBandwidth(bandwidth: Integer): OpusEncoder = {
     require(
-      Set(OPUS_BANDWIDTH_FULLBAND,
-          OPUS_BANDWIDTH_SUPERWIDEBAND,
-          OPUS_BANDWIDTH_WIDEBAND,
-          OPUS_BANDWIDTH_MEDIUMBAND,
-          OPUS_BANDWIDTH_NARROWBAND).contains(bandwidth))
+      Set(
+        OPUS_BANDWIDTH_FULLBAND,
+        OPUS_BANDWIDTH_SUPERWIDEBAND,
+        OPUS_BANDWIDTH_WIDEBAND,
+        OPUS_BANDWIDTH_MEDIUMBAND,
+        OPUS_BANDWIDTH_NARROWBAND
+      ).contains(bandwidth)
+    )
     setter(OPUS_SET_MAX_BANDWIDTH_REQUEST, bandwidth)
     this
   }
 
   def setBandWidth(bandwidth: Integer): OpusEncoder = {
     require(
-      Set(OPUS_AUTO,
-          OPUS_BANDWIDTH_NARROWBAND,
-          OPUS_BANDWIDTH_MEDIUMBAND,
-          OPUS_BANDWIDTH_WIDEBAND,
-          OPUS_BANDWIDTH_SUPERWIDEBAND,
-          OPUS_BANDWIDTH_FULLBAND).contains(bandwidth))
+      Set(
+        OPUS_AUTO,
+        OPUS_BANDWIDTH_NARROWBAND,
+        OPUS_BANDWIDTH_MEDIUMBAND,
+        OPUS_BANDWIDTH_WIDEBAND,
+        OPUS_BANDWIDTH_SUPERWIDEBAND,
+        OPUS_BANDWIDTH_FULLBAND
+      ).contains(bandwidth)
+    )
     setter(OPUS_SET_BANDWIDTH_REQUEST, bandwidth)
     this
   }
@@ -205,13 +212,16 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
 
   def setExpertFrameDuration(duration: Integer): OpusEncoder = {
     require(
-      Set(OPUS_FRAMESIZE_ARG,
-          OPUS_FRAMESIZE_2_5_MS,
-          OPUS_FRAMESIZE_5_MS,
-          OPUS_FRAMESIZE_10_MS,
-          OPUS_FRAMESIZE_20_MS,
-          OPUS_FRAMESIZE_40_MS,
-          OPUS_FRAMESIZE_60_MS).contains(duration))
+      Set(
+        OPUS_FRAMESIZE_ARG,
+        OPUS_FRAMESIZE_2_5_MS,
+        OPUS_FRAMESIZE_5_MS,
+        OPUS_FRAMESIZE_10_MS,
+        OPUS_FRAMESIZE_20_MS,
+        OPUS_FRAMESIZE_40_MS,
+        OPUS_FRAMESIZE_60_MS
+      ).contains(duration)
+    )
     setter(OPUS_SET_EXPERT_FRAME_DURATION_REQUEST, duration)
     this
   }

@@ -10,7 +10,7 @@ package za.co.monadic.scopus.dsp
   * @param b The coefficients of the polynomial defining the xeros in the Z-domain
   */
 case class Filter(order: Int, a: Array[Float], b: Array[Float]) {
-  require(order == a.length -1  && order == b.length - 1, "Order and coefficient array sizes must be equal")
+  require(order == a.length - 1 && order == b.length - 1, "Order and coefficient array sizes must be equal")
 }
 
 /**
@@ -27,7 +27,7 @@ object MultirateFilterFactory {
     * @return A Filter
     */
   def apply(factor: Int): Filter = factor match {
-    case 2 ⇒
+    case 2 =>
       Filter(
         6,
         Array[Float](1.0000000000e+00f, -2.2150939834e+00f, 3.6340884990e+00f, -3.6053900178e+00f, 2.5896791922e+00f,
@@ -35,7 +35,7 @@ object MultirateFilterFactory {
         Array[Float](2.9743123894e-02f, 5.3683139827e-02f, 9.9997243561e-02f, 1.0623698403e-01f, 9.9997243561e-02f,
           5.3683139827e-02f, 2.9743123894e-02f)
       )
-    case 3 ⇒
+    case 3 =>
       Filter(
         6,
         Array[Float](1.0000000000e+00f, -3.9597283064e+00f, 7.5464419229e+00f, -8.4777972935e+00f, 5.8803344415e+00f,
@@ -43,7 +43,7 @@ object MultirateFilterFactory {
         Array[Float](1.1659133162e-02f, -7.6466313128e-03f, 2.3681010412e-02f, -7.8989770916e-03f, 2.3681010412e-02f,
           -7.6466313128e-03f, 1.1659133162e-02f)
       )
-    case 4 ⇒
+    case 4 =>
       Filter(
         6,
         Array[Float](1.0000000000e+00f, -4.6768497674e+00f, 9.7621423046e+00f, -1.1501934308e+01f, 8.0339245654e+00f,
@@ -51,7 +51,7 @@ object MultirateFilterFactory {
         Array[Float](7.2935097847e-03f, -1.5409691786e-02f, 2.5558502830e-02f, -2.5750839286e-02f, 2.5558502830e-02f,
           -1.5409691786e-02f, 7.2935097847e-03f)
       )
-    case 5 ⇒
+    case 5 =>
       Filter(
         6,
         Array[Float](1.0000000000e+00f, -5.0470082922e+00f, 1.1055203383e+01f, -1.3388074677e+01f, 9.4329631691e+00f,
@@ -59,7 +59,7 @@ object MultirateFilterFactory {
         Array[Float](5.5699828667e-03f, -1.7047032929e-02f, 3.0001912362e-02f, -3.4532704919e-02f, 3.0001912362e-02f,
           -1.7047032929e-02f, 5.5699828667e-03f)
       )
-    case 6 ⇒
+    case 6 =>
       Filter(
         6,
         Array[Float](1.0000000000e+00f, -5.2664800962e+00f, 1.1874502680e+01f, -1.4637401088e+01f, 1.0390542726e+01f,
@@ -67,7 +67,7 @@ object MultirateFilterFactory {
         Array[Float](4.7105692599e-03f, -1.7496959962e-02f, 3.3343643097e-02f, -4.0241782497e-02f, 3.3343643097e-02f,
           -1.7496959962e-02f, 4.7105692599e-03f)
       )
-    case _ ⇒ throw new RuntimeException("Unsupported decimation factor")
+    case _ => throw new RuntimeException("Unsupported decimation factor")
   }
 }
 

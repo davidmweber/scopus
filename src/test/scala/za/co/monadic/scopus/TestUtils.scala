@@ -56,11 +56,10 @@ object TestUtils {
     * @return Computed correlation coefficient.
     */
   def correlate(a: List[Double], b: List[Double]): Double = {
-    val aAve = a.sum / a.length
-    val bAve = b.sum / b.length
-    val top  = (for ((x, y) <- a zip b) yield (x - aAve) * (y - bAve)).sum
-    val bottom = math.sqrt(a.map((t: Double) => sqr(t - aAve)).sum) * math.sqrt(
-        b.map((t: Double) => sqr(t - bAve)).sum)
+    val aAve   = a.sum / a.length
+    val bAve   = b.sum / b.length
+    val top    = (for ((x, y) <- a zip b) yield (x - aAve) * (y - bAve)).sum
+    val bottom = math.sqrt(a.map((t: Double) => sqr(t - aAve)).sum) * math.sqrt(b.map((t: Double) => sqr(t - bAve)).sum)
     top / bottom
   }
 

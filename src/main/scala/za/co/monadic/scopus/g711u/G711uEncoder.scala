@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package za.co.monadic.scopus.g711μ
+package za.co.monadic.scopus.g711u
 
 import za.co.monadic.scopus.dsp.Downsampler
 import za.co.monadic.scopus._
 
 import scala.util.{Success, Try}
 
-case class G711μEncoder(sampleFreq: SampleFrequency, channels: Int) extends Encoder with G711μCodec {
+case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Encoder with G711uCodec {
 
   require(channels == 1, s"The $getDetail supports only mono audio")
   import ArrayConversion._
 
-  private val BIAS     = 0x84 /* Bias for linear code. */
-  private val CLIP     = 8159
-  private val uEnd     = Array[Int](0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0x1FFF)
+  private val BIAS = 0x84 /* Bias for linear code. */
+  private val CLIP = 8159
+  private val uEnd = Array[Int](0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0x1FFF)
 
   private val factor = sampleFreq match {
-    case Sf8000  ⇒ 1
-    case Sf16000 ⇒ 2
-    case Sf24000 ⇒ 3
-    case Sf32000 ⇒ 4
-    case Sf48000 ⇒ 6
-    case _       ⇒ throw new RuntimeException("Unsupported sample rate conversion")
+    case Sf8000  => 1
+    case Sf16000 => 2
+    case Sf24000 => 3
+    case Sf32000 => 4
+    case Sf48000 => 6
+    case _       => throw new RuntimeException("Unsupported sample rate conversion")
   }
 
   private val down = if (factor == 1) None else Some(Downsampler(factor))
@@ -85,8 +85,8 @@ case class G711μEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enc
   override def apply(audio: Array[Short]): Try[Array[Byte]] = {
     val out = new Array[Byte](audio.length / factor)
     val dAudio = down match {
-      case Some(d) ⇒ floatToShort(d.process(shortToFloat(audio)))
-      case None    ⇒ audio
+      case Some(d) => floatToShort(d.process(shortToFloat(audio)))
+      case None    => audio
     }
     var i = 0
     while (i < dAudio.length) {
@@ -105,8 +105,8 @@ case class G711μEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enc
   override def apply(audio: Array[Float]): Try[Array[Byte]] = {
     val out = new Array[Byte](audio.length / factor)
     val dAudio = down match {
-      case Some(d) ⇒ d.process(audio)
-      case None    ⇒ audio
+      case Some(d) => d.process(audio)
+      case None    => audio
     }
     var i = 0
     while (i < dAudio.length) {
@@ -134,7 +134,7 @@ case class G711μEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enc
   /**
     * @return A discription of this instance of an encoder or decoder
     */
-  override def getDetail: String = "G.711u μ-law encoder"
+  override def getDetail: String = "G.711u u-law encoder"
 
   /**
     * Reset the underlying codec.

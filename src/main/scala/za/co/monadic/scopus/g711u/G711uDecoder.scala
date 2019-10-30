@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package za.co.monadic.scopus.g711μ
+package za.co.monadic.scopus.g711u
 
 import za.co.monadic.scopus._
 import za.co.monadic.scopus.dsp.Upsampler
 
 import scala.util.{Success, Try}
 
-private object G711μDecoder {
+private object G711uDecoder {
 
-  // Lookup table for μ-law decoder
-  val μToLin: Array[Short] = Array[Short](-32124, -31100, -30076, -29052, -28028, -27004, -25980, -24956, -23932,
+  // Lookup table for u-law decoder
+  val uToLin: Array[Short] = Array[Short](-32124, -31100, -30076, -29052, -28028, -27004, -25980, -24956, -23932,
     -22908, -21884, -20860, -19836, -18812, -17788, -16764, -15996, -15484, -14972, -14460, -13948, -13436, -12924,
     -12412, -11900, -11388, -10876, -10364, -9852, -9340, -8828, -8316, -7932, -7676, -7420, -7164, -6908, -6652, -6396,
     -6140, -5884, -5628, -5372, -5116, -4860, -4604, -4348, -4092, -3900, -3772, -3644, -3516, -3388, -3260, -3132,
@@ -41,29 +41,29 @@ private object G711μDecoder {
     72, 64, 56, 48, 40, 32, 24, 16, 8, 0)
 
   // Lookup table returning Float values
-  val μToLinF: Array[Float] = new Array[Float](μToLin.length)
+  val uToLinF: Array[Float] = new Array[Float](uToLin.length)
 
   // Just build the Float version
-  for (i ← μToLin.indices) {
-    μToLinF(i) = μToLin(i) / 32124.0f
+  for (i <- uToLin.indices) {
+    uToLinF(i) = uToLin(i) / 32124.0f
   }
 
 }
 
-case class G711μDecoderShort(fs: SampleFrequency, channels: Int) extends DecoderShort with G711μCodec {
+case class G711uDecoderShort(fs: SampleFrequency, channels: Int) extends DecoderShort with G711uCodec {
 
   require(channels == 1, s"The $getDetail supports only mono audio")
 
-  import G711μDecoder.μToLin
+  import G711uDecoder.uToLin
   import ArrayConversion._
 
   private val factor = fs match {
-    case Sf8000  ⇒ 1
-    case Sf16000 ⇒ 2
-    case Sf24000 ⇒ 3
-    case Sf32000 ⇒ 4
-    case Sf48000 ⇒ 6
-    case _       ⇒ throw new RuntimeException("Unsupported sample rate conversion")
+    case Sf8000  => 1
+    case Sf16000 => 2
+    case Sf24000 => 3
+    case Sf32000 => 4
+    case Sf48000 => 6
+    case _       => throw new RuntimeException("Unsupported sample rate conversion")
   }
 
   private val up = if (factor == 1) None else Some(Upsampler(factor))
@@ -78,12 +78,12 @@ case class G711μDecoderShort(fs: SampleFrequency, channels: Int) extends Decode
     val out = new Array[Short](compressedAudio.length)
     var i   = 0
     while (i < compressedAudio.length) {
-      out(i) = μToLin(compressedAudio(i) & 0xff)
+      out(i) = uToLin(compressedAudio(i) & 0xff)
       i += 1
     }
     up match {
-      case Some(u) ⇒ Success(floatToShort(u.process(shortToFloat(out))))
-      case None ⇒ Success(out)
+      case Some(u) => Success(floatToShort(u.process(shortToFloat(out))))
+      case None    => Success(out)
     }
   }
 
@@ -105,7 +105,7 @@ case class G711μDecoderShort(fs: SampleFrequency, channels: Int) extends Decode
   /**
     * @return A description of this instance of an encoder or decoder
     */
-  override def getDetail: String = "G.711u μ-law decoder"
+  override def getDetail: String = "G.711u u-law decoder"
 
   /**
     * Reset the underlying codec.
@@ -118,18 +118,18 @@ case class G711μDecoderShort(fs: SampleFrequency, channels: Int) extends Decode
   override def getSampleRate: Int = fs()
 }
 
-case class G711μDecoderFloat(fs: SampleFrequency, channels: Int) extends DecoderFloat with G711μCodec {
-  import G711μDecoder.μToLinF
+case class G711uDecoderFloat(fs: SampleFrequency, channels: Int) extends DecoderFloat with G711uCodec {
+  import G711uDecoder.uToLinF
 
   require(channels == 1, s"The $getDetail supports only mono audio")
 
   private val factor = fs match {
-    case Sf8000  ⇒ 1
-    case Sf16000 ⇒ 2
-    case Sf24000 ⇒ 3
-    case Sf32000 ⇒ 4
-    case Sf48000 ⇒ 6
-    case _       ⇒ throw new RuntimeException("Unsupported sample rate conversion")
+    case Sf8000  => 1
+    case Sf16000 => 2
+    case Sf24000 => 3
+    case Sf32000 => 4
+    case Sf48000 => 6
+    case _       => throw new RuntimeException("Unsupported sample rate conversion")
   }
 
   private val up = if (factor == 1) None else Some(Upsampler(factor))
@@ -144,12 +144,12 @@ case class G711μDecoderFloat(fs: SampleFrequency, channels: Int) extends Decode
     val out = new Array[Float](compressedAudio.length)
     var i   = 0
     while (i < compressedAudio.length) {
-      out(i) = μToLinF(compressedAudio(i) & 0xff)
+      out(i) = uToLinF(compressedAudio(i) & 0xff)
       i += 1
     }
     up match {
-      case Some(u) ⇒ Success(u.process(out))
-      case None ⇒ Success(out)
+      case Some(u) => Success(u.process(out))
+      case None    => Success(out)
     }
   }
 
@@ -171,7 +171,7 @@ case class G711μDecoderFloat(fs: SampleFrequency, channels: Int) extends Decode
   /**
     * @return A discription of this instance of an encoder or decoder
     */
-  override def getDetail: String = "G.711u μ-law decoder"
+  override def getDetail: String = "G.711u u-law decoder"
 
   /**
     * Reset the underlying codec.

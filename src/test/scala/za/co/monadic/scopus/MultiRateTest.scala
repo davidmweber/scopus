@@ -12,7 +12,6 @@ class MultiRateTest extends FunSpec with Matchers {
 
   describe("The multirate filter tools should") {
 
-
     it("interpolate a signal with zeros") {
       val x0 = Array[Float](1.0f, 2.0f, 3.0f)
       val y0 = Array[Float](1.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f)
@@ -43,17 +42,17 @@ class MultiRateTest extends FunSpec with Matchers {
       x(0) = 1.0f
 
       // The impulse response for the filter above will be the following
-      val ty = Array.range(0, 10).map(i ⇒ (i + 1.0f) * Math.pow(p, i))
+      val ty = Array.range(0, 10).map(i => (i + 1.0f) * Math.pow(p, i))
 
       val f    = new FilterIIR(fc)
       val y    = f.filter(x)
       val diff = (y, ty).zipped.map(_ - _)
-      diff.foreach(d ⇒ assert(Math.abs(d) < 1e-6))
+      diff.foreach(d => assert(Math.abs(d) < 1e-6))
     }
 
     it("has stable standard interpolation and decimation filters") {
       val l = 1000
-      for (o ← 2 until 7) {
+      for (o <- 2 until 7) {
         val x = new Array[Float](l)
         x(0) = 1.0f
         val f = new FilterIIR(MultirateFilterFactory(o))
@@ -63,10 +62,10 @@ class MultiRateTest extends FunSpec with Matchers {
     }
 
     it("interpolates a sine wave, retaining the original frequency at the new sample rate") {
-      val freqTable = Map(2 → Sf16000, 3 → Sf24000, 4 → Sf32000, 6 → Sf48000)
+      val freqTable = Map(2 -> Sf16000, 3 -> Sf24000, 4 -> Sf32000, 6 -> Sf48000)
       val l         = 1000
       freqTable.foreach {
-        case (factor, sf) ⇒
+        case (factor, sf) =>
           val f   = pickFreq(150, l, Sf8000) // 1200Hz
           val x   = genSine(f, l, Sf8000)
           val ups = Upsampler(factor)
@@ -83,9 +82,9 @@ class MultiRateTest extends FunSpec with Matchers {
 
     it("decimates a sine wave, retaining its frequency at the new sample rate") {
       // We start at 48kHz and decimate down by various factors
-      val freqTable = Map(2 → Sf24000, 3 → Sf16000, 4 → Sf12000, 6 → Sf8000)
+      val freqTable = Map(2 -> Sf24000, 3 -> Sf16000, 4 -> Sf12000, 6 -> Sf8000)
       freqTable.foreach {
-        case (factor, sf) ⇒
+        case (factor, sf) =>
           val l  = factor * (1000 / factor) // Ensure that the length is a multiple of our decimation factor
           val f  = pickFreq(45, l, Sf48000) // Approx 2100Hz
           val x  = genSine(f, l, Sf48000)
@@ -104,15 +103,15 @@ class MultiRateTest extends FunSpec with Matchers {
     it("decimates a sine wave with frequency above the new Nyquist rate, filtering it from the new signal") {
       // We start at 48kHz and decimate down by various factors and input a frequency outside the
       // band of the decimated sample rate. The energy in the signal should be very small after decimation.
-      List(2, 3, 4, 6).foreach { factor ⇒
-          val l = factor * (1000 / factor) // Ensure that the length is a multiple of our decimation factor
-          val f = pickFreq(400, l, Sf48000) // Must be above Nyquist frequency for 24kHz and lower
-          val x  = genSine(f, l, Sf48000)
-          val ds = Downsampler(factor)
-          ds.process(x).length shouldBe l / factor
-          val y = ds.process(x)
-          val e = y.foldLeft(0.0f)( (s, a) ⇒  s + a * a) / l // Computes the energy in the signal
-          e should be < 1e-6f
+      List(2, 3, 4, 6).foreach { factor =>
+        val l  = factor * (1000 / factor) // Ensure that the length is a multiple of our decimation factor
+        val f  = pickFreq(400, l, Sf48000) // Must be above Nyquist frequency for 24kHz and lower
+        val x  = genSine(f, l, Sf48000)
+        val ds = Downsampler(factor)
+        ds.process(x).length shouldBe l / factor
+        val y = ds.process(x)
+        val e = y.foldLeft(0.0f)((s, a) => s + a * a) / l // Computes the energy in the signal
+        e should be < 1e-6f
       }
     }
   }

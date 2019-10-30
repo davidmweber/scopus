@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package za.co.monadic.scopus.opus
 
 import za.co.monadic.scopus.Libraries
-
 
 trait OpusCodec {
   def getCodecName: String = "opus"
@@ -38,20 +37,24 @@ object Opus {
   def decoder_create(Fs: Int, channels: Int, error: Array[Int]): Long
 
   @native
-  def decode_short(decoder: Long,
-                   input: Array[Byte],
-                   inSize: Int,
-                   output: Array[Short],
-                   outSize: Int,
-                   decodeFEC: Int): Int
+  def decode_short(
+      decoder: Long,
+      input: Array[Byte],
+      inSize: Int,
+      output: Array[Short],
+      outSize: Int,
+      decodeFEC: Int
+  ): Int
 
   @native
-  def decode_float(decoder: Long,
-                   input: Array[Byte],
-                   inSize: Int,
-                   output: Array[Float],
-                   outSize: Int,
-                   decodeFEC: Int): Int
+  def decode_float(
+      decoder: Long,
+      input: Array[Byte],
+      inSize: Int,
+      output: Array[Float],
+      outSize: Int,
+      decodeFEC: Int
+  ): Int
 
   @native
   def decoder_get_nb_samples(data: Array[Byte], length: Int, fs: Int): Int
@@ -63,7 +66,7 @@ object Opus {
   def decoder_get_nb_frames(data: Array[Byte], length: Int): Int
 
   @native
-  def decoder_destroy(decoder: Long)
+  def decoder_destroy(decoder: Long): Unit
 
   @native
   def decoder_get_ctl(decoder: Long, command: Int, param: Array[Int]): Int
@@ -81,7 +84,7 @@ object Opus {
   def encode_float(encoder: Long, input: Array[Float], inSize: Int, output: Array[Byte], outSize: Int): Int
 
   @native
-  def encoder_destroy(encoder: Long)
+  def encoder_destroy(encoder: Long): Unit
 
   @native
   def encoder_get_ctl(encoder: Long, command: Int, param: Array[Int]): Int

@@ -21,7 +21,7 @@ object FreqUtils {
     var re      = 0.0
     var im      = 0.0
     val twiddle = 2.0 * math.Pi * freq / sampleFreq()
-    for (idx ← x.indices) {
+    for (idx <- x.indices) {
       re += x(idx) * math.sin(twiddle * idx)
       im += x(idx) * math.cos(twiddle * idx)
     }
@@ -53,7 +53,7 @@ object FreqUtils {
     */
   def genSine(freq: Float, len: Int, sampleFreq: SampleFrequency): Array[Float] = {
     val buffer = new Array[Float](len)
-    for (idx ← buffer.indices) {
+    for (idx <- buffer.indices) {
       buffer(idx) = math.sin(2.0 * math.Pi * idx * freq / sampleFreq()).toFloat
     }
     buffer

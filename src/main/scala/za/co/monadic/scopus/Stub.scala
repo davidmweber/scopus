@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package za.co.monadic.scopus
 
 import za.co.monadic.scopus.opus.{OpusEncoder, OpusDecoderShort}
-import za.co.monadic.scopus.speex.{SpeexDecoderShort, SpeexEncoder, Speex}
 
 import scala.util.Try
 
@@ -37,16 +36,6 @@ object Stub extends App {
 
   // On receive end
   val decoded: Try[Array[Short]] = dec(coded.get)
-
-  println(Speex.get_version_string())
-
-  val senc = SpeexEncoder(Sf8000)
-  senc.cleanup()
-
-  val sdec = SpeexDecoderShort(Sf8000, true)
-  sdec.cleanup()
-
-  // Send decoded packet off
 
   println("Done....")
 }

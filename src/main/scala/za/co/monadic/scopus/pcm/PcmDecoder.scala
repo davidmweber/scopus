@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,9 @@ case class PcmDecoderFloat(fs: SampleFrequency, channels: Int) extends DecoderFl
     Try {
       if (ca.length > 0) {
         ca(0) match {
-          case 0 ⇒ byteArrayToShortArray(ca.drop(1)).map(_.toFloat / 32768.0f)
-          case 1 ⇒ byteArrayToFloatArray(ca.drop(1))
-          case s ⇒ throw new IllegalArgumentException(s"Type $s cannot be decoded")
+          case 0 => byteArrayToShortArray(ca.drop(1)).map(_.toFloat / 32768.0f)
+          case 1 => byteArrayToFloatArray(ca.drop(1))
+          case s => throw new IllegalArgumentException(s"Type $s cannot be decoded")
         }
       } else throw new IllegalArgumentException(s"Byte Array lenght cannot be zero")
     }
@@ -90,9 +90,9 @@ case class PcmDecoderShort(fs: SampleFrequency, channels: Int) extends DecoderSh
   override def apply(ca: Array[Byte]): Try[Array[Short]] = Try {
     if (ca.length > 0) {
       ca(0) match {
-        case 0 ⇒ byteArrayToShortArray(ca.drop(1))
-        case 1 ⇒ byteArrayToFloatArray(ca.drop(1)).map((f: Float) => (f * 32768.0f).round.toShort)
-        case s ⇒ throw new IllegalArgumentException(s"Type $s cannot be decoded")
+        case 0 => byteArrayToShortArray(ca.drop(1))
+        case 1 => byteArrayToFloatArray(ca.drop(1)).map((f: Float) => (f * 32768.0f).round.toShort)
+        case s => throw new IllegalArgumentException(s"Type $s cannot be decoded")
       }
     } else throw new IllegalArgumentException(s"Byte Array length cannot be zero")
   }
