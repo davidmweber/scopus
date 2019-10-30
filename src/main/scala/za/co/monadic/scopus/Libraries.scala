@@ -27,6 +27,9 @@ object Libraries {
     case "Linux/amd64" =>
       LibLoader("libopus.so.0", load = false) // Don't load this as it is dynamically found by the linker in Linux
       LibLoader("libjni_opus.so")
+      LibLoader("ld-linux-x86-64.so.2", load = false)
+      LibLoader("libc.so.6", load = false)
+      LibLoader("libm.so.6", load = false)
     case "Mac OS X/x86_64" =>
       LibLoader("libopus.0.dylib", load = false)
       LibLoader("libjni_opus.dylib")
