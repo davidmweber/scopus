@@ -25,11 +25,11 @@ object Libraries {
   // System dependent load of native libraries
   LibLoader.getOsArch match {
     case "Linux/amd64" =>
-      LibLoader("libopus.so.0", load = false) // Don't load this as it is dynamically found by the linker in Linux
       LibLoader("libjni_opus.so")
       LibLoader("ld-linux-x86-64.so.2")
       LibLoader("libc.so.6")
       LibLoader("libm.so.6")
+      LibLoader("libopus.so.0") // Don't load this as it is dynamically found by the linker in Linux
     case "Mac OS X/x86_64" =>
       LibLoader("libopus.0.dylib", load = false)
       LibLoader("libjni_opus.dylib")
