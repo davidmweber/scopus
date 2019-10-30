@@ -12,7 +12,6 @@ class MultiRateTest extends FunSpec with Matchers {
 
   describe("The multirate filter tools should") {
 
-
     it("interpolate a signal with zeros") {
       val x0 = Array[Float](1.0f, 2.0f, 3.0f)
       val y0 = Array[Float](1.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f)
@@ -105,14 +104,14 @@ class MultiRateTest extends FunSpec with Matchers {
       // We start at 48kHz and decimate down by various factors and input a frequency outside the
       // band of the decimated sample rate. The energy in the signal should be very small after decimation.
       List(2, 3, 4, 6).foreach { factor =>
-          val l = factor * (1000 / factor) // Ensure that the length is a multiple of our decimation factor
-          val f = pickFreq(400, l, Sf48000) // Must be above Nyquist frequency for 24kHz and lower
-          val x  = genSine(f, l, Sf48000)
-          val ds = Downsampler(factor)
-          ds.process(x).length shouldBe l / factor
-          val y = ds.process(x)
-          val e = y.foldLeft(0.0f)( (s, a) =>  s + a * a) / l // Computes the energy in the signal
-          e should be < 1e-6f
+        val l  = factor * (1000 / factor) // Ensure that the length is a multiple of our decimation factor
+        val f  = pickFreq(400, l, Sf48000) // Must be above Nyquist frequency for 24kHz and lower
+        val x  = genSine(f, l, Sf48000)
+        val ds = Downsampler(factor)
+        ds.process(x).length shouldBe l / factor
+        val y = ds.process(x)
+        val e = y.foldLeft(0.0f)((s, a) => s + a * a) / l // Computes the energy in the signal
+        e should be < 1e-6f
       }
     }
   }

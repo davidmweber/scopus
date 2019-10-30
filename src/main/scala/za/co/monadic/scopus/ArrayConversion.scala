@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package za.co.monadic.scopus
 object ArrayConversion {
 
   val PCM_NORM = 32124.0f /* Normalization factor for Float to PCM */
-
 
   /**
     * Re-interpret a byte array as an array of short. This means that two bytes are combined
@@ -74,9 +73,9 @@ object ArrayConversion {
     var i    = 0
     while (i < dest.length) {
       val temp = ((in(4 * i + 3) & 0xFF) << 24) |
-          ((in(4 * i + 2) & 0xFF) << 16) |
-          ((in(4 * i + 1) & 0xFF) << 8) |
-          (in(4 * i) & 0xFF)
+        ((in(4 * i + 2) & 0xFF) << 16) |
+        ((in(4 * i + 1) & 0xFF) << 8) |
+        (in(4 * i) & 0xFF)
       dest(i) = java.lang.Float.intBitsToFloat(temp)
       i += 1
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,10 @@ sealed trait OpusBase extends OpusCodec {
   val channels: Int
 
   // 120ms of audio is the longest possible buffer we will need for the decoder
-  val bufferLen: Int = math.round(0.120f * fs() * channels)
-  var fec            = 0
+  val bufferLen: Int    = math.round(0.120f * fs() * channels)
+  var fec               = 0
   val error: Array[Int] = Array[Int](0)
-  val decoder: Long = decoder_create(fs(), channels, error)
+  val decoder: Long     = decoder_create(fs(), channels, error)
   if (error(0) != OPUS_OK) {
     throw new IllegalArgumentException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
   }

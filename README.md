@@ -4,9 +4,9 @@
 Scopus
 ------
 
-Scopus is a Scala interface to the [Opus 1.2.1](http://www.opus-codec.org),
-[Speex 1.2.0](http://www.speex.org/) and g.711u codecs. There is also a PCM "codec" which
-is effectively a NULL codec and is useful in testing.
+Scopus is a Scala interface to the [Opus 1.2.1](http://www.opus-codec.org) and 
+g.711u codecs. There is also a PCM "codec" which is effectively a NULL codec and is useful 
+in testing.
 
 It is light and thin by design and gives programmers access to the bulk
 of the functionality to the codecs. It
@@ -17,16 +17,7 @@ native C implementation. For example, on a 3.5Ghz i5, the Opus coder runs at
 1600 times real time. A native benchmark shows the encoder to run at 400 times
 real time. The LLVM C compiler (clang v3.4) pips GCC by about 5%.
 
-There is support for the Speex [echo cancellation API](http://www.speex.org/docs/manual/speex-manual/node7.html#SECTION00740000000000000000).
-Like the rest of the library, this is a thin layer over the underlying C libraries. See the tests for an example of 
-how to use this.
-
-The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/) and those for Speex are [here](http://www.speex.org/downloads/).
-
-Note that the Opus codec is better in most aspects than the Speex codec. The
-latter demonstrates that the framework can manage multiple codecs without
-running into patent issues.
-
+The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/).
 
 Licensing
 ---------
@@ -68,11 +59,11 @@ make check
 
 Usage
 -----
-Scopus is available from the Sonatype Maven repo with builds for Scala 2.11 and 2.12. Add the
+Scopus is available from the Sonatype Maven repo with builds for Scala 2.12 and 2.13. Add the
 following dependency to your sbt build:
 
 ```scala
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.3.14"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.4.0"
 ```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`
@@ -84,22 +75,6 @@ so it is up to you to manage errors reported by the decoder or the encoder.
 
    // Corresponding decoder
    val dec = OpusDecoder(Sf8000, 1)
-
-   val coded: Try[Array[Byte]] = enc(new Array[Short](160))
-   // Transmit
-
-   // On receive end
-   val decoded: Try[Array[Short]] = dec(coded.get)
-
-   // Send decoded packet off
-```
-
-Using the Speex codec is very similar. 
-
-```scala
-   val enc = SpeexEncoder(Sf8000)
-
-   val dec = SpeexDecoder(Sf8000)
 
    val coded: Try[Array[Byte]] = enc(new Array[Short](160))
    // Transmit

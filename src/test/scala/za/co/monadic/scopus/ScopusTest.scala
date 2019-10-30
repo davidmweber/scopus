@@ -142,7 +142,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         for (_ <- 0 until repeats) {
           for (c <- chunks) enc(c)
         }
-        val duration = (System.currentTimeMillis() - tStart) / 1000.0 // Seconds
+        val duration = (System.currentTimeMillis() - tStart) / 1000.0    // Seconds
         val speed    = repeats * nSamples / duration / enc.getSampleRate // multiple of real time
         speed should be > 100.0
         info(f"Encoder runs at $speed%5.1f times real time")
@@ -156,7 +156,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         for (_ <- 0 until repeats) {
           for (c <- coded) dec(c)
         }
-        val duration = (System.currentTimeMillis() - tStart) / 1000.0 // Seconds
+        val duration = (System.currentTimeMillis() - tStart) / 1000.0    // Seconds
         val speed    = repeats * nSamples / duration / enc.getSampleRate // multiple of real time
         speed should be > 400.0
         info(f"Decoder runs at $speed%5.1f times real time")
@@ -313,16 +313,20 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
         Given("a set of sampling frequencies for the encoders and decoders")
         val freqs = List(8000, 12000, 16000, 24000, 48000)
         When("they are constructed for different sample frequencies")
-        val e = List(OpusEncoder(Sf8000, 1),
-                     OpusEncoder(Sf12000, 1),
-                     OpusEncoder(Sf16000, 1),
-                     OpusEncoder(Sf24000, 1),
-                     OpusEncoder(Sf48000, 1))
-        val d = List(OpusDecoderShort(Sf8000, 1),
-                     OpusDecoderShort(Sf12000, 1),
-                     OpusDecoderShort(Sf16000, 1),
-                     OpusDecoderShort(Sf24000, 1),
-                     OpusDecoderShort(Sf48000, 1))
+        val e = List(
+          OpusEncoder(Sf8000, 1),
+          OpusEncoder(Sf12000, 1),
+          OpusEncoder(Sf16000, 1),
+          OpusEncoder(Sf24000, 1),
+          OpusEncoder(Sf48000, 1)
+        )
+        val d = List(
+          OpusDecoderShort(Sf8000, 1),
+          OpusDecoderShort(Sf12000, 1),
+          OpusDecoderShort(Sf16000, 1),
+          OpusDecoderShort(Sf24000, 1),
+          OpusDecoderShort(Sf48000, 1)
+        )
         Then("the encoder structures return the correct sample frequency it was configured for")
         for ((f, t) <- freqs zip e) {
           t.getSampleRate should equal(f)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ case class G711uDecoderShort(fs: SampleFrequency, channels: Int) extends Decoder
     }
     up match {
       case Some(u) => Success(floatToShort(u.process(shortToFloat(out))))
-      case None => Success(out)
+      case None    => Success(out)
     }
   }
 
@@ -149,7 +149,7 @@ case class G711uDecoderFloat(fs: SampleFrequency, channels: Int) extends Decoder
     }
     up match {
       case Some(u) => Success(u.process(out))
-      case None => Success(out)
+      case None    => Success(out)
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,4 +78,3 @@ object Audio extends Application {
 object LowDelay extends Application {
   def apply(): Int = OPUS_APPLICATION_RESTRICTED_LOWDELAY
 }
-

@@ -10,7 +10,7 @@ package za.co.monadic.scopus.dsp
   * @param b The coefficients of the polynomial defining the xeros in the Z-domain
   */
 case class Filter(order: Int, a: Array[Float], b: Array[Float]) {
-  require(order == a.length -1  && order == b.length - 1, "Order and coefficient array sizes must be equal")
+  require(order == a.length - 1 && order == b.length - 1, "Order and coefficient array sizes must be equal")
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package za.co.monadic.scopus.opus
 
 import za.co.monadic.scopus.Libraries
-
 
 trait OpusCodec {
   def getCodecName: String = "opus"
@@ -38,20 +37,24 @@ object Opus {
   def decoder_create(Fs: Int, channels: Int, error: Array[Int]): Long
 
   @native
-  def decode_short(decoder: Long,
-                   input: Array[Byte],
-                   inSize: Int,
-                   output: Array[Short],
-                   outSize: Int,
-                   decodeFEC: Int): Int
+  def decode_short(
+      decoder: Long,
+      input: Array[Byte],
+      inSize: Int,
+      output: Array[Short],
+      outSize: Int,
+      decodeFEC: Int
+  ): Int
 
   @native
-  def decode_float(decoder: Long,
-                   input: Array[Byte],
-                   inSize: Int,
-                   output: Array[Float],
-                   outSize: Int,
-                   decodeFEC: Int): Int
+  def decode_float(
+      decoder: Long,
+      input: Array[Byte],
+      inSize: Int,
+      output: Array[Float],
+      outSize: Int,
+      decodeFEC: Int
+  ): Int
 
   @native
   def decoder_get_nb_samples(data: Array[Byte], length: Int, fs: Int): Int

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 David Weber
+ * Copyright 2019 David Weber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enco
   require(channels == 1, s"The $getDetail supports only mono audio")
   import ArrayConversion._
 
-  private val BIAS     = 0x84 /* Bias for linear code. */
-  private val CLIP     = 8159
-  private val uEnd     = Array[Int](0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0x1FFF)
+  private val BIAS = 0x84 /* Bias for linear code. */
+  private val CLIP = 8159
+  private val uEnd = Array[Int](0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0x1FFF)
 
   private val factor = sampleFreq match {
     case Sf8000  => 1
