@@ -1,5 +1,4 @@
-before_install:
-  - sudo apt install -y libc6
+dist: bionic
 sudo: false
 language: scala
 scala:
