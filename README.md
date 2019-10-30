@@ -17,6 +17,10 @@ native C implementation. For example, on a 3.5Ghz i5, the Opus coder runs at
 1600 times real time. A native benchmark shows the encoder to run at 400 times
 real time. The LLVM C compiler (clang v3.4) pips GCC by about 5%.
 
+NOTE that the 0.4.0 build for Linux was done on Ubuntu 19:04 (disco dingo) and 
+relies on libc6. You may need to install this on your system to prevent dynamic
+link errors.
+
 The sources for Opus can be downloaded [here](http://www.opus-codec.org/downloads/).
 
 Licensing

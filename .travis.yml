@@ -1,6 +1,8 @@
 dist: bionic
 before_install:
   - sudo apt install -y libc6
+  - ls /lib/x86_64-linux-gnu
+
 language: scala
 scala:
    - 2.12.10
