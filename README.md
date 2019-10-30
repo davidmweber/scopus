@@ -4,7 +4,7 @@
 Scopus
 ------
 
-Scopus is a Scala interface to the [Opus 1.2.1](http://www.opus-codec.org) and 
+Scopus is a Scala interface to the [Opus 1.3.1](http://www.opus-codec.org) and 
 g.711u codecs. There is also a PCM "codec" which is effectively a NULL codec and is useful 
 in testing.
 
@@ -31,10 +31,9 @@ The native libraries can be built using the makefiles in the `src/native/opus
 directory`. You do need to have the Opus libraries and headers installed and
 copied to the appropriate native directories in the `resource` directory. You
 may have to customise the paths to the include file (jni.h) a little. The
-libraries libjni-opus.{so,dylib}, libopus.{so.0,0.dylib}  and
-libspeex{.so.1,1.dylib} should be placed in the appropriate
-`resources/native/` directory. Some resources to understanding this process
-are:
+libraries libjni-opus.{so,dylib} and libopus.{so.0,0.dylib} should be placed 
+in the appropriate `resources/native/` directory. Some resources to understanding 
+this process are:
 
 * [Benson Margulies' JNI test bed](https://github.com/bimargulies/jni-origin-testbed) shows how to avoid `LD_LIBRARY_PATH` hell.
 * Read the `ld` man page, especially the bit about -rpath=$ORIGIN (Linux) and @loader_path (OSX). It makes the magic work.

@@ -1,7 +1,7 @@
 # -*-makefile-*-
 
 CC=cc
-JAVA = 1.7.0.jdk
+JAVA = 1.8.0.jdk
 NATIVE = ../../resources/native/Mac\ OS\ X/x86_64/
 INCLUDES = -I/Library/Java/JavaVirtualMachines/$(JAVA)/Contents/Home/include\
 	   -I/Library/Java/JavaVirtualMachines/$(JAVA)/Contents/Home/include/darwin\
@@ -21,8 +21,6 @@ clean:
 $(TARGETLIB) : $(SOURCES:.c=.o)
 	$(CC) $(LDFLAGS) $(LDPATH) -o $@ $^ $(LIBS)
 	install_name_tool -change /usr/local/lib/libopus.0.dylib @loader_path/libopus.0.dylib $(TARGETLIB)
-	install_name_tool -change /usr/local/lib/libspeex.1.dylib @loader_path/libspeex.1.dylib $(TARGETLIB)
-	install_name_tool -change /usr/local/lib/libspeexdsp.1.dylib @loader_path/libspeexdsp.1.dylib $(TARGETLIB)
 
 install: $(TARGETLIB)
 	cp $(TARGETLIB) $(NATIVE)
