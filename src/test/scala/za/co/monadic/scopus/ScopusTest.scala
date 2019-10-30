@@ -8,7 +8,7 @@ package za.co.monadic.scopus
 import org.scalatest._
 import za.co.monadic.scopus.TestUtils._
 import za.co.monadic.scopus.echo.EchoCanceller
-import za.co.monadic.scopus.g711μ.{G711μDecoderFloat, G711μDecoderShort, G711μEncoder}
+import za.co.monadic.scopus.g711u.{G711uDecoderFloat, G711uDecoderShort, G711uEncoder}
 import za.co.monadic.scopus.opus._
 import za.co.monadic.scopus.speex._
 import za.co.monadic.scopus.pcm._
@@ -35,7 +35,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
      0.81),
     ("Opus", OpusEncoder(Sf8000, 1).complexity(2), OpusDecoderShort(Sf8000, 1), OpusDecoderFloat(Sf8000, 1), 0.90),
     ("PCM", PcmEncoder(Sf8000, 1), PcmDecoderShort(Sf8000, 1), PcmDecoderFloat(Sf8000, 1), 0.95),
-    ("g.711μ", G711μEncoder(Sf8000, 1), G711μDecoderShort(Sf8000, 1), G711μDecoderFloat(Sf8000, 1), 0.90)
+    ("g.711u", G711uEncoder(Sf8000, 1), G711uDecoderShort(Sf8000, 1), G711uDecoderFloat(Sf8000, 1), 0.90)
   )
 
   for ((desc, enc, dec, decFloat, corrMin) <- codecs) {
@@ -230,13 +230,13 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
   describe("The G711u codec") {
 
     it("fails if an invalid codec construction is requested") {
-      a[IllegalArgumentException] should be thrownBy G711μEncoder(Sf8000, 2)
-      a[IllegalArgumentException] should be thrownBy G711μDecoderFloat(Sf8000, 2)
-      a[IllegalArgumentException] should be thrownBy G711μDecoderShort(Sf8000, 2)
+      a[IllegalArgumentException] should be thrownBy G711uEncoder(Sf8000, 2)
+      a[IllegalArgumentException] should be thrownBy G711uDecoderFloat(Sf8000, 2)
+      a[IllegalArgumentException] should be thrownBy G711uDecoderShort(Sf8000, 2)
 
-      a[RuntimeException] should be thrownBy G711μEncoder(Sf12000, 1)
-      a[RuntimeException] should be thrownBy G711μDecoderShort(Sf12000, 1)
-      a[RuntimeException] should be thrownBy G711μDecoderFloat(Sf12000, 1)
+      a[RuntimeException] should be thrownBy G711uEncoder(Sf12000, 1)
+      a[RuntimeException] should be thrownBy G711uDecoderShort(Sf12000, 1)
+      a[RuntimeException] should be thrownBy G711uDecoderFloat(Sf12000, 1)
     }
 
     it("encodes and decodes a Float signal, generating the correct output") {
@@ -247,8 +247,8 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
           val l: Int = (0.04 * sf()).toInt
           val f      = pickFreq(100, l, sf)
           val x      = genSine(f, l, sf)
-          val enc    = G711μEncoder(sf, 1)
-          val dec    = G711μDecoderFloat(sf, 1)
+          val enc    = G711uEncoder(sf, 1)
+          val dec    = G711uDecoderFloat(sf, 1)
           val e      = enc(x).get
           e.length shouldBe l / factor
           dec(enc(x).get) // Work past transient from filter startup
@@ -267,8 +267,8 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
           val l: Int = (0.04 * sf()).toInt
           val f      = pickFreq(100, l, sf)
           val x      = floatToShort(genSine(f, l, sf))
-          val enc    = G711μEncoder(sf, 1)
-          val dec    = G711μDecoderShort(sf, 1)
+          val enc    = G711uEncoder(sf, 1)
+          val dec    = G711uDecoderShort(sf, 1)
           val e      = enc(x).get
           e.length shouldBe l / factor
           dec(enc(x).get) // Work past transient from filter startup
@@ -305,7 +305,7 @@ class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAnd
       val enc = OpusEncoder(Sf8000, 1)
       enc.setUseDtx(1)
       val coded = for (c <- chunksFloat) yield enc(c).get
-      coded.count(enc.isDTX) shouldBe 7
+      coded.count(enc.isDTX) shouldBe 6
       val blank = Array.fill[Float](chunkSize)(0.0f)
       // With DTS, packets are either 1 or 6 bytes long. The 6 byte one gets transmitted, the
       // 1 byte long packets should not be transmitted.

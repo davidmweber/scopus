@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package za.co.monadic.scopus.g711μ
+package za.co.monadic.scopus.g711u
 
 import za.co.monadic.scopus.dsp.Downsampler
 import za.co.monadic.scopus._
 
 import scala.util.{Success, Try}
 
-case class G711μEncoder(sampleFreq: SampleFrequency, channels: Int) extends Encoder with G711μCodec {
+case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Encoder with G711uCodec {
 
   require(channels == 1, s"The $getDetail supports only mono audio")
   import ArrayConversion._
@@ -134,7 +134,7 @@ case class G711μEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enc
   /**
     * @return A discription of this instance of an encoder or decoder
     */
-  override def getDetail: String = "G.711u μ-law encoder"
+  override def getDetail: String = "G.711u u-law encoder"
 
   /**
     * Reset the underlying codec.
