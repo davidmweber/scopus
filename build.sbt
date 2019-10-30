@@ -1,6 +1,6 @@
 name := "Scopus"
 organization := "za.co.monadic"
-version := "0.4.0-SNAPSHOT"
+version := "0.4.0"
 scalaVersion := "2.13.1"
 crossScalaVersions := Seq("2.12.10", "2.13.1")
 fork in Test := true
