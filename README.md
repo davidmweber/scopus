@@ -91,16 +91,13 @@ rate goals. If the encoder is set to decode to a 48kHz sampling rate, it expects
 to reach 48kHz. Similarly, a decoder configured for 48kHz will first downsample the
 signal to 8kHz then u-Law encode it. Stereo is not supported for this mode.
 
-There are restrictions on the size of the input buffer. For Speex, all audio
-frames must be 20ms long. For 8kHz sampling rate, this is 20ms. For Opus,
+There are restrictions on the size of the input buffer. For Opus,
 audio frames may be one of the following durations: 2.5, 5, 10, 20, 40 or 60
 ms. Smaller values obviously give less delay but at the expense of slightly
 less efficient compression. Note that Java is big endian while most raw audio
 data are little endian (at least on Intel Architectures). This means you may
 have to do some byte swapping when reading audio streams from external
 sources.
-
-Opus can handle two channels while the Speex codec is restricted to 1 channel.
 
 Scala does not seem to have a [convention for error
 handling](http://grokbase.com/t/gg/scala-user/1293fwp1je/trying-to-work-with-try). 
