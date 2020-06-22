@@ -1,17 +1,21 @@
 name := "Scopus"
 organization := "za.co.monadic"
-version := "0.4.1"
+version := "0.4.2"
 scalaVersion := "2.13.1"
-crossScalaVersions := Seq("2.12.10", "2.13.1")
+crossScalaVersions := Seq("2.12.11", "2.13.2")
+scalacOptions ++= Seq(
+  "-deprecation"
+)
 fork in Test := true
 
 organizationName := "David Weber"
-startYear := Some(2014)
+startYear := Some(2020)
 licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
 homepage := Some(url("https://github.com/davidmweber/scopus"))
 
 libraryDependencies ++= List(
-  "org.scalatest" %% "scalatest" % "3.0.8" % "test"
+  "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.0" % "test",
+  "org.scalatest" %% "scalatest-funspec" % "3.2.0" % "test"
 )
 
 publishMavenStyle := true

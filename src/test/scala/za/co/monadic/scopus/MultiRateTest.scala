@@ -3,10 +3,11 @@
   */
 package za.co.monadic.scopus
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import za.co.monadic.scopus.dsp._
 
-class MultiRateTest extends FunSpec with Matchers {
+class MultiRateTest extends AnyFunSpec with Matchers {
 
   import FreqUtils._
 

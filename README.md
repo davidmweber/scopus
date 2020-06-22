@@ -21,7 +21,7 @@ The sources for Opus can be downloaded [here](http://www.opus-codec.org/download
 
 Licensing
 ---------
-Scopus by David Weber is released under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)) license.
+Scopus by David Weber. Released under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0.txt) license.
 
 Building
 --------

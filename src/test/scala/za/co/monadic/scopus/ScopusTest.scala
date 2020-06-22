@@ -5,7 +5,9 @@ package za.co.monadic.scopus
  * Released under the Creative Commons License (http://creativecommons.org/licenses/by/4.0/legalcode)
  */
 
-import org.scalatest._
+import org.scalatest.{BeforeAndAfterAll, GivenWhenThen}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import za.co.monadic.scopus.TestUtils._
 import za.co.monadic.scopus.g711u.{G711uDecoderFloat, G711uDecoderShort, G711uEncoder}
 import za.co.monadic.scopus.opus._
@@ -13,7 +15,7 @@ import za.co.monadic.scopus.pcm._
 
 import scala.util.{Failure, Success, Try}
 
-class ScopusTest extends FunSpec with Matchers with GivenWhenThen with BeforeAndAfterAll {
+class ScopusTest extends AnyFunSpec with Matchers with GivenWhenThen with BeforeAndAfterAll {
 
   val audio: Array[Short]      = readAudioFile("test/audio_samples/torvalds-says-linux.int.raw")
   val audioFloat: Array[Float] = audio.map(_.toFloat / (1 << 15))
