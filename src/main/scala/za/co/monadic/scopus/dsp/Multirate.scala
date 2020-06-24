@@ -181,7 +181,7 @@ case class Upsampler(factor: Int) extends FilterIIR(MultirateFilterFactory(facto
     * Process a signal, increasing its effective sample rate
     * @param x Signal to be upsampled
     */
-  def process(x: Array[Float]): Array[Float] = filter(interpolate(x), factor)
+  def process(x: Array[Float]): Array[Float] = filter(interpolate(x), factor.toFloat)
 }
 
 /**
