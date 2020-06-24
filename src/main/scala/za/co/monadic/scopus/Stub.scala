@@ -21,7 +21,6 @@ import za.co.monadic.scopus.opus.{OpusEncoder, OpusDecoderShort}
 import scala.util.Try
 
 /**
-  *
   */
 object Stub extends App {
 

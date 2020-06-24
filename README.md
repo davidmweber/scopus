@@ -62,7 +62,7 @@ Scopus is available from the Sonatype Maven repo with builds for Scala 2.12 and 
 following dependency to your sbt build:
 
 ```scala
-  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.4.1"
+  libaryDependencies +=  "za.co.monadic" %% "scopus" % "0.5.0"
 ```
 
 Encoding a stream is pretty simple. Return types are Scala are wrapped in a `Try[_]`
@@ -98,6 +98,12 @@ less efficient compression. Note that Java is big endian while most raw audio
 data are little endian (at least on Intel Architectures). This means you may
 have to do some byte swapping when reading audio streams from external
 sources.
+
+Individual instances of encoders and decoders are not thread safe as they *have* to
+be called sequentially to maintain the state of the encoder/decoder. The Opus codec
+instances use a shared decode buffer which is not thread safe. In practice, if you
+are calling decode on the same instance of the codec, you are managing the stream
+incorrectly.
 
 Scala does not seem to have a [convention for error
 handling](http://grokbase.com/t/gg/scala-user/1293fwp1je/trying-to-work-with-try). 

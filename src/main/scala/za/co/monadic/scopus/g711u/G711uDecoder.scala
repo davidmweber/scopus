@@ -57,16 +57,8 @@ case class G711uDecoderShort(fs: SampleFrequency, channels: Int) extends Decoder
   import G711uDecoder.uToLin
   import ArrayConversion._
 
-  private val factor = fs match {
-    case Sf8000  => 1
-    case Sf16000 => 2
-    case Sf24000 => 3
-    case Sf32000 => 4
-    case Sf48000 => 6
-    case _       => throw new RuntimeException("Unsupported sample rate conversion")
-  }
-
-  private val up = if (factor == 1) None else Some(Upsampler(factor))
+  private val factor = toFactor(fs)
+  private val up     = if (factor == 1) None else Some(Upsampler(factor))
 
   /**
     * Decode an audio packet to an array of Shorts
@@ -123,16 +115,8 @@ case class G711uDecoderFloat(fs: SampleFrequency, channels: Int) extends Decoder
 
   require(channels == 1, s"The $getDetail supports only mono audio")
 
-  private val factor = fs match {
-    case Sf8000  => 1
-    case Sf16000 => 2
-    case Sf24000 => 3
-    case Sf32000 => 4
-    case Sf48000 => 6
-    case _       => throw new RuntimeException("Unsupported sample rate conversion")
-  }
-
-  private val up = if (factor == 1) None else Some(Upsampler(factor))
+  private val factor = toFactor(fs)
+  private val up     = if (factor == 1) None else Some(Upsampler(factor))
 
   /**
     * Decode an audio packet to an array of Floats

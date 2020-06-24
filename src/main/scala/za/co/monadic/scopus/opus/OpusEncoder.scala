@@ -40,6 +40,8 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
   val error: Array[Int] = Array[Int](0)
   val decodePtr         = new Array[Byte](bufferSize)
   val encoder: Long     = encoder_create(sampleFreq(), channels, app(), error)
+  private var lastPacketWasSilent = false
+
   if (error(0) != OPUS_OK) {
     throw new RuntimeException(s"Failed to create the Opus encoder: ${error_string(error(0))}")
   }
@@ -47,14 +49,21 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
 
   def getDetail = s"Opus encoder with sf= ${sampleFreq()}"
 
+  private def updateLastPacketStatus(len: Int): Unit = {
+    if (len == 1) {
+      lastPacketWasSilent = true
+    } else {
+      lastPacketWasSilent = false
+    }
+  }
   /**
     * Encode a block of raw audio  in integer format using the configured encoder
     * @param audio Audio data arranged as a contiguous block interleaved array of short integers
     * @return An array containing the compressed audio or the exception in case of a failure
     */
   def apply(audio: Array[Short]): Try[Array[Byte]] = {
-    val len: Int =
-      encode_short(encoder, audio, audio.length, decodePtr, bufferSize)
+    val len: Int = encode_short(encoder, audio, audio.length, decodePtr, bufferSize)
+    updateLastPacketStatus(len)
     if (len < 0)
       Failure(new IllegalArgumentException(s"opus_encode() failed: ${error_string(len)}"))
     else
@@ -68,6 +77,7 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
     */
   def apply(audio: Array[Float]): Try[Array[Byte]] = {
     val len = encode_float(encoder, audio, audio.length, decodePtr, bufferSize)
+    updateLastPacketStatus(len)
     if (len < 0)
       Failure(new RuntimeException(s"opus_encode_float() failed: ${error_string(len)}"))
     else
@@ -267,13 +277,33 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
   def getPredictionDisable: Int = getter(OPUS_GET_PREDICTION_DISABLED_REQUEST)
 
   /**
-    * Test if the packet is an Opus DTX (silent) packet. In practice, if
-    * this is true then don't transmit this packet.
+    *  Returns 1 if the codec is in DTX mode. Confusingly, it sets DTX mode based
+    *  on the current packet which which may still need to be transmitted. It seems like
+    *  the best test for DTX is to check if the encoded packet's length is 1 before deciding
+    *  to transmit it.
+    */
+  def getInDtx: Int = getter(OPUS_GET_IN_DTX_REQUEST)
+
+  /**
+    * If this is true, the encoder was in DTX mode when it encoded the last packet. This packet
+    * would be either comfort noise or zeros. Typically, one would transmit a comfort noise packet
+    * and not a silence packet. Some cases call for not sending either. If this is your
+    * case, use this to test if one should transmit the packet or not.
+    * See https://tools.ietf.org/html/rfc3551 for details on how to handle DTX.
+    *
+    * @return true if the codec is either comfort noise or not encoded because of DTX
+    */
+  override def wasDtx: Boolean = getInDtx == 1
+
+  /**
+    * Test if the packet is an Opus DTX (silent) packet and should not be transmitted.
+    * This means the codec is sending a silence packet instead of a comfort noise packet.
     * @param audio Opus compressed packet
     * @return True if it is a DTX packet
     */
   override def isDTX(audio: Array[Byte]): Boolean = audio.length <= 2
 
+  override def wasSilentPacket: Boolean = lastPacketWasSilent
 }
 
 object OpusEncoder {

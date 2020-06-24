@@ -1,7 +1,7 @@
 name := "Scopus"
 organization := "za.co.monadic"
-version := "0.4.2"
-scalaVersion := "2.13.1"
+version := "0.5.0"
+scalaVersion := "2.13.2"
 crossScalaVersions := Seq("2.12.11", "2.13.2")
 scalacOptions ++= Seq(
   "-deprecation"

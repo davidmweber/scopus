@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 David Weber
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package za.co.monadic.scopus
 
 /*
@@ -243,8 +259,13 @@ class ScopusTest extends AnyFunSpec with Matchers with GivenWhenThen with Before
     it("detects silence packets in DTX mode") {
       val enc = OpusEncoder(Sf8000, 1)
       enc.setUseDtx(1)
-      val coded = for (c <- chunksFloat) yield enc(c).get
-      coded.count(enc.isDTX) shouldBe 6
+      val coded = for (c <- chunksFloat) yield {
+        val ret = enc(c).get
+        (ret, enc.wasSilentPacket, enc.wasDtx)
+      }
+      coded.count(t => enc.isDTX(t._1)) shouldBe 6 // Tests old API
+      coded.count(t => t._2) shouldBe 6
+      coded.count(t => t._3) shouldBe 7
       val blank = Array.fill[Float](chunkSize)(0.0f)
       // With DTS, packets are either 1 or 6 bytes long. The 6 byte one gets transmitted, the
       // 1 byte long packets should not be transmitted.

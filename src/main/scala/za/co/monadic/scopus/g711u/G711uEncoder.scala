@@ -26,18 +26,10 @@ case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enco
   require(channels == 1, s"The $getDetail supports only mono audio")
   import ArrayConversion._
 
-  private val BIAS = 0x84 /* Bias for linear code. */
-  private val CLIP = 8159
-  private val uEnd = Array[Int](0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0x1FFF)
-
-  private val factor = sampleFreq match {
-    case Sf8000  => 1
-    case Sf16000 => 2
-    case Sf24000 => 3
-    case Sf32000 => 4
-    case Sf48000 => 6
-    case _       => throw new RuntimeException("Unsupported sample rate conversion")
-  }
+  private val BIAS   = 0x84 /* Bias for linear code. */
+  private val CLIP   = 8159
+  private val uEnd   = Array[Int](0x3f, 0x7f, 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff)
+  private val factor = toFactor(sampleFreq)
 
   private val down = if (factor == 1) None else Some(Downsampler(factor))
 
@@ -52,9 +44,9 @@ case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enco
   private def toMu(xIn: Short): Byte = {
     val xScale: Int = xIn >> 2
     var (x, mask) = if (xScale < 0) {
-      (-xScale - 1, 0x7F)
+      (-xScale - 1, 0x7f)
     } else {
-      (xScale, 0xFF)
+      (xScale, 0xff)
     }
     if (x > CLIP) x = CLIP /* clip the magnitude */
     x += (BIAS >> 2)
@@ -67,14 +59,15 @@ case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enco
      * and complement the code word.
      */
     if (seg >= 8)
-      ((0x7F ^ mask) & 0xFF).toByte /* out of range, return maximum value. */
+      ((0x7f ^ mask) & 0xff).toByte /* out of range, return maximum value. */
     else {
-      val uval = (seg << 4) | ((x >> (seg + 1)) & 0xF)
-      ((uval ^ mask) & 0xFF).toByte
+      val uval = (seg << 4) | ((x >> (seg + 1)) & 0xf)
+      ((uval ^ mask) & 0xff).toByte
     }
   }
 
   private def toMu(xIn: Float): Byte = toMu((xIn * PCM_NORM).toShort)
+
 
   /**
     * Encode a block of raw audio in integer format using the configured encoder

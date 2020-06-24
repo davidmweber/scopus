@@ -16,6 +16,24 @@
 
 package za.co.monadic.scopus.g711u
 
+import za.co.monadic.scopus.{SampleFrequency, Sf16000, Sf24000, Sf32000, Sf48000, Sf8000}
+
 trait G711uCodec {
   def getCodecName: String = "g711u"
+
+  /**
+    * Calculates the downsample factor needed for the input sampling frequency
+    * @param fs The sample frequecy of the current signal
+    * @return An integer indicating the decimation factor to achieve 8kHz sampling required by this codec
+    */
+  def toFactor(fs: SampleFrequency): Int =
+    fs match {
+      case Sf8000  => 1
+      case Sf16000 => 2
+      case Sf24000 => 3
+      case Sf32000 => 4
+      case Sf48000 => 6
+      case _       => throw new RuntimeException("Unsupported sample rate conversion")
+    }
+
 }

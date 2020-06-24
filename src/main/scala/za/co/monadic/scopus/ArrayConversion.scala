@@ -31,7 +31,7 @@ object ArrayConversion {
     val dest = new Array[Short](in.length / 2)
     var i    = 0
     while (i < dest.length) {
-      dest(i) = (((in(2 * i + 1) & 0xff) << 8) | (in(2 * i) & 0xFF)).toShort
+      dest(i) = (((in(2 * i + 1) & 0xff) << 8) | (in(2 * i) & 0xff)).toShort
       i += 1
     }
     dest
@@ -46,8 +46,8 @@ object ArrayConversion {
     val dest = new Array[Byte](in.length * 2)
     var i    = 0
     while (i < in.length) {
-      dest(2 * i) = (in(i) & 0xFF).toByte
-      dest(2 * i + 1) = ((in(i) & 0xFF00) >> 8).toByte
+      dest(2 * i) = (in(i) & 0xff).toByte
+      dest(2 * i + 1) = ((in(i) & 0xff00) >> 8).toByte
       i += 1
     }
     dest
@@ -58,10 +58,10 @@ object ArrayConversion {
     var i    = 0
     while (i < in.length) {
       val temp = java.lang.Float.floatToIntBits(in(i))
-      dest(4 * i) = (temp & 0xFF).toByte
-      dest(4 * i + 1) = ((temp & 0xFF00) >> 8).toByte
-      dest(4 * i + 2) = ((temp & 0xFF0000) >> 16).toByte
-      dest(4 * i + 3) = ((temp & 0xFF000000) >> 24).toByte
+      dest(4 * i) = (temp & 0xff).toByte
+      dest(4 * i + 1) = ((temp & 0xff00) >> 8).toByte
+      dest(4 * i + 2) = ((temp & 0xff0000) >> 16).toByte
+      dest(4 * i + 3) = ((temp & 0xff000000) >> 24).toByte
       i += 1
     }
     dest
@@ -72,10 +72,10 @@ object ArrayConversion {
     val dest = new Array[Float](in.length / 4)
     var i    = 0
     while (i < dest.length) {
-      val temp = ((in(4 * i + 3) & 0xFF) << 24) |
-        ((in(4 * i + 2) & 0xFF) << 16) |
-        ((in(4 * i + 1) & 0xFF) << 8) |
-        (in(4 * i) & 0xFF)
+      val temp = ((in(4 * i + 3) & 0xff) << 24) |
+        ((in(4 * i + 2) & 0xff) << 16) |
+        ((in(4 * i + 1) & 0xff) << 8) |
+        (in(4 * i) & 0xff)
       dest(i) = java.lang.Float.intBitsToFloat(temp)
       i += 1
     }

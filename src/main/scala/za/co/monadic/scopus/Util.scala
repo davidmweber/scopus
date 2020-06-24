@@ -28,15 +28,16 @@ sealed trait SampleFrequency {
 
 object SampleFrequency {
 
-  def convert(freq: Int): SampleFrequency = freq match {
-    case 8000  => Sf8000
-    case 12000 => Sf12000
-    case 16000 => Sf16000
-    case 24000 => Sf24000
-    case 32000 => Sf32000
-    case 48000 => Sf48000
-    case x     => throw new IllegalArgumentException(s"Sampling frequency $x is unsupported.")
-  }
+  def convert(freq: Int): SampleFrequency =
+    freq match {
+      case 8000  => Sf8000
+      case 12000 => Sf12000
+      case 16000 => Sf16000
+      case 24000 => Sf24000
+      case 32000 => Sf32000
+      case 48000 => Sf48000
+      case x     => throw new IllegalArgumentException(s"Sampling frequency $x is unsupported.")
+    }
 }
 
 object Sf8000 extends SampleFrequency {

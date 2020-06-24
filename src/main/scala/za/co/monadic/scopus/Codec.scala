@@ -51,12 +51,23 @@ trait Codec {
   def getCodecName: String
 
   /**
-    * Returns true if the compressed audio packet is DTX. In practice, if
-    * this is true then don't transmit this packet.
+    * Returns true if the compressed audio packet is DTX.
     * @param compressedAudio A compressed audio packet for this codec
     * @return True if the packet is DTX and should not be transmitted
     */
+  @deprecated
   def isDTX(compressedAudio: Array[Byte]): Boolean = false
+
+  /**
+    * True if the last packet was silent and should not be transmitted
+    * @return True if it is a silent packet
+    */
+  def wasSilentPacket: Boolean = false
+
+  /**
+    * @return true if the codec is either comfort noise or not encoded because of DTX
+    */
+  def wasDtx: Boolean = false
 }
 
 trait Decoder {

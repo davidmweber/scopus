@@ -162,8 +162,10 @@ object Opus {
   final val OPUS_GET_LAST_PACKET_DURATION_REQUEST: Int      = 4039
   final val OPUS_GET_PREDICTION_DISABLED_REQUEST: Int       = 4043
   final val OPUS_GET_GAIN_REQUEST: Int                      = 4045
+  final val OPUS_GET_IN_DTX_REQUEST                         = 4049
   final val OPUS_BANDWIDTH_WIDEBAND: Int                    = 1103
   final val OPUS_INVALID_PACKET: Int                        = -4
   final val OPUS_ALLOC_FAIL: Int                            = -7
   final val OPUS_OK: Int                                    = 0
+
 }

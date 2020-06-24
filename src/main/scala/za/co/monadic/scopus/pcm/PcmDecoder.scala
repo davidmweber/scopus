@@ -87,15 +87,16 @@ case class PcmDecoderShort(fs: SampleFrequency, channels: Int) extends DecoderSh
     * @param ca The incoming audio packet
     * @return A Try containing decoded audio in Short format
     */
-  override def apply(ca: Array[Byte]): Try[Array[Short]] = Try {
-    if (ca.length > 0) {
-      ca(0) match {
-        case 0 => byteArrayToShortArray(ca.drop(1))
-        case 1 => byteArrayToFloatArray(ca.drop(1)).map((f: Float) => (f * 32768.0f).round.toShort)
-        case s => throw new IllegalArgumentException(s"Type $s cannot be decoded")
-      }
-    } else throw new IllegalArgumentException(s"Byte Array length cannot be zero")
-  }
+  override def apply(ca: Array[Byte]): Try[Array[Short]] =
+    Try {
+      if (ca.length > 0) {
+        ca(0) match {
+          case 0 => byteArrayToShortArray(ca.drop(1))
+          case 1 => byteArrayToFloatArray(ca.drop(1)).map((f: Float) => (f * 32768.0f).round.toShort)
+          case s => throw new IllegalArgumentException(s"Type $s cannot be decoded")
+        }
+      } else throw new IllegalArgumentException(s"Byte Array length cannot be zero")
+    }
 
   /**
     * Decode an erased (i.e. not received) audio packet. Note you need to specify
