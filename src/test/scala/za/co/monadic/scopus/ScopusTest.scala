@@ -21,9 +21,9 @@ package za.co.monadic.scopus
  * Released under the Creative Commons License (http://creativecommons.org/licenses/by/4.0/legalcode)
  */
 
-import org.scalatest.{BeforeAndAfterAll, GivenWhenThen}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.{BeforeAndAfterAll, GivenWhenThen}
 import za.co.monadic.scopus.TestUtils._
 import za.co.monadic.scopus.g711u.{G711uDecoderFloat, G711uDecoderShort, G711uEncoder}
 import za.co.monadic.scopus.opus._
@@ -44,6 +44,13 @@ class ScopusTest extends AnyFunSpec with Matchers with GivenWhenThen with Before
 
   val codecs = List(
     ("Opus", OpusEncoder(Sf8000, 1).complexity(2), OpusDecoderShort(Sf8000, 1), OpusDecoderFloat(Sf8000, 1), 0.90),
+    (
+      "Opus stereo",
+      OpusEncoder(Sf8000, 2).complexity(2),
+      OpusDecoderShort(Sf8000, 2),
+      OpusDecoderFloat(Sf8000, 2),
+      0.80
+    ),
     ("PCM", PcmEncoder(Sf8000, 1), PcmDecoderShort(Sf8000, 1), PcmDecoderFloat(Sf8000, 1), 0.95),
     ("g.711u", G711uEncoder(Sf8000, 1), G711uDecoderShort(Sf8000, 1), G711uDecoderFloat(Sf8000, 1), 0.90)
   )
@@ -214,8 +221,8 @@ class ScopusTest extends AnyFunSpec with Matchers with GivenWhenThen with Before
     }
 
     it("encodes and decodes a Short signal, generating the correct output") {
-      import FreqUtils._
       import ArrayConversion._
+      import FreqUtils._
       val freqTable = Map(1 -> Sf8000, 2 -> Sf16000, 3 -> Sf24000, 4 -> Sf32000, 6 -> Sf48000)
       freqTable.foreach {
         case (factor, sf) =>

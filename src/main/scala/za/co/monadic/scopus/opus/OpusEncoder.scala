@@ -16,8 +16,8 @@
 
 package za.co.monadic.scopus.opus
 
-import Opus._
-import za.co.monadic.scopus.{Encoder, Application, SampleFrequency, Voip}
+import za.co.monadic.scopus.opus.Opus._
+import za.co.monadic.scopus.{Application, Encoder, SampleFrequency, Voip}
 
 import scala.util.{Failure, Success, Try}
 
@@ -37,9 +37,9 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
     extends Encoder
     with OpusCodec {
   require(bufferSize > 0, "Buffer size must be positive")
-  val error: Array[Int] = Array[Int](0)
-  val decodePtr         = new Array[Byte](bufferSize)
-  val encoder: Long     = encoder_create(sampleFreq(), channels, app(), error)
+  val error: Array[Int]           = Array[Int](0)
+  val decodePtr                   = new Array[Byte](bufferSize)
+  val encoder: Long               = encoder_create(sampleFreq(), channels, app(), error)
   private var lastPacketWasSilent = false
 
   if (error(0) != OPUS_OK) {
@@ -56,13 +56,14 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
       lastPacketWasSilent = false
     }
   }
+
   /**
     * Encode a block of raw audio  in integer format using the configured encoder
     * @param audio Audio data arranged as a contiguous block interleaved array of short integers
     * @return An array containing the compressed audio or the exception in case of a failure
     */
   def apply(audio: Array[Short]): Try[Array[Byte]] = {
-    val len: Int = encode_short(encoder, audio, audio.length, decodePtr, bufferSize)
+    val len: Int = encode_short(encoder, audio, audio.length / channels, decodePtr, bufferSize)
     updateLastPacketStatus(len)
     if (len < 0)
       Failure(new IllegalArgumentException(s"opus_encode() failed: ${error_string(len)}"))
@@ -76,7 +77,7 @@ class OpusEncoder(sampleFreq: SampleFrequency, channels: Int, app: Application, 
     * @return An array containing the compressed audio or the exception in case of a failure
     */
   def apply(audio: Array[Float]): Try[Array[Byte]] = {
-    val len = encode_float(encoder, audio, audio.length, decodePtr, bufferSize)
+    val len = encode_float(encoder, audio, audio.length / channels, decodePtr, bufferSize)
     updateLastPacketStatus(len)
     if (len < 0)
       Failure(new RuntimeException(s"opus_encode_float() failed: ${error_string(len)}"))
