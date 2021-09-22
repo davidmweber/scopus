@@ -120,7 +120,7 @@ class OpusDecoderShort(val fs: SampleFrequency, val channels: Int) extends Decod
     if (len < 0)
       Failure(new RuntimeException(s"opus_decode() failed: ${error_string(len)}"))
     else
-      Success(decodedBuf.slice(0, len))
+      Success(decodedBuf.slice(0, len * channels))
   }
 
   /**
@@ -177,7 +177,7 @@ class OpusDecoderFloat(val fs: SampleFrequency, val channels: Int) extends Decod
     if (len < 0)
       Failure(new RuntimeException(s"opus_decode_float() failed: ${error_string(len)}"))
     else
-      Success(decodedBuf.slice(0, len))
+      Success(decodedBuf.slice(0, len * channels))
   }
 
   /**

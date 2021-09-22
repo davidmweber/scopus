@@ -1,6 +1,6 @@
 name := "Scopus"
 organization := "za.co.monadic"
-version := "0.5.0"
+version := "0.5.1"
 scalaVersion := "2.13.2"
 crossScalaVersions := Seq("2.12.11", "2.13.2")
 scalacOptions ++= Seq(
@@ -15,7 +15,7 @@ homepage := Some(url("https://github.com/davidmweber/scopus"))
 
 libraryDependencies ++= List(
   "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.0" % "test",
-  "org.scalatest" %% "scalatest-funspec" % "3.2.0" % "test"
+  "org.scalatest" %% "scalatest-funspec"        % "3.2.0" % "test"
 )
 
 publishMavenStyle := true
