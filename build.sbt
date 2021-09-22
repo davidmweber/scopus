@@ -1,8 +1,8 @@
 name := "Scopus"
 organization := "za.co.monadic"
-version := "0.5.1"
-scalaVersion := "2.13.2"
-crossScalaVersions := Seq("2.12.11", "2.13.2")
+version := "0.5.2"
+scalaVersion := "2.13.6"
+crossScalaVersions := Seq("2.12.15", "2.13.6")
 scalacOptions ++= Seq(
   "-deprecation"
 )
@@ -14,8 +14,8 @@ licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.
 homepage := Some(url("https://github.com/davidmweber/scopus"))
 
 libraryDependencies ++= List(
-  "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.0" % "test",
-  "org.scalatest" %% "scalatest-funspec"        % "3.2.0" % "test"
+  "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.9" % "test",
+  "org.scalatest" %% "scalatest-funspec"        % "3.2.9" % "test"
 )
 
 publishMavenStyle := true
