@@ -23,7 +23,6 @@ import scala.util.{Success, Try}
 
 case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Encoder with G711uCodec {
 
-  require(channels == 1, s"The $getDetail supports only mono audio")
   import ArrayConversion._
 
   private val BIAS   = 0x84 /* Bias for linear code. */
@@ -68,7 +67,6 @@ case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enco
 
   private def toMu(xIn: Float): Byte = toMu((xIn * PCM_NORM).toShort)
 
-
   /**
     * Encode a block of raw audio in integer format using the configured encoder
     *
@@ -76,10 +74,11 @@ case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enco
     * @return An array containing the compressed audio or the exception in case of a failure
     */
   override def apply(audio: Array[Short]): Try[Array[Byte]] = {
-    val out = new Array[Byte](audio.length / factor)
+    val mono = toMono(audio)
+    val out  = new Array[Byte](mono.length / factor)
     val dAudio = down match {
-      case Some(d) => floatToShort(d.process(shortToFloat(audio)))
-      case None    => audio
+      case Some(d) => floatToShort(d.process(shortToFloat(mono)))
+      case None    => mono
     }
     var i = 0
     while (i < dAudio.length) {
@@ -96,10 +95,11 @@ case class G711uEncoder(sampleFreq: SampleFrequency, channels: Int) extends Enco
     * @return An array containing the compressed audio or the exception in case of a failure
     */
   override def apply(audio: Array[Float]): Try[Array[Byte]] = {
-    val out = new Array[Byte](audio.length / factor)
+    val mono = toMono(audio)
+    val out  = new Array[Byte](mono.length / factor)
     val dAudio = down match {
-      case Some(d) => d.process(audio)
-      case None    => audio
+      case Some(d) => d.process(mono)
+      case None    => mono
     }
     var i = 0
     while (i < dAudio.length) {

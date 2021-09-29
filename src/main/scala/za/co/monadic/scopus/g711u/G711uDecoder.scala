@@ -52,8 +52,6 @@ private object G711uDecoder {
 
 case class G711uDecoderShort(fs: SampleFrequency, channels: Int) extends DecoderShort with G711uCodec {
 
-  require(channels == 1, s"The $getDetail supports only mono audio")
-
   import G711uDecoder.uToLin
   import ArrayConversion._
 
@@ -74,8 +72,8 @@ case class G711uDecoderShort(fs: SampleFrequency, channels: Int) extends Decoder
       i += 1
     }
     up match {
-      case Some(u) => Success(floatToShort(u.process(shortToFloat(out))))
-      case None    => Success(out)
+      case Some(u) => Success(toStereo(floatToShort(u.process(shortToFloat(out)))))
+      case None    => Success(toStereo(out))
     }
   }
 
@@ -113,8 +111,6 @@ case class G711uDecoderShort(fs: SampleFrequency, channels: Int) extends Decoder
 case class G711uDecoderFloat(fs: SampleFrequency, channels: Int) extends DecoderFloat with G711uCodec {
   import G711uDecoder.uToLinF
 
-  require(channels == 1, s"The $getDetail supports only mono audio")
-
   private val factor = toFactor(fs)
   private val up     = if (factor == 1) None else Some(Upsampler(factor))
 
@@ -132,8 +128,8 @@ case class G711uDecoderFloat(fs: SampleFrequency, channels: Int) extends Decoder
       i += 1
     }
     up match {
-      case Some(u) => Success(u.process(out))
-      case None    => Success(out)
+      case Some(u) => Success(toStereo(u.process(out)))
+      case None    => Success(toStereo(out))
     }
   }
 

@@ -21,6 +21,8 @@ import za.co.monadic.scopus.{SampleFrequency, Sf16000, Sf24000, Sf32000, Sf48000
 trait G711uCodec {
   def getCodecName: String = "g711u"
 
+  def channels: Int
+
   /**
     * Calculates the downsample factor needed for the input sampling frequency
     * @param fs The sample frequecy of the current signal
@@ -35,5 +37,103 @@ trait G711uCodec {
       case Sf48000 => 6
       case _       => throw new RuntimeException("Unsupported sample rate conversion")
     }
+
+  /**
+    * When audio codec is configured to use two channels, mix them into one.
+    * Otherwise return the source array.
+    *
+    * @param audio Audio data arranged as a contiguous block interleaved array of floats
+    * @return An array containing one mixed audio channel
+    */
+  def toMono(audio: Array[Float]): Array[Float] = {
+    if (channels == 1) {
+      audio
+    } else {
+      val out = new Array[Float](audio.length / 2)
+      var i   = 0
+      var j   = 0
+      while (i < audio.length - 1) {
+        out(j) = (audio(i) + audio(i + 1)) / 2f
+        i += 2
+        j += 1
+      }
+      out
+    }
+  }
+
+  /**
+    * When audio codec is configured to use two channels, mix them into one.
+    * Otherwise return the source array.
+    *
+    * @param audio Audio data arranged as a contiguous block interleaved array of short integers
+    * @return An array containing one mixed audio channel
+    */
+  def toMono(audio: Array[Short]): Array[Short] = {
+    if (channels == 1) {
+      audio
+    } else {
+      val out = new Array[Short](audio.length / 2)
+      var i   = 0
+      var j   = 0
+      while (i < audio.length - 1) {
+        out(j) = ((audio(i) + audio(i + 1)) / 2).toShort
+        i += 2
+        j += 1
+      }
+      out
+    }
+  }
+
+  /**
+    * When audio codec is configured to use two channels
+    * it duplicates one, mono channel into a stream containing left and right channel.
+    * Otherwise return the source array.
+    *
+    * @param audio Audio data arranged as a contiguous block array of floats
+    * @return An array containing interleaved array of duplicate audio channel.
+    */
+  def toStereo(audio: Array[Short]): Array[Short] = {
+    if (channels == 1) {
+      audio
+    } else {
+      val out = new Array[Short](audio.length * 2)
+      var i   = 0
+      var j   = 0
+      while (i < audio.length) {
+        val elem = audio(i)
+        out(j) = elem
+        out(j + 1) = elem
+        i += 1
+        j += 2
+      }
+      out
+    }
+  }
+
+  /**
+    * When audio codec is configured to use two channels
+    * it duplicates one, mono channel into a stream containing left and right channel.
+    * Otherwise return the source array.
+    *
+    * @param audio Audio data arranged as a contiguous block array of short integers
+    * @return An array containing interleaved array of duplicate audio channel.
+    */
+  def toStereo(audio: Array[Float]): Array[Float] = {
+    if (channels == 1) {
+      audio
+    } else {
+      val out = new Array[Float](audio.length * 2)
+      var i   = 0
+      var j   = 0
+      while (i < audio.length) {
+        val elem = audio(i)
+        out(j) = elem
+        out(j + 1) = elem
+        i += 1
+        j += 2
+      }
+      out
+    }
+  }
 
 }
