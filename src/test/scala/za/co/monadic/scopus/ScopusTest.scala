@@ -81,7 +81,8 @@ class ScopusTest extends AnyFunSpec with Matchers with GivenWhenThen with Before
       0.90
     ),
     ("PCM", mono, PcmEncoder(Sf8000, 1), PcmDecoderShort(Sf8000, 1), PcmDecoderFloat(Sf8000, 1), 0.95),
-    ("g.711u", mono, G711uEncoder(Sf8000, 1), G711uDecoderShort(Sf8000, 1), G711uDecoderFloat(Sf8000, 1), 0.90)
+    ("g.711u", mono, G711uEncoder(Sf8000, 1), G711uDecoderShort(Sf8000, 1), G711uDecoderFloat(Sf8000, 1), 0.90),
+    ("g.711u mono to stereo", mono, G711uEncoder(Sf8000, 2), G711uDecoderShort(Sf8000, 2), G711uDecoderFloat(Sf8000, 2), 0.90)
   )
 
   for ((desc, audio, enc, dec, decFloat, corrMin) <- codecs) {
@@ -226,10 +227,6 @@ class ScopusTest extends AnyFunSpec with Matchers with GivenWhenThen with Before
   describe("The G711u codec") {
 
     it("fails if an invalid codec construction is requested") {
-      a[IllegalArgumentException] should be thrownBy G711uEncoder(Sf8000, 2)
-      a[IllegalArgumentException] should be thrownBy G711uDecoderFloat(Sf8000, 2)
-      a[IllegalArgumentException] should be thrownBy G711uDecoderShort(Sf8000, 2)
-
       a[RuntimeException] should be thrownBy G711uEncoder(Sf12000, 1)
       a[RuntimeException] should be thrownBy G711uDecoderShort(Sf12000, 1)
       a[RuntimeException] should be thrownBy G711uDecoderFloat(Sf12000, 1)
