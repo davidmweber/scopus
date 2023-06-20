@@ -2,10 +2,12 @@
 
 CC=cc
 JAVA = 1.8.0.jdk
+LIBOPUSPATH = /opt/homebrew/Cellar/opus/1.3.1
 NATIVE = ../../resources/native/Mac\ OS\ X/x86_64/
 INCLUDES = -I/Library/Java/JavaVirtualMachines/$(JAVA)/Contents/Home/include\
 	   -I/Library/Java/JavaVirtualMachines/$(JAVA)/Contents/Home/include/darwin\
-	   -I/usr/local/include
+	   -I/usr/local/include\
+	   -I$(LIBOPUSPATH)/include
 CFLAGS = -Ofast -Wall -fPIC $(INCLUDES)
 LDFLAGS = -dynamiclib
 LDPATH = -L$(NATIVE)
@@ -17,13 +19,16 @@ all: $(TARGETLIB)
 
 clean:
 	rm -f *.o *~ $(TARGETLIB)
+	rm -f $(NATIVE)/$(TARGETLIB)
+	rm -f $(NATIVE)/libopus.0.dylib
 
 $(TARGETLIB) : $(SOURCES:.c=.o)
 	$(CC) $(LDFLAGS) $(LDPATH) -o $@ $^ $(LIBS)
-	install_name_tool -change /usr/local/lib/libopus.0.dylib @loader_path/libopus.0.dylib $(TARGETLIB)
+	install_name_tool -change $(LIBOPUSPATH)/lib/libopus.0.dylib @loader_path/libopus.0.dylib $(TARGETLIB)
 
 install: $(TARGETLIB)
 	cp $(TARGETLIB) $(NATIVE)
+	cp $(LIBOPUSPATH)/lib/libopus.0.dylib $(NATIVE)
 
 .c.o:
 	$(CC) -c  $(CFLAGS) $< -o $@

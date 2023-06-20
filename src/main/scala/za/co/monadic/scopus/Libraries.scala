@@ -30,6 +30,9 @@ object Libraries {
     case "Mac OS X/x86_64" =>
       LibLoader("libopus.0.dylib", load = false)
       LibLoader("libjni_opus.dylib")
+    case "Mac OS X/aarch64" =>
+      LibLoader("libopus.0.dylib", load = false)
+      LibLoader("libjni_opus.dylib")
     case s: String =>
       println(s"Unknown OS/platform combination: $s")
       sys.exit(-1)

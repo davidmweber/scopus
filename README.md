@@ -114,3 +114,17 @@ Try can be flatmapped which is important in my application.
 Future plans include adding codecs and abstracting the codec layer so they are
 more pluggable. Pull requests welcome.
 
+
+Building Native Libraries
+-----
+
+To build native libraries located under `src/main/resources/native` folder, go to `src/main/native/opus` folder 
+and run the following commands:
+
+```bash
+make -f Makefile.[platform]
+make -f Makefile.[platform] install
+make -f Makefile.[platform] clean
+```
+
+this will produce the appropriate files and locate them under `resources/native` folder.

@@ -1,6 +1,6 @@
 name := "Scopus"
 organization := "za.co.monadic"
-version := "0.5.3"
+version := "0.5.4"
 scalaVersion := "2.13.6"
 crossScalaVersions := Seq("2.12.15", "2.13.6")
 scalacOptions ++= Seq(
