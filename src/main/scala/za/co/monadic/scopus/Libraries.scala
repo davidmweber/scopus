@@ -33,6 +33,11 @@ object Libraries {
     case "Mac OS X/aarch64" =>
       LibLoader("libopus.0.dylib", load = false)
       LibLoader("libjni_opus.dylib")
+    case "Windows 10/amd64" =>
+      LibLoader("libopus-0.dll")
+      LibLoader("libspeex-1.dll")
+      LibLoader("libspeexdsp-1.dll")
+      LibLoader("libjni_opus.dll")
     case s: String =>
       println(s"Unknown OS/platform combination: $s")
       sys.exit(-1)
